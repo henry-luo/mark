@@ -46,7 +46,7 @@ Some disadvantages of Mark, comparing to JSON would be:
 Comparing to HTML, Mark has the following advantages:
 
 - Mark is a generic data format, whereas HTML is a specialized format for web content.
-- It does not have whitespace ambiguity, as the text objects need to be quoted explicitly.
+- It does not have whitespace ambiguity, as the text objects need to be quoted explicitly. Thus Mark can be minified or prettified without worrying about changing the underlying content.
 - Its properties can have complex values, like JSON, not just quoted string values in HTML.
 - It has a very clean syntax, whereas HTML5 parsing can be challenging even with HTML5 spec.
 - Its objects are always properly closed, like JSON and XHTML; whereas HTML self-closing tag rules are non-extensible and error-prone.
