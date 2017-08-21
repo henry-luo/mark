@@ -1,0 +1,61 @@
+{
+  "name": "mark-js",
+  "version": "0.1.0",
+  "description": "The core library for Mark, an unified notation for both object and markup data.",
+  "main": "mark.js",
+  "directories": {
+    "lib":  "lib",
+	"dist": "dist",
+	"bin":  "bin",
+	"dev":  "dev",
+	"test": "test"
+  },
+  "bin": {
+    "mark": "./bin/mark-bin.js",
+    "mark-convert": "./bin/mark-convert.js"
+  },
+  "scripts": {
+    "test": "CLS && tape test/*.js | tap-spec",
+    "test-coverage": "istanbul cover node_modules/tape/bin/tape ./test/*.js",
+	"build": "npm-run-all --parallel build-mark build-convert build-query",
+    "build-mark": "browserify -x ./lib/mark.convert.js -x ./lib/mark.query.js -x htmlparser2 -x domutils --standalone Mark mark.js | uglifyjs > dist/mark.js",
+    "build-convert": "browserify --standalone MarkConv -r ./lib/mark.convert.js | uglifyjs > dist/mark.convert.js",
+    "build-query": "browserify -x domutils --standalone MarkQuery -r ./lib/mark.query.js | uglifyjs > dist/mark.query.js",
+    "build-find": "browserify --full-paths -x debug ./dev/mark.find.js | discify --open",
+    "list-bundle": "browserify --full-paths -x ./lib/mark.convert.js -x ./lib/mark.query.js -x htmlparser2 -x domutils --standalone Mark mark.js | discify --open",
+    "dev": "watchify mark.js --standalone Mark -o dist/mark.js -v"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/henry-luo/mark-js.git"
+  },
+  "keywords": [
+    "mark",
+	"markup",
+	"notation",
+	"json",
+	"json5",
+    "parser",
+    "stringify"
+  ],
+  "author": "Henry Luo",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^2.11.0",
+    "css-select": "^1.3.0-rc0",
+    "debug": "^2.6.8",
+    "he": "^1.1.1",
+    "helmsman": "^1.0.3",
+    "htmlparser2": "^3.9.2"
+  },
+  "devDependencies": {
+    "cssauron": "^1.4.0",
+    "disc": "^1.3.2",
+    "istanbul": "^0.4.5",
+    "minicat": "^1.0.0",
+    "npm-run-all": "^4.0.2",
+    "tap-spec": "^4.1.1",
+    "tape": "^4.7.0",
+    "uglify-es": "^3.0.27"
+  }
+}
