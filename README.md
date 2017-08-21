@@ -62,15 +62,15 @@ Mark object has a very clean and simple data model. Each Mark object has 3 facet
 
 Mark utilizes a novel feature in JavaScript that an plain JS object is actually *array-like*, it can contain both named properties and indexed properties.
 
-So each Mark object is mapped to just one plain JavaScript object, which is very compact and efficient comparing to other DOM models ~(Many JS virtual-dom implementations needs to represent one DOM element with at least 3 objects: the main object, one JSON object for the properties, and one array object for the contents. Browser DOM will be even heavier.)~.
+So each Mark object is mapped to just one plain JavaScript object, which is very compact and efficient comparing to other DOM models *(Many JS virtual-dom implementations needs to represent one DOM element with at least 3 objects: the main object, one JSON object for the properties, and one array object for the contents. Browser DOM will be even heavier.)*.
 
 ## mark.js
 
 This library consists of 3 modules:
 
 - The core module `mark.js`, which provides `parse()` and `stringify()` functions, like JSON, and a direct Mark object construction function `Mark()`.
-- Sub-module `mark.convert.js`, which provides conversion between Mark format and other formats like HTML, XML, etc. ~(still under development)~
-- Sub-module `mark.query.js`, which provides CSS selector based query interface on the Mark object model, like jQuery. ~(still under development)~
+- Sub-module `mark.convert.js`, which provides conversion between Mark format and other formats like HTML, XML, etc. *(still under development)*
+- Sub-module `mark.query.js`, which provides CSS selector based query interface on the Mark object model, like jQuery. *(still under development)*
 
 ## Usage
 
@@ -100,6 +100,6 @@ console.log("Greeting from Mark: " + Mark.stringify(obj));
 
 ## Documentation
 
-- Detailed syntax specification; ~(being developed)~
-- Detailed data model specification; ~(being developed)~
-- Library APIs documentation; ~(being developed)~
+- Detailed syntax specification; *(being developed)*
+- Detailed data model specification; *(being developed)*
+- Library APIs documentation; *(being developed)*
