@@ -72,13 +72,15 @@ This library consists of 3 modules:
 - Sub-module `mark.convert.js`, which provides conversion between Mark format and other formats like HTML, XML, etc. ~(still under development)~
 - Sub-module `mark.query.js`, which provides CSS selector based query interface on the Mark object model, like jQuery. ~(still under development)~
 
-## Installation
+## Usage
+
+Install from NPM using the following command:
 
 ```
 npm install mark-js --save
 ```
 
-Then in your script, use it as:
+Then in your node script, use it as:
 
 ```
 const Mark = require('mark-js');
