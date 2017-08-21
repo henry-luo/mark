@@ -83,7 +83,7 @@ Then in your script, use it as:
 ```
 const Mark = require('mark-js');
 var obj = Mark.parse(`{div {mark 'Hello World!' }}`);  // using ES6 backtick
-console.log("Greeting from Mark: " + obj.stringify());
+console.log("Greeting from Mark: " + Mark.stringify(obj));
 ```
 
 To use the library in browser, you can include the `mark.js` under `dist` directory, into your html page, e.g.:
