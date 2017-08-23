@@ -8,7 +8,7 @@ The core data structure in Mark is an compound object, which have the following 
 
 Below is a sample Mark object, representation a simple registration form:
 
-```
+```javascript
 {form                                                         // object type-name
   {!-- comment --}                                            // comment object, similar to HTML
   {div class:"form-group"                                     // nested Mark object
