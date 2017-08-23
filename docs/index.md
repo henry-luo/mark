@@ -22,7 +22,7 @@ Below is a sample Mark object, representation a simple registration form:
     {input type:"password", class:"form-control", id:"pwd"}
   }
   {button type:"submit" class:['btn', 'btn-default']          // property with complex values
-  	'Submit'                                                  // text needs to be quoted
+    'Submit'                                                  // text needs to be quoted
   }
 }
 ```
