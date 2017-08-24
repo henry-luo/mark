@@ -865,29 +865,29 @@ Mark.stringify = function (obj, replacer, space) {
         }
     };
 
-    function isWordChar(c) {
+    function isNameChar(c) {
         return (c >= 'a' && c <= 'z') ||
             (c >= 'A' && c <= 'Z') ||
             (c >= '0' && c <= '9') ||
             c === '_' || c === '$' || '.' || '-';
     }
 
-    function isWordStart(c) {
+    function isNameStart(c) {
         return (c >= 'a' && c <= 'z') ||
             (c >= 'A' && c <= 'Z') ||
             c === '_' || c === '$';
     }
 
-    function isWord(key) {
+    function isName(key) {
         if (typeof key !== 'string') {
             return false;
         }
-        if (!isWordStart(key[0])) {
+        if (!isNameStart(key[0])) {
             return false;
         }
         var i = 1, length = key.length;
         while (i < length) {
-            if (!isWordChar(key[i])) {
+            if (!isNameChar(key[i])) {
                 return false;
             }
             i++;
@@ -896,7 +896,7 @@ Mark.stringify = function (obj, replacer, space) {
     }
 
     // export for use in tests
-    Mark.isWord = isWord;
+    Mark.isName = isName;
 
     // polyfills
     function isArray(obj) {
@@ -1050,7 +1050,7 @@ Mark.stringify = function (obj, replacer, space) {
 						isTopLevel = false;
 						if (typeof value !== "undefined" && value !== null) {
 							// buffer += makeIndent(indentStr, objStack.length);                            
-							key = isWord(prop) ? prop : escapeString(prop);
+							key = isName(prop) ? prop : escapeString(prop);
 							buffer += (hasAttr ? ', ':(nonEmpty ? ' ':''))+ key +":" + value;
 							hasAttr = true;  nonEmpty = true;
 						}

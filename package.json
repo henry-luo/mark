@@ -17,10 +17,11 @@
   "scripts": {
     "test": "CLS && tape test/*.js | tap-spec",
     "test-coverage": "istanbul cover node_modules/tape/bin/tape ./test/*.js",
-    "build": "mkdir dist && npm-run-all --parallel build-mark build-convert build-query",
+    "build": "npm-run-all --parallel build-mark build-convert build-query",
     "build-mark": "browserify -x ./lib/mark.convert.js -x ./lib/mark.query.js -x htmlparser2 -x domutils --standalone Mark mark.js | uglifyjs > dist/mark.js",
     "build-convert": "browserify --standalone MarkConvert -r ./lib/mark.convert.js | uglifyjs > dist/mark.convert.js",
-    "build-query": "browserify -x domutils --standalone MarkQuery -r ./lib/mark.query.js | uglifyjs > dist/mark.query.js",
+    "build-query": "browserify --standalone MarkQuery -r ./lib/mark.query.js | uglifyjs > dist/mark.query.js",
+	"build-mark-query": "browserify -x ./lib/mark.convert.js -x htmlparser2 --standalone Mark mark.js | uglifyjs > dist/mark.js",
     "build-find": "browserify --full-paths -x debug ./dev/mark.find.js | discify --open",
     "list-bundle": "browserify --full-paths -x ./lib/mark.convert.js -x ./lib/mark.query.js -x htmlparser2 -x domutils --standalone Mark mark.js | discify --open",
     "dev": "watchify mark.js --standalone Mark -o dist/mark.js -v"
