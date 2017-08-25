@@ -213,9 +213,9 @@ var Mark = (function() {
 					if (!Mark.$select) { Mark.$select = require('./lib/mark.query.js'); }
 					return Mark.$select(this).find(selector);
 				},
-				match: function(selector) {
+				matches: function(selector) {
 					if (!Mark.$select) { Mark.$select = require('./lib/mark.query.js'); }
-					return Mark.$select(this).match(selector);
+					return Mark.$select(this).matches(selector);
 				},
 			};
 			for (let a in api) {

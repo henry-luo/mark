@@ -10,8 +10,8 @@ test('Mark Select', function(assert) {
 	assert.equal(vtree.find("div > span.bold").length, 1, "Match div > span.bold");
 	assert.equal(vtree.find("div").length, 0, "Find should not match on div itself");
 	
-	assert.equal(vtree.match("div"), true, "vtree should match div");
-	assert.equal(vtree[0].match("div span"), true, "span should match 'div span'");
-	assert.equal(vtree[0].match("div > span"), true, "span should match 'div >> span'");
+	assert.equal(vtree.matches("div"), true, "vtree should match div");
+	assert.equal(vtree[0].matches("div span"), true, "span should match 'div span'");
+	assert.equal(vtree[0].matches("div > span"), true, "span should match 'div >> span'");
 	assert.end();
 });
