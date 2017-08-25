@@ -15,7 +15,7 @@
     "mark-convert": "./bin/mark-convert.js"
   },
   "scripts": {
-    "test": "CLS && tape test/*.js | tap-spec",
+    "test": "clear && tape test/*.js | tap-spec",
     "test-coverage": "istanbul cover node_modules/tape/bin/tape ./test/*.js",
     "build": "npm-run-all --parallel build-mark build-convert build-query",
     "build-mark": "browserify -x ./lib/mark.convert.js -x ./lib/mark.query.js -x htmlparser2 -x domutils --standalone Mark mark.js | uglifyjs > dist/mark.js",
