@@ -1,6 +1,6 @@
 # {mark}
 <img src='https://api.travis-ci.org/henry-luo/mark.svg?branch=master'>
-Objective Markup Notation, abbreviated as **Mark** or **{mark}**, is a new unified notation for both object and markup data. The notation is a superset of what can be represented by JSON and HTML, but overcomes many limitations these two popular data formats, yet still having a very clean syntax and simple data model.
+Objective Markup Notation, abbreviated as <b>Mark</b> or <b>{mark}</b>, is a new unified notation for both object and markup data. The notation is a superset of what can be represented by JSON and HTML, but overcomes many limitations these two popular data formats, yet still having a very clean syntax and simple data model.
 
 The core data structure in Mark is an compound object, which have the following 3 facets of data:
 
