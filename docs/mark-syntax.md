@@ -21,7 +21,7 @@ contents ::= ( string | mark_object | mark_comment )*
 
 property ::= key ':' value
 
-key ::= string | identifier
+key ::= s_string | d_string | identifier
 
 mark_comment ::= '{--' (p_char_no_dash | ('-' p_char_no_dash))* '--}'
 ```
@@ -77,6 +77,8 @@ continue_identifier ::= begin_identifier | digit | '-' | '.'
 
 The formal grammar specification in EBNF is [here](mark.ebnf).
 
-Following the JSON convention, a [railway diagram](mark-grammar.html) of the entire grammar is also provided to help you visualize the grammar. You can click on the grammar terms to navigate around. Below is just a small portion of it.
+Following the JSON convention, a [railway diagram](https://mark.js.org/mark-grammar.html) of the entire grammar is also provided to help you visualize the grammar. You can click on the grammar terms to navigate around. Below is just a small portion of it.
 
+<div style='width:600px; margin:auto'>
 ![](mark-railway-diagram.png)
+</div>
