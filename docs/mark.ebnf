@@ -1,0 +1,148 @@
+/*--------------------------------------------------------
+Modified from JSON5 grammar at: https://github.com/json5/json5-spec/blob/master/json5.abnf
+--------------------------------------------------------*/
+
+eol ::= LF | CRLF | CR          /* End-of-line */
+
+eof ::= [!.]           			/* End-of-input */
+
+/*--------------------------------------------------------*/
+
+comment ::= sl_comment | ml_comment
+
+sl_comment ::= begin_sl_comment ( p_char | ows )* ( eol | eof )
+
+ml_comment ::= begin_ml_comment ( p_char_non_star | ( '*' p_char_non_slash ) | ows | eol )* end_ml_comment
+
+begin_sl_comment ::= [#x2F] [#x2F]    /* /* */
+
+begin_ml_comment ::= [#x2F] '*'    /* / * */
+
+end_ml_comment   ::= '*' [#x2F]    /* * / */
+
+p_char ::= [#x20-#x7E] | [#x80-#x10FFFF] /* Printable character */
+
+p_char_non_star ::= [#x20-#x29] | [#x2B-#x7E] | [#x80-#x10FFFF] /* Printable character except * */
+
+p_char_non_slash ::= [#x20-#x2E] | [#x30-#x7E] | [#x80-#x10FFFF] /* Printable character except / */
+
+/*--------------------------------------------------------*/
+
+ws ::= (
+          SP |                /* Space */
+          ows |               /* Other space-like characters */
+          eol |               /* Line ending */
+		  comment             /* Comment */
+      )*
+
+ows ::= HTAB |                /* Horizontal tab */
+      [#xA0] |                /* NBSP */
+      [#xFEFF]                /* BOM */
+
+/*--------------------------------------------------------*/
+
+begin_array     ::= ws '[' ws
+
+begin_object    ::= ws '{' ws
+
+end_array       ::= ws ']' ws
+
+end_object      ::= ws '}' ws
+
+separator  		::= ws ':' ws
+
+value_separator ::= ws ',' ws
+
+value_sep_opt   ::= (value_separator)?
+
+/*--------------------------------------------------------*/
+
+null  ::= [#x6E][#x75][#x6C][#x6C]         	/* null */
+
+true  ::= [#x74][#x72][#x75][#x65]         	/* true */
+
+false ::= [#x66][#x61][#x6C][#x73][#x65]    /* false */
+
+/*--------------------------------------------------------*/
+
+number ::= ('+' | '-')? (nan | inf | dec)
+
+nan ::= [#x4E][#x61][#x4E]              					/* NaN */
+
+inf ::= [#x49][#x6E][#x66][#x69][#x6E][#x69][#x74][#x79] 	/* Infinity */
+
+dec ::= ( int (frac0)? | frac1 ) (exp)?
+
+decimal_point ::= '.'     
+
+exp ::= ('e' | 'E') ('+' | '-')? DIGIT+
+
+frac0 ::= decimal_point DIGIT*
+
+frac1 ::= decimal_point DIGIT+
+
+int ::= '0' | ( [0-9] DIGIT* )
+
+/*--------------------------------------------------------*/
+
+string ::= s_string | d_string
+
+d_string ::= '"' (char | "'")* '"'
+
+s_string ::= "'" (char | '"')* "'"
+
+char ::= unescaped |
+       escape (
+           [#x30] |             /* 0    nul             U+0000 */
+           [#x62] |             /* b    backspace       U+0008 */
+           [#x66] |             /* f    form feed       U+000C */
+           [#x6E] |             /* n    line feed       U+000A */
+           [#x72] |             /* r    carriage return U+000D */
+           [#x74] |             /* t    tab             U+0009 */
+           [#x76] |             /* v    vtab            U+000B */
+           hex_char |     		/* xXX                  U+00XX */
+           unicode_char |     	/* uXXXX                U+XXXX */
+           eol |              	/* end-of-line -> empty string */
+           other-escape )     	/* the character itself */
+		
+hex_char ::= [#x78] HEXDIG HEXDIG
+
+unicode_char ::= [#x75] HEXDIG HEXDIG HEXDIG HEXDIG
+
+escape ::= [#x5C]                 /* \ backslash */
+
+unescaped ::= [#x20-#x21] | [#x23-#x26] | [#x28-#x5B] | [#x5D-#x7E] | [#x80-#x10FFFF]
+
+other_escaped ::= [#x20-#x2F] | [#x3A-#x61] | [#x63-#x65] | [#x67-#x6D] | [#x6F-#x71] | [#x73] | [#x77] | [#x79-#x7E] | [#x80-#x10FFFF]
+
+/*--------------------------------------------------------*/
+
+array ::= begin_array (value (value_separator value)* value_sep_opt)? end_array
+
+/*--------------------------------------------------------*/
+
+json_object ::= begin_object (property (value_separator property)* value_sep_opt)? end_object
+
+property ::= key separator value
+
+key ::= string | identifier
+
+begin_identifier ::= ALPHA | [#x5F] | [#x24] /* ALPHA | "_" | "$" */
+
+continue_identifier ::= begin_identifier | DIGIT
+
+identifier ::= begin_identifier continue_identifier*
+
+/*--------------------------------------------------------*/
+
+mark_object ::= begin_object type_name (property (value_separator property)* value_sep_opt)? content* end_object
+
+type_name ::= identifier
+
+content ::= string | mark_object
+
+/*--------------------------------------------------------*/
+
+value ::= null | true | false | number | string | array | json_object | mark_object
+
+Mark ::= ws value ws
