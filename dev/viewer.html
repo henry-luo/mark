@@ -1,0 +1,49 @@
+<!doctype html>
+<html>
+	<head>
+    <meta charset="utf-8">
+    <title>Railroad diagram for {{title}}</title>
+		<style>
+			{{style}}
+		</style>
+		<style>
+			body { font-family:"Helvetica Neue",Helvetica,Arial,sans-serif; }
+			h2 { margin:0.3em; }
+			.rule { padding-top:2em; }
+			.container { margin:auto; padding:2em; }
+			svg.railroad-diagram rect[rx] + text { cursor:auto; }
+		</style>
+		<script>
+			function svgBlockClick(ev) {
+				if (ev.target.tagName === 'text') {
+					location.hash = ev.target.textContent;
+				}
+			}
+			</script>
+	</head>
+	<body>
+		<div class="container">
+			<h1>Mark Grammar</h1>
+			{{#rules}}
+			  <div class="rule">
+					<h2 id='{{name}}'>{{name}}</h2>
+					<div onclick='svgBlockClick(event)'>
+						{{{diagram}}}
+					</div>
+					<div>
+						Used by:
+						{{#usedBy}}
+						<a href="#{{this}}">{{this}}</a>
+						{{/usedBy}}
+					</div>
+					<div>
+						References:
+						{{#references}}
+						<a href="#{{this}}">{{this}}</a>
+						{{/references}}
+					</div>
+				</div>
+			{{/rules}}
+		</div>
+	</body>
+</html>

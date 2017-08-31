@@ -59,20 +59,15 @@ textarea.form-control.grammar-edit {
 
 		</style>
 		<style>
-			body {
-				font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-			}
-			.rule {
-				padding-top: 4em;
-			}
-			.container {
-				margin: auto;
-				padding: 2em;
-			}
+			body { font-family:"Helvetica Neue",Helvetica,Arial,sans-serif; }
+			h2 { margin:0.3em; }
+			.rule { padding-top:2em; }
+			.container { margin:auto; padding:2em; }
+			svg.railroad-diagram rect[rx] + text { cursor:auto; }
 		</style>
 		<script>
 			function svgBlockClick(ev) {
-				if(ev.target.tagName === 'text') {
+				if (ev.target.tagName === 'text') {
 					location.hash = ev.target.textContent;
 				}
 			}
@@ -80,10 +75,10 @@ textarea.form-control.grammar-edit {
 	</head>
 	<body>
 		<div class="container">
-			<h1>mark.ebnf</h1>
+			<h1>Mark Grammar</h1>
 			  <div class="rule">
-					<h2 id=eol>eol</h2>
-					<div onclick=svgBlockClick>
+					<h2 id='eol'>eol</h2>
+					<div onclick='svgBlockClick(event)'>
 						<svg class="railroad-diagram" width="173" height="122" viewBox="0 0 173 122">
 <g transform="translate(.5 .5)">
 <path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
@@ -135,20 +130,20 @@ textarea.form-control.grammar-edit {
 					</div>
 				</div>
 			  <div class="rule">
-					<h2 id=eof>eof</h2>
-					<div onclick=svgBlockClick>
-						<svg class="railroad-diagram" width="153" height="62" viewBox="0 0 153 62">
+					<h2 id='eof'>eof</h2>
+					<div onclick='svgBlockClick(event)'>
+						<svg class="railroad-diagram" width="145" height="62" viewBox="0 0 145 62">
 <g transform="translate(.5 .5)">
 <path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
 <path d="M40 31h10"></path>
 <g>
 <path d="M50 31h0"></path>
-<path d="M102 31h0"></path>
-<rect x="50" y="20" width="52" height="22" rx="10" ry="10"></rect>
-<text x="76" y="35">&#91;!.&#93;</text>
+<path d="M94 31h0"></path>
+<rect x="50" y="20" width="44" height="22"></rect>
+<text x="72" y="35">EOF</text>
 </g>
-<path d="M102 31h10"></path>
-<path d="M 112 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
+<path d="M94 31h10"></path>
+<path d="M 104 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
 </g>
 </svg>
 
@@ -159,11 +154,12 @@ textarea.form-control.grammar-edit {
 					</div>
 					<div>
 						References:
+						<a href="#EOF">EOF</a>
 					</div>
 				</div>
 			  <div class="rule">
-					<h2 id=comment>comment</h2>
-					<div onclick=svgBlockClick>
+					<h2 id='comment'>comment</h2>
+					<div onclick='svgBlockClick(event)'>
 						<svg class="railroad-diagram" width="221" height="92" viewBox="0 0 221 92">
 <g transform="translate(.5 .5)">
 <path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
@@ -203,8 +199,8 @@ textarea.form-control.grammar-edit {
 					</div>
 				</div>
 			  <div class="rule">
-					<h2 id=sl_comment>sl_comment</h2>
-					<div onclick=svgBlockClick>
+					<h2 id='sl_comment'>sl_comment</h2>
+					<div onclick='svgBlockClick(event)'>
 						<svg class="railroad-diagram" width="501" height="110" viewBox="0 0 501 110">
 <g transform="translate(.5 .5)">
 <path d="M 20 31 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
@@ -301,8 +297,8 @@ textarea.form-control.grammar-edit {
 					</div>
 				</div>
 			  <div class="rule">
-					<h2 id=ml_comment>ml_comment</h2>
-					<div onclick=svgBlockClick>
+					<h2 id='ml_comment'>ml_comment</h2>
+					<div onclick='svgBlockClick(event)'>
 						<svg class="railroad-diagram" width="717" height="170" viewBox="0 0 717 170">
 <g transform="translate(.5 .5)">
 <path d="M 20 31 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
@@ -418,32 +414,20 @@ textarea.form-control.grammar-edit {
 					</div>
 				</div>
 			  <div class="rule">
-					<h2 id=begin_sl_comment>begin_sl_comment</h2>
-					<div onclick=svgBlockClick>
-						<svg class="railroad-diagram" width="257" height="62" viewBox="0 0 257 62">
+					<h2 id='begin_sl_comment'>begin_sl_comment</h2>
+					<div onclick='svgBlockClick(event)'>
+						<svg class="railroad-diagram" width="137" height="62" viewBox="0 0 137 62">
 <g transform="translate(.5 .5)">
 <path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
-<g>
-<path d="M40 31h0"></path>
-<path d="M216 31h0"></path>
 <path d="M40 31h10"></path>
 <g>
 <path d="M50 31h0"></path>
-<path d="M118 31h0"></path>
-<rect x="50" y="20" width="68" height="22" rx="10" ry="10"></rect>
-<text x="84" y="35">&#91;#x2F&#93;</text>
+<path d="M86 31h0"></path>
+<rect x="50" y="20" width="36" height="22" rx="10" ry="10"></rect>
+<text x="68" y="35">//</text>
 </g>
-<path d="M118 31h10"></path>
-<path d="M128 31h10"></path>
-<g>
-<path d="M138 31h0"></path>
-<path d="M206 31h0"></path>
-<rect x="138" y="20" width="68" height="22" rx="10" ry="10"></rect>
-<text x="172" y="35">&#91;#x2F&#93;</text>
-</g>
-<path d="M206 31h10"></path>
-</g>
-<path d="M 216 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
+<path d="M86 31h10"></path>
+<path d="M 96 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
 </g>
 </svg>
 
@@ -457,32 +441,20 @@ textarea.form-control.grammar-edit {
 					</div>
 				</div>
 			  <div class="rule">
-					<h2 id=begin_ml_comment>begin_ml_comment</h2>
-					<div onclick=svgBlockClick>
-						<svg class="railroad-diagram" width="217" height="62" viewBox="0 0 217 62">
+					<h2 id='begin_ml_comment'>begin_ml_comment</h2>
+					<div onclick='svgBlockClick(event)'>
+						<svg class="railroad-diagram" width="137" height="62" viewBox="0 0 137 62">
 <g transform="translate(.5 .5)">
 <path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
-<g>
-<path d="M40 31h0"></path>
-<path d="M176 31h0"></path>
 <path d="M40 31h10"></path>
 <g>
 <path d="M50 31h0"></path>
-<path d="M118 31h0"></path>
-<rect x="50" y="20" width="68" height="22" rx="10" ry="10"></rect>
-<text x="84" y="35">&#91;#x2F&#93;</text>
+<path d="M86 31h0"></path>
+<rect x="50" y="20" width="36" height="22" rx="10" ry="10"></rect>
+<text x="68" y="35">/&#42;</text>
 </g>
-<path d="M118 31h10"></path>
-<path d="M128 31h10"></path>
-<g>
-<path d="M138 31h0"></path>
-<path d="M166 31h0"></path>
-<rect x="138" y="20" width="28" height="22" rx="10" ry="10"></rect>
-<text x="152" y="35">&#42;</text>
-</g>
-<path d="M166 31h10"></path>
-</g>
-<path d="M 176 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
+<path d="M86 31h10"></path>
+<path d="M 96 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
 </g>
 </svg>
 
@@ -496,32 +468,20 @@ textarea.form-control.grammar-edit {
 					</div>
 				</div>
 			  <div class="rule">
-					<h2 id=end_ml_comment>end_ml_comment</h2>
-					<div onclick=svgBlockClick>
-						<svg class="railroad-diagram" width="217" height="62" viewBox="0 0 217 62">
+					<h2 id='end_ml_comment'>end_ml_comment</h2>
+					<div onclick='svgBlockClick(event)'>
+						<svg class="railroad-diagram" width="137" height="62" viewBox="0 0 137 62">
 <g transform="translate(.5 .5)">
 <path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
-<g>
-<path d="M40 31h0"></path>
-<path d="M176 31h0"></path>
 <path d="M40 31h10"></path>
 <g>
 <path d="M50 31h0"></path>
-<path d="M78 31h0"></path>
-<rect x="50" y="20" width="28" height="22" rx="10" ry="10"></rect>
-<text x="64" y="35">&#42;</text>
+<path d="M86 31h0"></path>
+<rect x="50" y="20" width="36" height="22" rx="10" ry="10"></rect>
+<text x="68" y="35">&#42;/</text>
 </g>
-<path d="M78 31h10"></path>
-<path d="M88 31h10"></path>
-<g>
-<path d="M98 31h0"></path>
-<path d="M166 31h0"></path>
-<rect x="98" y="20" width="68" height="22" rx="10" ry="10"></rect>
-<text x="132" y="35">&#91;#x2F&#93;</text>
-</g>
-<path d="M166 31h10"></path>
-</g>
-<path d="M 176 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
+<path d="M86 31h10"></path>
+<path d="M 96 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
 </g>
 </svg>
 
@@ -535,8 +495,8 @@ textarea.form-control.grammar-edit {
 					</div>
 				</div>
 			  <div class="rule">
-					<h2 id=p_char>p_char</h2>
-					<div onclick=svgBlockClick>
+					<h2 id='p_char'>p_char</h2>
+					<div onclick='svgBlockClick(event)'>
 						<svg class="railroad-diagram" width="261" height="92" viewBox="0 0 261 92">
 <g transform="translate(.5 .5)">
 <path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
@@ -574,8 +534,8 @@ textarea.form-control.grammar-edit {
 					</div>
 				</div>
 			  <div class="rule">
-					<h2 id=p_char_non_star>p_char_non_star</h2>
-					<div onclick=svgBlockClick>
+					<h2 id='p_char_non_star'>p_char_non_star</h2>
+					<div onclick='svgBlockClick(event)'>
 						<svg class="railroad-diagram" width="261" height="122" viewBox="0 0 261 122">
 <g transform="translate(.5 .5)">
 <path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
@@ -621,8 +581,8 @@ textarea.form-control.grammar-edit {
 					</div>
 				</div>
 			  <div class="rule">
-					<h2 id=p_char_non_slash>p_char_non_slash</h2>
-					<div onclick=svgBlockClick>
+					<h2 id='p_char_non_slash'>p_char_non_slash</h2>
+					<div onclick='svgBlockClick(event)'>
 						<svg class="railroad-diagram" width="261" height="122" viewBox="0 0 261 122">
 <g transform="translate(.5 .5)">
 <path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
@@ -668,8 +628,8 @@ textarea.form-control.grammar-edit {
 					</div>
 				</div>
 			  <div class="rule">
-					<h2 id=ws>ws</h2>
-					<div onclick=svgBlockClick>
+					<h2 id='ws'>ws</h2>
+					<div onclick='svgBlockClick(event)'>
 						<svg class="railroad-diagram" width="257" height="170" viewBox="0 0 257 170">
 <g transform="translate(.5 .5)">
 <path d="M 20 31 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
@@ -738,12 +698,15 @@ textarea.form-control.grammar-edit {
 					</div>
 					<div>
 						Used by:
+						<a href="#string">string</a>
 						<a href="#begin_array">begin_array</a>
-						<a href="#begin_object">begin_object</a>
 						<a href="#end_array">end_array</a>
+						<a href="#value_separator">value_separator</a>
+						<a href="#begin_object">begin_object</a>
 						<a href="#end_object">end_object</a>
 						<a href="#separator">separator</a>
-						<a href="#value_separator">value_separator</a>
+						<a href="#type_name">type_name</a>
+						<a href="#contents">contents</a>
 						<a href="#Mark">Mark</a>
 					</div>
 					<div>
@@ -755,8 +718,8 @@ textarea.form-control.grammar-edit {
 					</div>
 				</div>
 			  <div class="rule">
-					<h2 id=ows>ows</h2>
-					<div onclick=svgBlockClick>
+					<h2 id='ows'>ows</h2>
+					<div onclick='svgBlockClick(event)'>
 						<svg class="railroad-diagram" width="205" height="122" viewBox="0 0 205 122">
 <g transform="translate(.5 .5)">
 <path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
@@ -805,380 +768,20 @@ textarea.form-control.grammar-edit {
 					</div>
 				</div>
 			  <div class="rule">
-					<h2 id=begin_array>begin_array</h2>
-					<div onclick=svgBlockClick>
-						<svg class="railroad-diagram" width="241" height="62" viewBox="0 0 241 62">
+					<h2 id='null'>null</h2>
+					<div onclick='svgBlockClick(event)'>
+						<svg class="railroad-diagram" width="153" height="62" viewBox="0 0 153 62">
 <g transform="translate(.5 .5)">
 <path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
-<g>
-<path d="M40 31h0"></path>
-<path d="M200 31h0"></path>
 <path d="M40 31h10"></path>
 <g>
 <path d="M50 31h0"></path>
-<path d="M86 31h0"></path>
-<rect x="50" y="20" width="36" height="22"></rect>
-<text x="68" y="35">ws</text>
+<path d="M102 31h0"></path>
+<rect x="50" y="20" width="52" height="22" rx="10" ry="10"></rect>
+<text x="76" y="35">null</text>
 </g>
-<path d="M86 31h10"></path>
-<path d="M96 31h10"></path>
-<g>
-<path d="M106 31h0"></path>
-<path d="M134 31h0"></path>
-<rect x="106" y="20" width="28" height="22" rx="10" ry="10"></rect>
-<text x="120" y="35">&#91;</text>
-</g>
-<path d="M134 31h10"></path>
-<path d="M144 31h10"></path>
-<g>
-<path d="M154 31h0"></path>
-<path d="M190 31h0"></path>
-<rect x="154" y="20" width="36" height="22"></rect>
-<text x="172" y="35">ws</text>
-</g>
-<path d="M190 31h10"></path>
-</g>
-<path d="M 200 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
-</g>
-</svg>
-
-					</div>
-					<div>
-						Used by:
-						<a href="#array">array</a>
-					</div>
-					<div>
-						References:
-						<a href="#ws">ws</a>
-					</div>
-				</div>
-			  <div class="rule">
-					<h2 id=begin_object>begin_object</h2>
-					<div onclick=svgBlockClick>
-						<svg class="railroad-diagram" width="241" height="62" viewBox="0 0 241 62">
-<g transform="translate(.5 .5)">
-<path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
-<g>
-<path d="M40 31h0"></path>
-<path d="M200 31h0"></path>
-<path d="M40 31h10"></path>
-<g>
-<path d="M50 31h0"></path>
-<path d="M86 31h0"></path>
-<rect x="50" y="20" width="36" height="22"></rect>
-<text x="68" y="35">ws</text>
-</g>
-<path d="M86 31h10"></path>
-<path d="M96 31h10"></path>
-<g>
-<path d="M106 31h0"></path>
-<path d="M134 31h0"></path>
-<rect x="106" y="20" width="28" height="22" rx="10" ry="10"></rect>
-<text x="120" y="35">{</text>
-</g>
-<path d="M134 31h10"></path>
-<path d="M144 31h10"></path>
-<g>
-<path d="M154 31h0"></path>
-<path d="M190 31h0"></path>
-<rect x="154" y="20" width="36" height="22"></rect>
-<text x="172" y="35">ws</text>
-</g>
-<path d="M190 31h10"></path>
-</g>
-<path d="M 200 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
-</g>
-</svg>
-
-					</div>
-					<div>
-						Used by:
-						<a href="#json_object">json_object</a>
-						<a href="#mark_object">mark_object</a>
-					</div>
-					<div>
-						References:
-						<a href="#ws">ws</a>
-					</div>
-				</div>
-			  <div class="rule">
-					<h2 id=end_array>end_array</h2>
-					<div onclick=svgBlockClick>
-						<svg class="railroad-diagram" width="241" height="62" viewBox="0 0 241 62">
-<g transform="translate(.5 .5)">
-<path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
-<g>
-<path d="M40 31h0"></path>
-<path d="M200 31h0"></path>
-<path d="M40 31h10"></path>
-<g>
-<path d="M50 31h0"></path>
-<path d="M86 31h0"></path>
-<rect x="50" y="20" width="36" height="22"></rect>
-<text x="68" y="35">ws</text>
-</g>
-<path d="M86 31h10"></path>
-<path d="M96 31h10"></path>
-<g>
-<path d="M106 31h0"></path>
-<path d="M134 31h0"></path>
-<rect x="106" y="20" width="28" height="22" rx="10" ry="10"></rect>
-<text x="120" y="35">&#93;</text>
-</g>
-<path d="M134 31h10"></path>
-<path d="M144 31h10"></path>
-<g>
-<path d="M154 31h0"></path>
-<path d="M190 31h0"></path>
-<rect x="154" y="20" width="36" height="22"></rect>
-<text x="172" y="35">ws</text>
-</g>
-<path d="M190 31h10"></path>
-</g>
-<path d="M 200 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
-</g>
-</svg>
-
-					</div>
-					<div>
-						Used by:
-						<a href="#array">array</a>
-					</div>
-					<div>
-						References:
-						<a href="#ws">ws</a>
-					</div>
-				</div>
-			  <div class="rule">
-					<h2 id=end_object>end_object</h2>
-					<div onclick=svgBlockClick>
-						<svg class="railroad-diagram" width="241" height="62" viewBox="0 0 241 62">
-<g transform="translate(.5 .5)">
-<path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
-<g>
-<path d="M40 31h0"></path>
-<path d="M200 31h0"></path>
-<path d="M40 31h10"></path>
-<g>
-<path d="M50 31h0"></path>
-<path d="M86 31h0"></path>
-<rect x="50" y="20" width="36" height="22"></rect>
-<text x="68" y="35">ws</text>
-</g>
-<path d="M86 31h10"></path>
-<path d="M96 31h10"></path>
-<g>
-<path d="M106 31h0"></path>
-<path d="M134 31h0"></path>
-<rect x="106" y="20" width="28" height="22" rx="10" ry="10"></rect>
-<text x="120" y="35">}</text>
-</g>
-<path d="M134 31h10"></path>
-<path d="M144 31h10"></path>
-<g>
-<path d="M154 31h0"></path>
-<path d="M190 31h0"></path>
-<rect x="154" y="20" width="36" height="22"></rect>
-<text x="172" y="35">ws</text>
-</g>
-<path d="M190 31h10"></path>
-</g>
-<path d="M 200 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
-</g>
-</svg>
-
-					</div>
-					<div>
-						Used by:
-						<a href="#json_object">json_object</a>
-						<a href="#mark_object">mark_object</a>
-					</div>
-					<div>
-						References:
-						<a href="#ws">ws</a>
-					</div>
-				</div>
-			  <div class="rule">
-					<h2 id=separator>separator</h2>
-					<div onclick=svgBlockClick>
-						<svg class="railroad-diagram" width="241" height="62" viewBox="0 0 241 62">
-<g transform="translate(.5 .5)">
-<path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
-<g>
-<path d="M40 31h0"></path>
-<path d="M200 31h0"></path>
-<path d="M40 31h10"></path>
-<g>
-<path d="M50 31h0"></path>
-<path d="M86 31h0"></path>
-<rect x="50" y="20" width="36" height="22"></rect>
-<text x="68" y="35">ws</text>
-</g>
-<path d="M86 31h10"></path>
-<path d="M96 31h10"></path>
-<g>
-<path d="M106 31h0"></path>
-<path d="M134 31h0"></path>
-<rect x="106" y="20" width="28" height="22" rx="10" ry="10"></rect>
-<text x="120" y="35">:</text>
-</g>
-<path d="M134 31h10"></path>
-<path d="M144 31h10"></path>
-<g>
-<path d="M154 31h0"></path>
-<path d="M190 31h0"></path>
-<rect x="154" y="20" width="36" height="22"></rect>
-<text x="172" y="35">ws</text>
-</g>
-<path d="M190 31h10"></path>
-</g>
-<path d="M 200 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
-</g>
-</svg>
-
-					</div>
-					<div>
-						Used by:
-						<a href="#property">property</a>
-					</div>
-					<div>
-						References:
-						<a href="#ws">ws</a>
-					</div>
-				</div>
-			  <div class="rule">
-					<h2 id=value_separator>value_separator</h2>
-					<div onclick=svgBlockClick>
-						<svg class="railroad-diagram" width="241" height="62" viewBox="0 0 241 62">
-<g transform="translate(.5 .5)">
-<path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
-<g>
-<path d="M40 31h0"></path>
-<path d="M200 31h0"></path>
-<path d="M40 31h10"></path>
-<g>
-<path d="M50 31h0"></path>
-<path d="M86 31h0"></path>
-<rect x="50" y="20" width="36" height="22"></rect>
-<text x="68" y="35">ws</text>
-</g>
-<path d="M86 31h10"></path>
-<path d="M96 31h10"></path>
-<g>
-<path d="M106 31h0"></path>
-<path d="M134 31h0"></path>
-<rect x="106" y="20" width="28" height="22" rx="10" ry="10"></rect>
-<text x="120" y="35">,</text>
-</g>
-<path d="M134 31h10"></path>
-<path d="M144 31h10"></path>
-<g>
-<path d="M154 31h0"></path>
-<path d="M190 31h0"></path>
-<rect x="154" y="20" width="36" height="22"></rect>
-<text x="172" y="35">ws</text>
-</g>
-<path d="M190 31h10"></path>
-</g>
-<path d="M 200 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
-</g>
-</svg>
-
-					</div>
-					<div>
-						Used by:
-						<a href="#value_sep_opt">value_sep_opt</a>
-						<a href="#array">array</a>
-						<a href="#json_object">json_object</a>
-						<a href="#mark_object">mark_object</a>
-					</div>
-					<div>
-						References:
-						<a href="#ws">ws</a>
-					</div>
-				</div>
-			  <div class="rule">
-					<h2 id=value_sep_opt>value_sep_opt</h2>
-					<div onclick=svgBlockClick>
-						<svg class="railroad-diagram" width="261" height="72" viewBox="0 0 261 72">
-<g transform="translate(.5 .5)">
-<path d="M 20 31 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
-<g>
-<path d="M40 41h0"></path>
-<path d="M220 41h0"></path>
-<path d="M40 41a10 10 0 0 0 10 -10v0a10 10 0 0 1 10 -10"></path>
-<g>
-<path d="M60 21h140"></path>
-</g>
-<path d="M200 21a10 10 0 0 1 10 10v0a10 10 0 0 0 10 10"></path>
-<path d="M40 41h20"></path>
-<g>
-<path d="M60 41h0"></path>
-<path d="M200 41h0"></path>
-<rect x="60" y="30" width="140" height="22"></rect>
-<text x="130" y="45">value&#95;separator</text>
-</g>
-<path d="M200 41h20"></path>
-</g>
-<path d="M 220 41 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
-</g>
-</svg>
-
-					</div>
-					<div>
-						Used by:
-						<a href="#array">array</a>
-						<a href="#json_object">json_object</a>
-						<a href="#mark_object">mark_object</a>
-					</div>
-					<div>
-						References:
-						<a href="#value_separator">value_separator</a>
-					</div>
-				</div>
-			  <div class="rule">
-					<h2 id=null>null</h2>
-					<div onclick=svgBlockClick>
-						<svg class="railroad-diagram" width="433" height="62" viewBox="0 0 433 62">
-<g transform="translate(.5 .5)">
-<path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
-<g>
-<path d="M40 31h0"></path>
-<path d="M392 31h0"></path>
-<path d="M40 31h10"></path>
-<g>
-<path d="M50 31h0"></path>
-<path d="M118 31h0"></path>
-<rect x="50" y="20" width="68" height="22" rx="10" ry="10"></rect>
-<text x="84" y="35">&#91;#x6E&#93;</text>
-</g>
-<path d="M118 31h10"></path>
-<path d="M128 31h10"></path>
-<g>
-<path d="M138 31h0"></path>
-<path d="M206 31h0"></path>
-<rect x="138" y="20" width="68" height="22" rx="10" ry="10"></rect>
-<text x="172" y="35">&#91;#x75&#93;</text>
-</g>
-<path d="M206 31h10"></path>
-<path d="M216 31h10"></path>
-<g>
-<path d="M226 31h0"></path>
-<path d="M294 31h0"></path>
-<rect x="226" y="20" width="68" height="22" rx="10" ry="10"></rect>
-<text x="260" y="35">&#91;#x6C&#93;</text>
-</g>
-<path d="M294 31h10"></path>
-<path d="M304 31h10"></path>
-<g>
-<path d="M314 31h0"></path>
-<path d="M382 31h0"></path>
-<rect x="314" y="20" width="68" height="22" rx="10" ry="10"></rect>
-<text x="348" y="35">&#91;#x6C&#93;</text>
-</g>
-<path d="M382 31h10"></path>
-</g>
-<path d="M 392 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
+<path d="M102 31h10"></path>
+<path d="M 112 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
 </g>
 </svg>
 
@@ -1192,48 +795,20 @@ textarea.form-control.grammar-edit {
 					</div>
 				</div>
 			  <div class="rule">
-					<h2 id=true>true</h2>
-					<div onclick=svgBlockClick>
-						<svg class="railroad-diagram" width="433" height="62" viewBox="0 0 433 62">
+					<h2 id='true'>true</h2>
+					<div onclick='svgBlockClick(event)'>
+						<svg class="railroad-diagram" width="153" height="62" viewBox="0 0 153 62">
 <g transform="translate(.5 .5)">
 <path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
-<g>
-<path d="M40 31h0"></path>
-<path d="M392 31h0"></path>
 <path d="M40 31h10"></path>
 <g>
 <path d="M50 31h0"></path>
-<path d="M118 31h0"></path>
-<rect x="50" y="20" width="68" height="22" rx="10" ry="10"></rect>
-<text x="84" y="35">&#91;#x74&#93;</text>
+<path d="M102 31h0"></path>
+<rect x="50" y="20" width="52" height="22" rx="10" ry="10"></rect>
+<text x="76" y="35">true</text>
 </g>
-<path d="M118 31h10"></path>
-<path d="M128 31h10"></path>
-<g>
-<path d="M138 31h0"></path>
-<path d="M206 31h0"></path>
-<rect x="138" y="20" width="68" height="22" rx="10" ry="10"></rect>
-<text x="172" y="35">&#91;#x72&#93;</text>
-</g>
-<path d="M206 31h10"></path>
-<path d="M216 31h10"></path>
-<g>
-<path d="M226 31h0"></path>
-<path d="M294 31h0"></path>
-<rect x="226" y="20" width="68" height="22" rx="10" ry="10"></rect>
-<text x="260" y="35">&#91;#x75&#93;</text>
-</g>
-<path d="M294 31h10"></path>
-<path d="M304 31h10"></path>
-<g>
-<path d="M314 31h0"></path>
-<path d="M382 31h0"></path>
-<rect x="314" y="20" width="68" height="22" rx="10" ry="10"></rect>
-<text x="348" y="35">&#91;#x65&#93;</text>
-</g>
-<path d="M382 31h10"></path>
-</g>
-<path d="M 392 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
+<path d="M102 31h10"></path>
+<path d="M 112 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
 </g>
 </svg>
 
@@ -1247,56 +822,20 @@ textarea.form-control.grammar-edit {
 					</div>
 				</div>
 			  <div class="rule">
-					<h2 id=false>false</h2>
-					<div onclick=svgBlockClick>
-						<svg class="railroad-diagram" width="521" height="62" viewBox="0 0 521 62">
+					<h2 id='false'>false</h2>
+					<div onclick='svgBlockClick(event)'>
+						<svg class="railroad-diagram" width="161" height="62" viewBox="0 0 161 62">
 <g transform="translate(.5 .5)">
 <path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
-<g>
-<path d="M40 31h0"></path>
-<path d="M480 31h0"></path>
 <path d="M40 31h10"></path>
 <g>
 <path d="M50 31h0"></path>
-<path d="M118 31h0"></path>
-<rect x="50" y="20" width="68" height="22" rx="10" ry="10"></rect>
-<text x="84" y="35">&#91;#x66&#93;</text>
+<path d="M110 31h0"></path>
+<rect x="50" y="20" width="60" height="22" rx="10" ry="10"></rect>
+<text x="80" y="35">false</text>
 </g>
-<path d="M118 31h10"></path>
-<path d="M128 31h10"></path>
-<g>
-<path d="M138 31h0"></path>
-<path d="M206 31h0"></path>
-<rect x="138" y="20" width="68" height="22" rx="10" ry="10"></rect>
-<text x="172" y="35">&#91;#x61&#93;</text>
-</g>
-<path d="M206 31h10"></path>
-<path d="M216 31h10"></path>
-<g>
-<path d="M226 31h0"></path>
-<path d="M294 31h0"></path>
-<rect x="226" y="20" width="68" height="22" rx="10" ry="10"></rect>
-<text x="260" y="35">&#91;#x6C&#93;</text>
-</g>
-<path d="M294 31h10"></path>
-<path d="M304 31h10"></path>
-<g>
-<path d="M314 31h0"></path>
-<path d="M382 31h0"></path>
-<rect x="314" y="20" width="68" height="22" rx="10" ry="10"></rect>
-<text x="348" y="35">&#91;#x73&#93;</text>
-</g>
-<path d="M382 31h10"></path>
-<path d="M392 31h10"></path>
-<g>
-<path d="M402 31h0"></path>
-<path d="M470 31h0"></path>
-<rect x="402" y="20" width="68" height="22" rx="10" ry="10"></rect>
-<text x="436" y="35">&#91;#x65&#93;</text>
-</g>
-<path d="M470 31h10"></path>
-</g>
-<path d="M 480 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
+<path d="M110 31h10"></path>
+<path d="M 120 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
 </g>
 </svg>
 
@@ -1310,8 +849,8 @@ textarea.form-control.grammar-edit {
 					</div>
 				</div>
 			  <div class="rule">
-					<h2 id=number>number</h2>
-					<div onclick=svgBlockClick>
+					<h2 id='number'>number</h2>
+					<div onclick='svgBlockClick(event)'>
 						<svg class="railroad-diagram" width="273" height="132" viewBox="0 0 273 132">
 <g transform="translate(.5 .5)">
 <path d="M 20 31 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
@@ -1395,40 +934,20 @@ textarea.form-control.grammar-edit {
 					</div>
 				</div>
 			  <div class="rule">
-					<h2 id=nan>nan</h2>
-					<div onclick=svgBlockClick>
-						<svg class="railroad-diagram" width="345" height="62" viewBox="0 0 345 62">
+					<h2 id='nan'>nan</h2>
+					<div onclick='svgBlockClick(event)'>
+						<svg class="railroad-diagram" width="145" height="62" viewBox="0 0 145 62">
 <g transform="translate(.5 .5)">
 <path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
-<g>
-<path d="M40 31h0"></path>
-<path d="M304 31h0"></path>
 <path d="M40 31h10"></path>
 <g>
 <path d="M50 31h0"></path>
-<path d="M118 31h0"></path>
-<rect x="50" y="20" width="68" height="22" rx="10" ry="10"></rect>
-<text x="84" y="35">&#91;#x4E&#93;</text>
+<path d="M94 31h0"></path>
+<rect x="50" y="20" width="44" height="22" rx="10" ry="10"></rect>
+<text x="72" y="35">NaN</text>
 </g>
-<path d="M118 31h10"></path>
-<path d="M128 31h10"></path>
-<g>
-<path d="M138 31h0"></path>
-<path d="M206 31h0"></path>
-<rect x="138" y="20" width="68" height="22" rx="10" ry="10"></rect>
-<text x="172" y="35">&#91;#x61&#93;</text>
-</g>
-<path d="M206 31h10"></path>
-<path d="M216 31h10"></path>
-<g>
-<path d="M226 31h0"></path>
-<path d="M294 31h0"></path>
-<rect x="226" y="20" width="68" height="22" rx="10" ry="10"></rect>
-<text x="260" y="35">&#91;#x4E&#93;</text>
-</g>
-<path d="M294 31h10"></path>
-</g>
-<path d="M 304 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
+<path d="M94 31h10"></path>
+<path d="M 104 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
 </g>
 </svg>
 
@@ -1442,80 +961,20 @@ textarea.form-control.grammar-edit {
 					</div>
 				</div>
 			  <div class="rule">
-					<h2 id=inf>inf</h2>
-					<div onclick=svgBlockClick>
-						<svg class="railroad-diagram" width="785" height="62" viewBox="0 0 785 62">
+					<h2 id='inf'>inf</h2>
+					<div onclick='svgBlockClick(event)'>
+						<svg class="railroad-diagram" width="185" height="62" viewBox="0 0 185 62">
 <g transform="translate(.5 .5)">
 <path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
-<g>
-<path d="M40 31h0"></path>
-<path d="M744 31h0"></path>
 <path d="M40 31h10"></path>
 <g>
 <path d="M50 31h0"></path>
-<path d="M118 31h0"></path>
-<rect x="50" y="20" width="68" height="22" rx="10" ry="10"></rect>
-<text x="84" y="35">&#91;#x49&#93;</text>
+<path d="M134 31h0"></path>
+<rect x="50" y="20" width="84" height="22" rx="10" ry="10"></rect>
+<text x="92" y="35">Infinity</text>
 </g>
-<path d="M118 31h10"></path>
-<path d="M128 31h10"></path>
-<g>
-<path d="M138 31h0"></path>
-<path d="M206 31h0"></path>
-<rect x="138" y="20" width="68" height="22" rx="10" ry="10"></rect>
-<text x="172" y="35">&#91;#x6E&#93;</text>
-</g>
-<path d="M206 31h10"></path>
-<path d="M216 31h10"></path>
-<g>
-<path d="M226 31h0"></path>
-<path d="M294 31h0"></path>
-<rect x="226" y="20" width="68" height="22" rx="10" ry="10"></rect>
-<text x="260" y="35">&#91;#x66&#93;</text>
-</g>
-<path d="M294 31h10"></path>
-<path d="M304 31h10"></path>
-<g>
-<path d="M314 31h0"></path>
-<path d="M382 31h0"></path>
-<rect x="314" y="20" width="68" height="22" rx="10" ry="10"></rect>
-<text x="348" y="35">&#91;#x69&#93;</text>
-</g>
-<path d="M382 31h10"></path>
-<path d="M392 31h10"></path>
-<g>
-<path d="M402 31h0"></path>
-<path d="M470 31h0"></path>
-<rect x="402" y="20" width="68" height="22" rx="10" ry="10"></rect>
-<text x="436" y="35">&#91;#x6E&#93;</text>
-</g>
-<path d="M470 31h10"></path>
-<path d="M480 31h10"></path>
-<g>
-<path d="M490 31h0"></path>
-<path d="M558 31h0"></path>
-<rect x="490" y="20" width="68" height="22" rx="10" ry="10"></rect>
-<text x="524" y="35">&#91;#x69&#93;</text>
-</g>
-<path d="M558 31h10"></path>
-<path d="M568 31h10"></path>
-<g>
-<path d="M578 31h0"></path>
-<path d="M646 31h0"></path>
-<rect x="578" y="20" width="68" height="22" rx="10" ry="10"></rect>
-<text x="612" y="35">&#91;#x74&#93;</text>
-</g>
-<path d="M646 31h10"></path>
-<path d="M656 31h10"></path>
-<g>
-<path d="M666 31h0"></path>
-<path d="M734 31h0"></path>
-<rect x="666" y="20" width="68" height="22" rx="10" ry="10"></rect>
-<text x="700" y="35">&#91;#x79&#93;</text>
-</g>
-<path d="M734 31h10"></path>
-</g>
-<path d="M 744 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
+<path d="M134 31h10"></path>
+<path d="M 144 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
 </g>
 </svg>
 
@@ -1529,76 +988,135 @@ textarea.form-control.grammar-edit {
 					</div>
 				</div>
 			  <div class="rule">
-					<h2 id=dec>dec</h2>
-					<div onclick=svgBlockClick>
-						<svg class="railroad-diagram" width="369" height="102" viewBox="0 0 369 102">
+					<h2 id='dec'>dec</h2>
+					<div onclick='svgBlockClick(event)'>
+						<svg class="railroad-diagram" width="477" height="130" viewBox="0 0 477 130">
 <g transform="translate(.5 .5)">
-<path d="M 20 31 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
+<path d="M 20 41 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
 <g>
-<path d="M40 41h0"></path>
-<path d="M328 41h0"></path>
+<path d="M40 51h0"></path>
+<path d="M436 51h0"></path>
 <g>
-<path d="M40 41h0"></path>
-<path d="M244 41h0"></path>
-<path d="M40 41h20"></path>
+<path d="M40 51h0"></path>
+<path d="M352 51h0"></path>
+<path d="M40 51h20"></path>
 <g>
-<path d="M60 41h0"></path>
-<path d="M224 41h0"></path>
-<path d="M60 41h10"></path>
+<path d="M60 51h0"></path>
+<path d="M332 51h0"></path>
+<path d="M60 51h10"></path>
 <g>
-<path d="M70 41h0"></path>
-<path d="M114 41h0"></path>
-<rect x="70" y="30" width="44" height="22"></rect>
-<text x="92" y="45">int</text>
+<path d="M70 51h0"></path>
+<path d="M114 51h0"></path>
+<rect x="70" y="40" width="44" height="22"></rect>
+<text x="92" y="55">int</text>
 </g>
-<path d="M114 41h10"></path>
+<path d="M114 51h10"></path>
 <g>
-<path d="M124 41h0"></path>
-<path d="M224 41h0"></path>
-<path d="M124 41a10 10 0 0 0 10 -10v0a10 10 0 0 1 10 -10"></path>
+<path d="M124 51h0"></path>
+<path d="M332 51h0"></path>
+<path d="M124 51a10 10 0 0 0 10 -10v-9a10 10 0 0 1 10 -10"></path>
 <g>
-<path d="M144 21h60"></path>
+<path d="M144 22h168"></path>
 </g>
-<path d="M204 21a10 10 0 0 1 10 10v0a10 10 0 0 0 10 10"></path>
-<path d="M124 41h20"></path>
+<path d="M312 22a10 10 0 0 1 10 10v9a10 10 0 0 0 10 10"></path>
+<path d="M124 51h20"></path>
 <g>
-<path d="M144 41h0"></path>
-<path d="M204 41h0"></path>
-<rect x="144" y="30" width="60" height="22"></rect>
-<text x="174" y="45">frac0</text>
-</g>
-<path d="M204 41h20"></path>
-</g>
-</g>
-<path d="M224 41h20"></path>
-<path d="M40 41a10 10 0 0 1 10 10v10a10 10 0 0 0 10 10"></path>
+<path d="M144 51h0"></path>
+<path d="M312 51h0"></path>
+<path d="M144 51h10"></path>
 <g>
-<path d="M60 71h52"></path>
-<path d="M172 71h52"></path>
-<rect x="112" y="60" width="60" height="22"></rect>
-<text x="142" y="75">frac1</text>
+<path d="M154 51h0"></path>
+<path d="M182 51h0"></path>
+<rect x="154" y="40" width="28" height="22" rx="10" ry="10"></rect>
+<text x="168" y="55">.</text>
 </g>
-<path d="M224 71a10 10 0 0 0 10 -10v-10a10 10 0 0 1 10 -10"></path>
+<path d="M182 51h10"></path>
+<g>
+<path d="M192 51h0"></path>
+<path d="M312 51h0"></path>
+<path d="M192 51a10 10 0 0 0 10 -10v0a10 10 0 0 1 10 -10"></path>
+<g>
+<path d="M212 31h80"></path>
+</g>
+<path d="M292 31a10 10 0 0 1 10 10v0a10 10 0 0 0 10 10"></path>
+<path d="M192 51h20"></path>
+<g>
+<path d="M212 51h0"></path>
+<path d="M292 51h0"></path>
+<path d="M212 51h10"></path>
+<g>
+<path d="M222 51h0"></path>
+<path d="M282 51h0"></path>
+<rect x="222" y="40" width="60" height="22"></rect>
+<text x="252" y="55">digit</text>
+</g>
+<path d="M282 51h10"></path>
+<path d="M222 51a10 10 0 0 0 -10 10v0a10 10 0 0 0 10 10"></path>
+<g>
+<path d="M222 71h60"></path>
+</g>
+<path d="M282 71a10 10 0 0 0 10 -10v0a10 10 0 0 0 -10 -10"></path>
+</g>
+<path d="M292 51h20"></path>
+</g>
+</g>
+<path d="M312 51h20"></path>
+</g>
+</g>
+<path d="M332 51h20"></path>
+<path d="M40 51a10 10 0 0 1 10 10v19a10 10 0 0 0 10 10"></path>
+<g>
+<path d="M60 90h62"></path>
+<path d="M270 90h62"></path>
+<path d="M122 90h10"></path>
+<g>
+<path d="M132 90h0"></path>
+<path d="M160 90h0"></path>
+<rect x="132" y="79" width="28" height="22" rx="10" ry="10"></rect>
+<text x="146" y="94">.</text>
+</g>
+<path d="M160 90h10"></path>
+<path d="M170 90h10"></path>
+<g>
+<path d="M180 90h0"></path>
+<path d="M260 90h0"></path>
+<path d="M180 90h10"></path>
+<g>
+<path d="M190 90h0"></path>
+<path d="M250 90h0"></path>
+<rect x="190" y="79" width="60" height="22"></rect>
+<text x="220" y="94">digit</text>
+</g>
+<path d="M250 90h10"></path>
+<path d="M190 90a10 10 0 0 0 -10 10v0a10 10 0 0 0 10 10"></path>
+<g>
+<path d="M190 110h60"></path>
+</g>
+<path d="M250 110a10 10 0 0 0 10 -10v0a10 10 0 0 0 -10 -10"></path>
+</g>
+<path d="M260 90h10"></path>
+</g>
+<path d="M332 90a10 10 0 0 0 10 -10v-19a10 10 0 0 1 10 -10"></path>
 </g>
 <g>
-<path d="M244 41h0"></path>
-<path d="M328 41h0"></path>
-<path d="M244 41a10 10 0 0 0 10 -10v0a10 10 0 0 1 10 -10"></path>
+<path d="M352 51h0"></path>
+<path d="M436 51h0"></path>
+<path d="M352 51a10 10 0 0 0 10 -10v0a10 10 0 0 1 10 -10"></path>
 <g>
-<path d="M264 21h44"></path>
+<path d="M372 31h44"></path>
 </g>
-<path d="M308 21a10 10 0 0 1 10 10v0a10 10 0 0 0 10 10"></path>
-<path d="M244 41h20"></path>
+<path d="M416 31a10 10 0 0 1 10 10v0a10 10 0 0 0 10 10"></path>
+<path d="M352 51h20"></path>
 <g>
-<path d="M264 41h0"></path>
-<path d="M308 41h0"></path>
-<rect x="264" y="30" width="44" height="22"></rect>
-<text x="286" y="45">exp</text>
+<path d="M372 51h0"></path>
+<path d="M416 51h0"></path>
+<rect x="372" y="40" width="44" height="22"></rect>
+<text x="394" y="55">exp</text>
 </g>
-<path d="M308 41h20"></path>
+<path d="M416 51h20"></path>
 </g>
 </g>
-<path d="M 328 41 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
+<path d="M 436 51 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
 </g>
 </svg>
 
@@ -1610,42 +1128,13 @@ textarea.form-control.grammar-edit {
 					<div>
 						References:
 						<a href="#int">int</a>
-						<a href="#frac0">frac0</a>
-						<a href="#frac1">frac1</a>
+						<a href="#digit">digit</a>
 						<a href="#exp">exp</a>
 					</div>
 				</div>
 			  <div class="rule">
-					<h2 id=decimal_point>decimal_point</h2>
-					<div onclick=svgBlockClick>
-						<svg class="railroad-diagram" width="129" height="62" viewBox="0 0 129 62">
-<g transform="translate(.5 .5)">
-<path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
-<path d="M40 31h10"></path>
-<g>
-<path d="M50 31h0"></path>
-<path d="M78 31h0"></path>
-<rect x="50" y="20" width="28" height="22" rx="10" ry="10"></rect>
-<text x="64" y="35">.</text>
-</g>
-<path d="M78 31h10"></path>
-<path d="M 88 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
-</g>
-</svg>
-
-					</div>
-					<div>
-						Used by:
-						<a href="#frac0">frac0</a>
-						<a href="#frac1">frac1</a>
-					</div>
-					<div>
-						References:
-					</div>
-				</div>
-			  <div class="rule">
-					<h2 id=exp>exp</h2>
-					<div onclick=svgBlockClick>
+					<h2 id='exp'>exp</h2>
+					<div onclick='svgBlockClick(event)'>
 						<svg class="railroad-diagram" width="357" height="102" viewBox="0 0 357 102">
 <g transform="translate(.5 .5)">
 <path d="M 20 31 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
@@ -1712,7 +1201,7 @@ textarea.form-control.grammar-edit {
 <path d="M236 41h0"></path>
 <path d="M296 41h0"></path>
 <rect x="236" y="30" width="60" height="22"></rect>
-<text x="266" y="45">DIGIT</text>
+<text x="266" y="45">digit</text>
 </g>
 <path d="M296 41h10"></path>
 <path d="M236 41a10 10 0 0 0 -10 10v0a10 10 0 0 0 10 10"></path>
@@ -1734,125 +1223,12 @@ textarea.form-control.grammar-edit {
 					</div>
 					<div>
 						References:
-						<a href="#DIGIT">DIGIT</a>
+						<a href="#digit">digit</a>
 					</div>
 				</div>
 			  <div class="rule">
-					<h2 id=frac0>frac0</h2>
-					<div onclick=svgBlockClick>
-						<svg class="railroad-diagram" width="345" height="81" viewBox="0 0 345 81">
-<g transform="translate(.5 .5)">
-<path d="M 20 31 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
-<g>
-<path d="M40 41h0"></path>
-<path d="M304 41h0"></path>
-<path d="M40 41h10"></path>
-<g>
-<path d="M50 41h0"></path>
-<path d="M174 41h0"></path>
-<rect x="50" y="30" width="124" height="22"></rect>
-<text x="112" y="45">decimal&#95;point</text>
-</g>
-<path d="M174 41h10"></path>
-<g>
-<path d="M184 41h0"></path>
-<path d="M304 41h0"></path>
-<path d="M184 41a10 10 0 0 0 10 -10v0a10 10 0 0 1 10 -10"></path>
-<g>
-<path d="M204 21h80"></path>
-</g>
-<path d="M284 21a10 10 0 0 1 10 10v0a10 10 0 0 0 10 10"></path>
-<path d="M184 41h20"></path>
-<g>
-<path d="M204 41h0"></path>
-<path d="M284 41h0"></path>
-<path d="M204 41h10"></path>
-<g>
-<path d="M214 41h0"></path>
-<path d="M274 41h0"></path>
-<rect x="214" y="30" width="60" height="22"></rect>
-<text x="244" y="45">DIGIT</text>
-</g>
-<path d="M274 41h10"></path>
-<path d="M214 41a10 10 0 0 0 -10 10v0a10 10 0 0 0 10 10"></path>
-<g>
-<path d="M214 61h60"></path>
-</g>
-<path d="M274 61a10 10 0 0 0 10 -10v0a10 10 0 0 0 -10 -10"></path>
-</g>
-<path d="M284 41h20"></path>
-</g>
-</g>
-<path d="M 304 41 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
-</g>
-</svg>
-
-					</div>
-					<div>
-						Used by:
-						<a href="#dec">dec</a>
-					</div>
-					<div>
-						References:
-						<a href="#decimal_point">decimal_point</a>
-						<a href="#DIGIT">DIGIT</a>
-					</div>
-				</div>
-			  <div class="rule">
-					<h2 id=frac1>frac1</h2>
-					<div onclick=svgBlockClick>
-						<svg class="railroad-diagram" width="325" height="71" viewBox="0 0 325 71">
-<g transform="translate(.5 .5)">
-<path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
-<g>
-<path d="M40 31h0"></path>
-<path d="M284 31h0"></path>
-<path d="M40 31h10"></path>
-<g>
-<path d="M50 31h0"></path>
-<path d="M174 31h0"></path>
-<rect x="50" y="20" width="124" height="22"></rect>
-<text x="112" y="35">decimal&#95;point</text>
-</g>
-<path d="M174 31h10"></path>
-<path d="M184 31h10"></path>
-<g>
-<path d="M194 31h0"></path>
-<path d="M274 31h0"></path>
-<path d="M194 31h10"></path>
-<g>
-<path d="M204 31h0"></path>
-<path d="M264 31h0"></path>
-<rect x="204" y="20" width="60" height="22"></rect>
-<text x="234" y="35">DIGIT</text>
-</g>
-<path d="M264 31h10"></path>
-<path d="M204 31a10 10 0 0 0 -10 10v0a10 10 0 0 0 10 10"></path>
-<g>
-<path d="M204 51h60"></path>
-</g>
-<path d="M264 51a10 10 0 0 0 10 -10v0a10 10 0 0 0 -10 -10"></path>
-</g>
-<path d="M274 31h10"></path>
-</g>
-<path d="M 284 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
-</g>
-</svg>
-
-					</div>
-					<div>
-						Used by:
-						<a href="#dec">dec</a>
-					</div>
-					<div>
-						References:
-						<a href="#decimal_point">decimal_point</a>
-						<a href="#DIGIT">DIGIT</a>
-					</div>
-				</div>
-			  <div class="rule">
-					<h2 id=int>int</h2>
-					<div onclick=svgBlockClick>
+					<h2 id='int'>int</h2>
+					<div onclick='svgBlockClick(event)'>
 						<svg class="railroad-diagram" width="321" height="111" viewBox="0 0 321 111">
 <g transform="translate(.5 .5)">
 <path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
@@ -1876,7 +1252,7 @@ textarea.form-control.grammar-edit {
 <path d="M70 71h0"></path>
 <path d="M130 71h0"></path>
 <rect x="70" y="60" width="60" height="22" rx="10" ry="10"></rect>
-<text x="100" y="75">&#91;0-9&#93;</text>
+<text x="100" y="75">&#91;1-9&#93;</text>
 </g>
 <path d="M130 71h10"></path>
 <g>
@@ -1896,7 +1272,7 @@ textarea.form-control.grammar-edit {
 <path d="M170 71h0"></path>
 <path d="M230 71h0"></path>
 <rect x="170" y="60" width="60" height="22"></rect>
-<text x="200" y="75">DIGIT</text>
+<text x="200" y="75">digit</text>
 </g>
 <path d="M230 71h10"></path>
 <path d="M170 71a10 10 0 0 0 -10 10v0a10 10 0 0 0 10 10"></path>
@@ -1921,36 +1297,91 @@ textarea.form-control.grammar-edit {
 					</div>
 					<div>
 						References:
-						<a href="#DIGIT">DIGIT</a>
+						<a href="#digit">digit</a>
 					</div>
 				</div>
 			  <div class="rule">
-					<h2 id=string>string</h2>
-					<div onclick=svgBlockClick>
-						<svg class="railroad-diagram" width="205" height="92" viewBox="0 0 205 92">
+					<h2 id='digit'>digit</h2>
+					<div onclick='svgBlockClick(event)'>
+						<svg class="railroad-diagram" width="161" height="62" viewBox="0 0 161 62">
 <g transform="translate(.5 .5)">
 <path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
+<path d="M40 31h10"></path>
 <g>
-<path d="M40 31h0"></path>
-<path d="M164 31h0"></path>
-<path d="M40 31h20"></path>
+<path d="M50 31h0"></path>
+<path d="M110 31h0"></path>
+<rect x="50" y="20" width="60" height="22" rx="10" ry="10"></rect>
+<text x="80" y="35">&#91;0-9&#93;</text>
+</g>
+<path d="M110 31h10"></path>
+<path d="M 120 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
+</g>
+</svg>
+
+					</div>
+					<div>
+						Used by:
+						<a href="#dec">dec</a>
+						<a href="#exp">exp</a>
+						<a href="#int">int</a>
+						<a href="#continue_identifier">continue_identifier</a>
+					</div>
+					<div>
+						References:
+					</div>
+				</div>
+			  <div class="rule">
+					<h2 id='string'>string</h2>
+					<div onclick='svgBlockClick(event)'>
+						<svg class="railroad-diagram" width="301" height="100" viewBox="0 0 301 100">
+<g transform="translate(.5 .5)">
+<path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
+<path d="M40 31h10"></path>
+<g>
+<path d="M50 31h0"></path>
+<path d="M250 31h0"></path>
+<path d="M50 31h10"></path>
 <g>
 <path d="M60 31h0"></path>
-<path d="M144 31h0"></path>
-<rect x="60" y="20" width="84" height="22"></rect>
-<text x="102" y="35">s&#95;string</text>
-</g>
-<path d="M144 31h20"></path>
-<path d="M40 31a10 10 0 0 1 10 10v10a10 10 0 0 0 10 10"></path>
+<path d="M240 31h0"></path>
 <g>
-<path d="M60 61h0"></path>
-<path d="M144 61h0"></path>
-<rect x="60" y="50" width="84" height="22"></rect>
-<text x="102" y="65">d&#95;string</text>
+<path d="M60 31h0"></path>
+<path d="M184 31h0"></path>
+<path d="M60 31h20"></path>
+<g>
+<path d="M80 31h0"></path>
+<path d="M164 31h0"></path>
+<rect x="80" y="20" width="84" height="22"></rect>
+<text x="122" y="35">s&#95;string</text>
 </g>
-<path d="M144 61a10 10 0 0 0 10 -10v-10a10 10 0 0 1 10 -10"></path>
+<path d="M164 31h20"></path>
+<path d="M60 31a10 10 0 0 1 10 10v10a10 10 0 0 0 10 10"></path>
+<g>
+<path d="M80 61h0"></path>
+<path d="M164 61h0"></path>
+<rect x="80" y="50" width="84" height="22"></rect>
+<text x="122" y="65">d&#95;string</text>
 </g>
-<path d="M 164 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
+<path d="M164 61a10 10 0 0 0 10 -10v-10a10 10 0 0 1 10 -10"></path>
+</g>
+<path d="M184 31h10"></path>
+<g>
+<path d="M194 31h0"></path>
+<path d="M230 31h0"></path>
+<rect x="194" y="20" width="36" height="22"></rect>
+<text x="212" y="35">ws</text>
+</g>
+<path d="M230 31h10"></path>
+</g>
+<path d="M240 31h10"></path>
+<path d="M60 31a10 10 0 0 0 -10 10v29a10 10 0 0 0 10 10"></path>
+<g>
+<path d="M60 80h180"></path>
+</g>
+<path d="M240 80a10 10 0 0 0 10 -10v-29a10 10 0 0 0 -10 -10"></path>
+</g>
+<path d="M250 31h10"></path>
+<path d="M 260 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
 </g>
 </svg>
 
@@ -1958,18 +1389,19 @@ textarea.form-control.grammar-edit {
 					<div>
 						Used by:
 						<a href="#key">key</a>
-						<a href="#content">content</a>
+						<a href="#contents">contents</a>
 						<a href="#value">value</a>
 					</div>
 					<div>
 						References:
 						<a href="#s_string">s_string</a>
 						<a href="#d_string">d_string</a>
+						<a href="#ws">ws</a>
 					</div>
 				</div>
 			  <div class="rule">
-					<h2 id=d_string>d_string</h2>
-					<div onclick=svgBlockClick>
+					<h2 id='d_string'>d_string</h2>
+					<div onclick='svgBlockClick(event)'>
 						<svg class="railroad-diagram" width="329" height="110" viewBox="0 0 329 110">
 <g transform="translate(.5 .5)">
 <path d="M 20 31 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
@@ -2050,8 +1482,8 @@ textarea.form-control.grammar-edit {
 					</div>
 				</div>
 			  <div class="rule">
-					<h2 id=s_string>s_string</h2>
-					<div onclick=svgBlockClick>
+					<h2 id='s_string'>s_string</h2>
+					<div onclick='svgBlockClick(event)'>
 						<svg class="railroad-diagram" width="329" height="110" viewBox="0 0 329 110">
 <g transform="translate(.5 .5)">
 <path d="M 20 31 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
@@ -2132,26 +1564,26 @@ textarea.form-control.grammar-edit {
 					</div>
 				</div>
 			  <div class="rule">
-					<h2 id=char>char</h2>
-					<div onclick=svgBlockClick>
-						<svg class="railroad-diagram" width="477" height="421" viewBox="0 0 477 421">
+					<h2 id='char'>char</h2>
+					<div onclick='svgBlockClick(event)'>
+						<svg class="railroad-diagram" width="365" height="392" viewBox="0 0 365 392">
 <g transform="translate(.5 .5)">
 <path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
 <g>
 <path d="M40 31h0"></path>
-<path d="M436 31h0"></path>
+<path d="M324 31h0"></path>
 <path d="M40 31h20"></path>
 <g>
-<path d="M60 31h132"></path>
-<path d="M284 31h132"></path>
-<rect x="192" y="20" width="92" height="22"></rect>
-<text x="238" y="35">unescaped</text>
+<path d="M60 31h76"></path>
+<path d="M228 31h76"></path>
+<rect x="136" y="20" width="92" height="22"></rect>
+<text x="182" y="35">unescaped</text>
 </g>
-<path d="M416 31h20"></path>
+<path d="M304 31h20"></path>
 <path d="M40 31a10 10 0 0 1 10 10v10a10 10 0 0 0 10 10"></path>
 <g>
 <path d="M60 61h0"></path>
-<path d="M416 61h0"></path>
+<path d="M304 61h0"></path>
 <path d="M60 61h10"></path>
 <g>
 <path d="M70 61h0"></path>
@@ -2162,130 +1594,100 @@ textarea.form-control.grammar-edit {
 <path d="M138 61h10"></path>
 <g>
 <path d="M148 61h0"></path>
-<path d="M416 61h0"></path>
+<path d="M304 61h0"></path>
 <path d="M148 61h20"></path>
 <g>
-<path d="M168 61h80"></path>
-<path d="M316 61h80"></path>
-<rect x="248" y="50" width="68" height="22" rx="10" ry="10"></rect>
-<text x="282" y="65">&#91;#x30&#93;</text>
+<path d="M168 61h24"></path>
+<path d="M260 61h24"></path>
+<rect x="192" y="50" width="68" height="22" rx="10" ry="10"></rect>
+<text x="226" y="65">&#91;#x30&#93;</text>
 </g>
-<path d="M396 61h20"></path>
+<path d="M284 61h20"></path>
 <path d="M148 61a10 10 0 0 1 10 10v10a10 10 0 0 0 10 10"></path>
 <g>
-<path d="M168 91h80"></path>
-<path d="M316 91h80"></path>
-<rect x="248" y="80" width="68" height="22" rx="10" ry="10"></rect>
-<text x="282" y="95">&#91;#x62&#93;</text>
+<path d="M168 91h24"></path>
+<path d="M260 91h24"></path>
+<rect x="192" y="80" width="68" height="22" rx="10" ry="10"></rect>
+<text x="226" y="95">&#91;#x62&#93;</text>
 </g>
-<path d="M396 91a10 10 0 0 0 10 -10v-10a10 10 0 0 1 10 -10"></path>
+<path d="M284 91a10 10 0 0 0 10 -10v-10a10 10 0 0 1 10 -10"></path>
 <path d="M148 61a10 10 0 0 1 10 10v40a10 10 0 0 0 10 10"></path>
 <g>
-<path d="M168 121h80"></path>
-<path d="M316 121h80"></path>
-<rect x="248" y="110" width="68" height="22" rx="10" ry="10"></rect>
-<text x="282" y="125">&#91;#x66&#93;</text>
+<path d="M168 121h24"></path>
+<path d="M260 121h24"></path>
+<rect x="192" y="110" width="68" height="22" rx="10" ry="10"></rect>
+<text x="226" y="125">&#91;#x66&#93;</text>
 </g>
-<path d="M396 121a10 10 0 0 0 10 -10v-40a10 10 0 0 1 10 -10"></path>
+<path d="M284 121a10 10 0 0 0 10 -10v-40a10 10 0 0 1 10 -10"></path>
 <path d="M148 61a10 10 0 0 1 10 10v70a10 10 0 0 0 10 10"></path>
 <g>
-<path d="M168 151h80"></path>
-<path d="M316 151h80"></path>
-<rect x="248" y="140" width="68" height="22" rx="10" ry="10"></rect>
-<text x="282" y="155">&#91;#x6E&#93;</text>
+<path d="M168 151h24"></path>
+<path d="M260 151h24"></path>
+<rect x="192" y="140" width="68" height="22" rx="10" ry="10"></rect>
+<text x="226" y="155">&#91;#x6E&#93;</text>
 </g>
-<path d="M396 151a10 10 0 0 0 10 -10v-70a10 10 0 0 1 10 -10"></path>
+<path d="M284 151a10 10 0 0 0 10 -10v-70a10 10 0 0 1 10 -10"></path>
 <path d="M148 61a10 10 0 0 1 10 10v100a10 10 0 0 0 10 10"></path>
 <g>
-<path d="M168 181h80"></path>
-<path d="M316 181h80"></path>
-<rect x="248" y="170" width="68" height="22" rx="10" ry="10"></rect>
-<text x="282" y="185">&#91;#x72&#93;</text>
+<path d="M168 181h24"></path>
+<path d="M260 181h24"></path>
+<rect x="192" y="170" width="68" height="22" rx="10" ry="10"></rect>
+<text x="226" y="185">&#91;#x72&#93;</text>
 </g>
-<path d="M396 181a10 10 0 0 0 10 -10v-100a10 10 0 0 1 10 -10"></path>
+<path d="M284 181a10 10 0 0 0 10 -10v-100a10 10 0 0 1 10 -10"></path>
 <path d="M148 61a10 10 0 0 1 10 10v130a10 10 0 0 0 10 10"></path>
 <g>
-<path d="M168 211h80"></path>
-<path d="M316 211h80"></path>
-<rect x="248" y="200" width="68" height="22" rx="10" ry="10"></rect>
-<text x="282" y="215">&#91;#x74&#93;</text>
+<path d="M168 211h24"></path>
+<path d="M260 211h24"></path>
+<rect x="192" y="200" width="68" height="22" rx="10" ry="10"></rect>
+<text x="226" y="215">&#91;#x74&#93;</text>
 </g>
-<path d="M396 211a10 10 0 0 0 10 -10v-130a10 10 0 0 1 10 -10"></path>
+<path d="M284 211a10 10 0 0 0 10 -10v-130a10 10 0 0 1 10 -10"></path>
 <path d="M148 61a10 10 0 0 1 10 10v160a10 10 0 0 0 10 10"></path>
 <g>
-<path d="M168 241h80"></path>
-<path d="M316 241h80"></path>
-<rect x="248" y="230" width="68" height="22" rx="10" ry="10"></rect>
-<text x="282" y="245">&#91;#x76&#93;</text>
+<path d="M168 241h24"></path>
+<path d="M260 241h24"></path>
+<rect x="192" y="230" width="68" height="22" rx="10" ry="10"></rect>
+<text x="226" y="245">&#91;#x76&#93;</text>
 </g>
-<path d="M396 241a10 10 0 0 0 10 -10v-160a10 10 0 0 1 10 -10"></path>
+<path d="M284 241a10 10 0 0 0 10 -10v-160a10 10 0 0 1 10 -10"></path>
 <path d="M148 61a10 10 0 0 1 10 10v190a10 10 0 0 0 10 10"></path>
 <g>
-<path d="M168 271h72"></path>
-<path d="M324 271h72"></path>
-<rect x="240" y="260" width="84" height="22"></rect>
-<text x="282" y="275">hex&#95;char</text>
+<path d="M168 271h16"></path>
+<path d="M268 271h16"></path>
+<rect x="184" y="260" width="84" height="22"></rect>
+<text x="226" y="275">hex&#95;char</text>
 </g>
-<path d="M396 271a10 10 0 0 0 10 -10v-190a10 10 0 0 1 10 -10"></path>
+<path d="M284 271a10 10 0 0 0 10 -10v-190a10 10 0 0 1 10 -10"></path>
 <path d="M148 61a10 10 0 0 1 10 10v220a10 10 0 0 0 10 10"></path>
 <g>
-<path d="M168 301h56"></path>
-<path d="M340 301h56"></path>
-<rect x="224" y="290" width="116" height="22"></rect>
-<text x="282" y="305">unicode&#95;char</text>
+<path d="M168 301h0"></path>
+<path d="M284 301h0"></path>
+<rect x="168" y="290" width="116" height="22"></rect>
+<text x="226" y="305">unicode&#95;char</text>
 </g>
-<path d="M396 301a10 10 0 0 0 10 -10v-220a10 10 0 0 1 10 -10"></path>
+<path d="M284 301a10 10 0 0 0 10 -10v-220a10 10 0 0 1 10 -10"></path>
 <path d="M148 61a10 10 0 0 1 10 10v250a10 10 0 0 0 10 10"></path>
 <g>
-<path d="M168 331h92"></path>
-<path d="M304 331h92"></path>
-<rect x="260" y="320" width="44" height="22"></rect>
-<text x="282" y="335">eol</text>
+<path d="M168 331h36"></path>
+<path d="M248 331h36"></path>
+<rect x="204" y="320" width="44" height="22"></rect>
+<text x="226" y="335">eol</text>
 </g>
-<path d="M396 331a10 10 0 0 0 10 -10v-250a10 10 0 0 1 10 -10"></path>
+<path d="M284 331a10 10 0 0 0 10 -10v-250a10 10 0 0 1 10 -10"></path>
 <path d="M148 61a10 10 0 0 1 10 10v280a10 10 0 0 0 10 10"></path>
 <g>
 <path d="M168 361h0"></path>
-<path d="M396 361h0"></path>
-<g>
-<path d="M168 361h0"></path>
-<path d="M316 361h0"></path>
-<path d="M168 361h20"></path>
-<g>
-<path d="M188 361h108"></path>
+<path d="M284 361h0"></path>
+<rect x="168" y="350" width="116" height="22"></rect>
+<text x="226" y="365">other&#95;escape</text>
 </g>
-<path d="M296 361h20"></path>
-<path d="M168 361a10 10 0 0 1 10 10v0a10 10 0 0 0 10 10"></path>
-<g>
-<path d="M188 381h0"></path>
-<path d="M296 381h0"></path>
-<path d="M 188 381 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
-<path d="M208 381h10"></path>
-<g>
-<path d="M218 381h0"></path>
-<path d="M286 381h0"></path>
-<rect x="218" y="370" width="68" height="22"></rect>
-<text x="252" y="385">escape</text>
-</g>
-<path d="M286 381h10"></path>
-</g>
-<path d="M296 381a10 10 0 0 0 10 -10v0a10 10 0 0 1 10 -10"></path>
-</g>
-<path d="M316 361h10"></path>
-<g>
-<path d="M326 361h0"></path>
-<path d="M386 361h0"></path>
-<rect x="326" y="350" width="60" height="22"></rect>
-<text x="356" y="365">other</text>
-</g>
-<path d="M386 361h10"></path>
-</g>
-<path d="M396 361a10 10 0 0 0 10 -10v-280a10 10 0 0 1 10 -10"></path>
+<path d="M284 361a10 10 0 0 0 10 -10v-280a10 10 0 0 1 10 -10"></path>
 </g>
 </g>
-<path d="M416 61a10 10 0 0 0 10 -10v-10a10 10 0 0 1 10 -10"></path>
+<path d="M304 61a10 10 0 0 0 10 -10v-10a10 10 0 0 1 10 -10"></path>
 </g>
-<path d="M 436 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
+<path d="M 324 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
 </g>
 </svg>
 
@@ -2302,44 +1704,44 @@ textarea.form-control.grammar-edit {
 						<a href="#hex_char">hex_char</a>
 						<a href="#unicode_char">unicode_char</a>
 						<a href="#eol">eol</a>
-						<a href="#other">other</a>
+						<a href="#other_escape">other_escape</a>
 					</div>
 				</div>
 			  <div class="rule">
-					<h2 id=hex_char>hex_char</h2>
-					<div onclick=svgBlockClick>
-						<svg class="railroad-diagram" width="345" height="62" viewBox="0 0 345 62">
+					<h2 id='hex_char'>hex_char</h2>
+					<div onclick='svgBlockClick(event)'>
+						<svg class="railroad-diagram" width="305" height="62" viewBox="0 0 305 62">
 <g transform="translate(.5 .5)">
 <path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
 <g>
 <path d="M40 31h0"></path>
-<path d="M304 31h0"></path>
+<path d="M264 31h0"></path>
 <path d="M40 31h10"></path>
 <g>
 <path d="M50 31h0"></path>
-<path d="M118 31h0"></path>
-<rect x="50" y="20" width="68" height="22" rx="10" ry="10"></rect>
-<text x="84" y="35">&#91;#x78&#93;</text>
+<path d="M78 31h0"></path>
+<rect x="50" y="20" width="28" height="22" rx="10" ry="10"></rect>
+<text x="64" y="35">x</text>
 </g>
-<path d="M118 31h10"></path>
-<path d="M128 31h10"></path>
+<path d="M78 31h10"></path>
+<path d="M88 31h10"></path>
 <g>
-<path d="M138 31h0"></path>
-<path d="M206 31h0"></path>
-<rect x="138" y="20" width="68" height="22"></rect>
-<text x="172" y="35">HEXDIG</text>
+<path d="M98 31h0"></path>
+<path d="M166 31h0"></path>
+<rect x="98" y="20" width="68" height="22"></rect>
+<text x="132" y="35">hexdig</text>
 </g>
-<path d="M206 31h10"></path>
-<path d="M216 31h10"></path>
+<path d="M166 31h10"></path>
+<path d="M176 31h10"></path>
 <g>
-<path d="M226 31h0"></path>
-<path d="M294 31h0"></path>
-<rect x="226" y="20" width="68" height="22"></rect>
-<text x="260" y="35">HEXDIG</text>
+<path d="M186 31h0"></path>
+<path d="M254 31h0"></path>
+<rect x="186" y="20" width="68" height="22"></rect>
+<text x="220" y="35">hexdig</text>
 </g>
-<path d="M294 31h10"></path>
+<path d="M254 31h10"></path>
 </g>
-<path d="M 304 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
+<path d="M 264 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
 </g>
 </svg>
 
@@ -2350,60 +1752,60 @@ textarea.form-control.grammar-edit {
 					</div>
 					<div>
 						References:
-						<a href="#HEXDIG">HEXDIG</a>
+						<a href="#hexdig">hexdig</a>
 					</div>
 				</div>
 			  <div class="rule">
-					<h2 id=unicode_char>unicode_char</h2>
-					<div onclick=svgBlockClick>
-						<svg class="railroad-diagram" width="521" height="62" viewBox="0 0 521 62">
+					<h2 id='unicode_char'>unicode_char</h2>
+					<div onclick='svgBlockClick(event)'>
+						<svg class="railroad-diagram" width="481" height="62" viewBox="0 0 481 62">
 <g transform="translate(.5 .5)">
 <path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
 <g>
 <path d="M40 31h0"></path>
-<path d="M480 31h0"></path>
+<path d="M440 31h0"></path>
 <path d="M40 31h10"></path>
 <g>
 <path d="M50 31h0"></path>
-<path d="M118 31h0"></path>
-<rect x="50" y="20" width="68" height="22" rx="10" ry="10"></rect>
-<text x="84" y="35">&#91;#x75&#93;</text>
+<path d="M78 31h0"></path>
+<rect x="50" y="20" width="28" height="22" rx="10" ry="10"></rect>
+<text x="64" y="35">u</text>
 </g>
-<path d="M118 31h10"></path>
-<path d="M128 31h10"></path>
+<path d="M78 31h10"></path>
+<path d="M88 31h10"></path>
 <g>
-<path d="M138 31h0"></path>
-<path d="M206 31h0"></path>
-<rect x="138" y="20" width="68" height="22"></rect>
-<text x="172" y="35">HEXDIG</text>
+<path d="M98 31h0"></path>
+<path d="M166 31h0"></path>
+<rect x="98" y="20" width="68" height="22"></rect>
+<text x="132" y="35">hexdig</text>
 </g>
-<path d="M206 31h10"></path>
-<path d="M216 31h10"></path>
+<path d="M166 31h10"></path>
+<path d="M176 31h10"></path>
 <g>
-<path d="M226 31h0"></path>
-<path d="M294 31h0"></path>
-<rect x="226" y="20" width="68" height="22"></rect>
-<text x="260" y="35">HEXDIG</text>
+<path d="M186 31h0"></path>
+<path d="M254 31h0"></path>
+<rect x="186" y="20" width="68" height="22"></rect>
+<text x="220" y="35">hexdig</text>
 </g>
-<path d="M294 31h10"></path>
-<path d="M304 31h10"></path>
+<path d="M254 31h10"></path>
+<path d="M264 31h10"></path>
 <g>
-<path d="M314 31h0"></path>
-<path d="M382 31h0"></path>
-<rect x="314" y="20" width="68" height="22"></rect>
-<text x="348" y="35">HEXDIG</text>
+<path d="M274 31h0"></path>
+<path d="M342 31h0"></path>
+<rect x="274" y="20" width="68" height="22"></rect>
+<text x="308" y="35">hexdig</text>
 </g>
-<path d="M382 31h10"></path>
-<path d="M392 31h10"></path>
+<path d="M342 31h10"></path>
+<path d="M352 31h10"></path>
 <g>
-<path d="M402 31h0"></path>
-<path d="M470 31h0"></path>
-<rect x="402" y="20" width="68" height="22"></rect>
-<text x="436" y="35">HEXDIG</text>
+<path d="M362 31h0"></path>
+<path d="M430 31h0"></path>
+<rect x="362" y="20" width="68" height="22"></rect>
+<text x="396" y="35">hexdig</text>
 </g>
-<path d="M470 31h10"></path>
+<path d="M430 31h10"></path>
 </g>
-<path d="M 480 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
+<path d="M 440 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
 </g>
 </svg>
 
@@ -2414,24 +1816,52 @@ textarea.form-control.grammar-edit {
 					</div>
 					<div>
 						References:
-						<a href="#HEXDIG">HEXDIG</a>
+						<a href="#hexdig">hexdig</a>
 					</div>
 				</div>
 			  <div class="rule">
-					<h2 id=escape>escape</h2>
-					<div onclick=svgBlockClick>
-						<svg class="railroad-diagram" width="169" height="62" viewBox="0 0 169 62">
+					<h2 id='hexdig'>hexdig</h2>
+					<div onclick='svgBlockClick(event)'>
+						<svg class="railroad-diagram" width="209" height="62" viewBox="0 0 209 62">
 <g transform="translate(.5 .5)">
 <path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
 <path d="M40 31h10"></path>
 <g>
 <path d="M50 31h0"></path>
-<path d="M118 31h0"></path>
-<rect x="50" y="20" width="68" height="22" rx="10" ry="10"></rect>
-<text x="84" y="35">&#91;#x5C&#93;</text>
+<path d="M158 31h0"></path>
+<rect x="50" y="20" width="108" height="22" rx="10" ry="10"></rect>
+<text x="104" y="35">&#91;0-9a-fA-F&#93;</text>
 </g>
-<path d="M118 31h10"></path>
-<path d="M 128 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
+<path d="M158 31h10"></path>
+<path d="M 168 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
+</g>
+</svg>
+
+					</div>
+					<div>
+						Used by:
+						<a href="#hex_char">hex_char</a>
+						<a href="#unicode_char">unicode_char</a>
+					</div>
+					<div>
+						References:
+					</div>
+				</div>
+			  <div class="rule">
+					<h2 id='escape'>escape</h2>
+					<div onclick='svgBlockClick(event)'>
+						<svg class="railroad-diagram" width="129" height="62" viewBox="0 0 129 62">
+<g transform="translate(.5 .5)">
+<path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
+<path d="M40 31h10"></path>
+<g>
+<path d="M50 31h0"></path>
+<path d="M78 31h0"></path>
+<rect x="50" y="20" width="28" height="22" rx="10" ry="10"></rect>
+<text x="64" y="35">\</text>
+</g>
+<path d="M78 31h10"></path>
+<path d="M 88 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
 </g>
 </svg>
 
@@ -2445,8 +1875,8 @@ textarea.form-control.grammar-edit {
 					</div>
 				</div>
 			  <div class="rule">
-					<h2 id=unescaped>unescaped</h2>
-					<div onclick=svgBlockClick>
+					<h2 id='unescaped'>unescaped</h2>
+					<div onclick='svgBlockClick(event)'>
 						<svg class="railroad-diagram" width="261" height="182" viewBox="0 0 261 182">
 <g transform="translate(.5 .5)">
 <path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
@@ -2508,8 +1938,8 @@ textarea.form-control.grammar-edit {
 					</div>
 				</div>
 			  <div class="rule">
-					<h2 id=other_escaped>other_escaped</h2>
-					<div onclick=svgBlockClick>
+					<h2 id='other_escaped'>other_escaped</h2>
+					<div onclick='svgBlockClick(event)'>
 						<svg class="railroad-diagram" width="261" height="302" viewBox="0 0 261 302">
 <g transform="translate(.5 .5)">
 <path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
@@ -2602,8 +2032,8 @@ textarea.form-control.grammar-edit {
 					</div>
 				</div>
 			  <div class="rule">
-					<h2 id=array>array</h2>
-					<div onclick=svgBlockClick>
+					<h2 id='array'>array</h2>
+					<div onclick='svgBlockClick(event)'>
 						<svg class="railroad-diagram" width="705" height="102" viewBox="0 0 705 102">
 <g transform="translate(.5 .5)">
 <path d="M 20 31 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
@@ -2703,89 +2133,224 @@ textarea.form-control.grammar-edit {
 					</div>
 				</div>
 			  <div class="rule">
-					<h2 id=json_object>json_object</h2>
-					<div onclick=svgBlockClick>
-						<svg class="railroad-diagram" width="721" height="102" viewBox="0 0 721 102">
+					<h2 id='begin_array'>begin_array</h2>
+					<div onclick='svgBlockClick(event)'>
+						<svg class="railroad-diagram" width="241" height="62" viewBox="0 0 241 62">
+<g transform="translate(.5 .5)">
+<path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
+<g>
+<path d="M40 31h0"></path>
+<path d="M200 31h0"></path>
+<path d="M40 31h10"></path>
+<g>
+<path d="M50 31h0"></path>
+<path d="M86 31h0"></path>
+<rect x="50" y="20" width="36" height="22"></rect>
+<text x="68" y="35">ws</text>
+</g>
+<path d="M86 31h10"></path>
+<path d="M96 31h10"></path>
+<g>
+<path d="M106 31h0"></path>
+<path d="M134 31h0"></path>
+<rect x="106" y="20" width="28" height="22" rx="10" ry="10"></rect>
+<text x="120" y="35">&#91;</text>
+</g>
+<path d="M134 31h10"></path>
+<path d="M144 31h10"></path>
+<g>
+<path d="M154 31h0"></path>
+<path d="M190 31h0"></path>
+<rect x="154" y="20" width="36" height="22"></rect>
+<text x="172" y="35">ws</text>
+</g>
+<path d="M190 31h10"></path>
+</g>
+<path d="M 200 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
+</g>
+</svg>
+
+					</div>
+					<div>
+						Used by:
+						<a href="#array">array</a>
+					</div>
+					<div>
+						References:
+						<a href="#ws">ws</a>
+					</div>
+				</div>
+			  <div class="rule">
+					<h2 id='end_array'>end_array</h2>
+					<div onclick='svgBlockClick(event)'>
+						<svg class="railroad-diagram" width="241" height="62" viewBox="0 0 241 62">
+<g transform="translate(.5 .5)">
+<path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
+<g>
+<path d="M40 31h0"></path>
+<path d="M200 31h0"></path>
+<path d="M40 31h10"></path>
+<g>
+<path d="M50 31h0"></path>
+<path d="M86 31h0"></path>
+<rect x="50" y="20" width="36" height="22"></rect>
+<text x="68" y="35">ws</text>
+</g>
+<path d="M86 31h10"></path>
+<path d="M96 31h10"></path>
+<g>
+<path d="M106 31h0"></path>
+<path d="M134 31h0"></path>
+<rect x="106" y="20" width="28" height="22" rx="10" ry="10"></rect>
+<text x="120" y="35">&#93;</text>
+</g>
+<path d="M134 31h10"></path>
+<path d="M144 31h10"></path>
+<g>
+<path d="M154 31h0"></path>
+<path d="M190 31h0"></path>
+<rect x="154" y="20" width="36" height="22"></rect>
+<text x="172" y="35">ws</text>
+</g>
+<path d="M190 31h10"></path>
+</g>
+<path d="M 200 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
+</g>
+</svg>
+
+					</div>
+					<div>
+						Used by:
+						<a href="#array">array</a>
+					</div>
+					<div>
+						References:
+						<a href="#ws">ws</a>
+					</div>
+				</div>
+			  <div class="rule">
+					<h2 id='value_separator'>value_separator</h2>
+					<div onclick='svgBlockClick(event)'>
+						<svg class="railroad-diagram" width="241" height="62" viewBox="0 0 241 62">
+<g transform="translate(.5 .5)">
+<path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
+<g>
+<path d="M40 31h0"></path>
+<path d="M200 31h0"></path>
+<path d="M40 31h10"></path>
+<g>
+<path d="M50 31h0"></path>
+<path d="M86 31h0"></path>
+<rect x="50" y="20" width="36" height="22"></rect>
+<text x="68" y="35">ws</text>
+</g>
+<path d="M86 31h10"></path>
+<path d="M96 31h10"></path>
+<g>
+<path d="M106 31h0"></path>
+<path d="M134 31h0"></path>
+<rect x="106" y="20" width="28" height="22" rx="10" ry="10"></rect>
+<text x="120" y="35">,</text>
+</g>
+<path d="M134 31h10"></path>
+<path d="M144 31h10"></path>
+<g>
+<path d="M154 31h0"></path>
+<path d="M190 31h0"></path>
+<rect x="154" y="20" width="36" height="22"></rect>
+<text x="172" y="35">ws</text>
+</g>
+<path d="M190 31h10"></path>
+</g>
+<path d="M 200 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
+</g>
+</svg>
+
+					</div>
+					<div>
+						Used by:
+						<a href="#array">array</a>
+						<a href="#value_sep_opt">value_sep_opt</a>
+						<a href="#properties">properties</a>
+					</div>
+					<div>
+						References:
+						<a href="#ws">ws</a>
+					</div>
+				</div>
+			  <div class="rule">
+					<h2 id='value_sep_opt'>value_sep_opt</h2>
+					<div onclick='svgBlockClick(event)'>
+						<svg class="railroad-diagram" width="261" height="72" viewBox="0 0 261 72">
 <g transform="translate(.5 .5)">
 <path d="M 20 31 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
 <g>
 <path d="M40 41h0"></path>
-<path d="M680 41h0"></path>
-<path d="M40 41h10"></path>
+<path d="M220 41h0"></path>
+<path d="M40 41a10 10 0 0 0 10 -10v0a10 10 0 0 1 10 -10"></path>
 <g>
-<path d="M50 41h0"></path>
-<path d="M166 41h0"></path>
-<rect x="50" y="30" width="116" height="22"></rect>
-<text x="108" y="45">begin&#95;object</text>
+<path d="M60 21h140"></path>
 </g>
-<path d="M166 41h10"></path>
+<path d="M200 21a10 10 0 0 1 10 10v0a10 10 0 0 0 10 10"></path>
+<path d="M40 41h20"></path>
 <g>
-<path d="M176 41h0"></path>
-<path d="M560 41h0"></path>
-<path d="M176 41a10 10 0 0 0 10 -10v0a10 10 0 0 1 10 -10"></path>
+<path d="M60 41h0"></path>
+<path d="M200 41h0"></path>
+<rect x="60" y="30" width="140" height="22"></rect>
+<text x="130" y="45">value&#95;separator</text>
+</g>
+<path d="M200 41h20"></path>
+</g>
+<path d="M 220 41 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
+</g>
+</svg>
+
+					</div>
+					<div>
+						Used by:
+						<a href="#array">array</a>
+						<a href="#properties">properties</a>
+					</div>
+					<div>
+						References:
+						<a href="#value_separator">value_separator</a>
+					</div>
+				</div>
+			  <div class="rule">
+					<h2 id='json_object'>json_object</h2>
+					<div onclick='svgBlockClick(event)'>
+						<svg class="railroad-diagram" width="457" height="62" viewBox="0 0 457 62">
+<g transform="translate(.5 .5)">
+<path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
 <g>
-<path d="M196 21h344"></path>
-</g>
-<path d="M540 21a10 10 0 0 1 10 10v0a10 10 0 0 0 10 10"></path>
-<path d="M176 41h20"></path>
+<path d="M40 31h0"></path>
+<path d="M416 31h0"></path>
+<path d="M40 31h10"></path>
 <g>
-<path d="M196 41h0"></path>
-<path d="M540 41h0"></path>
-<path d="M196 41h10"></path>
+<path d="M50 31h0"></path>
+<path d="M166 31h0"></path>
+<rect x="50" y="20" width="116" height="22"></rect>
+<text x="108" y="35">begin&#95;object</text>
+</g>
+<path d="M166 31h10"></path>
+<path d="M176 31h10"></path>
 <g>
-<path d="M206 41h0"></path>
-<path d="M386 41h0"></path>
-<path d="M206 41h10"></path>
+<path d="M186 31h0"></path>
+<path d="M286 31h0"></path>
+<rect x="186" y="20" width="100" height="22"></rect>
+<text x="236" y="35">properties</text>
+</g>
+<path d="M286 31h10"></path>
+<path d="M296 31h10"></path>
 <g>
-<path d="M216 41h28"></path>
-<path d="M348 41h28"></path>
-<path d="M244 41h10"></path>
-<g>
-<path d="M254 41h0"></path>
-<path d="M338 41h0"></path>
-<rect x="254" y="30" width="84" height="22"></rect>
-<text x="296" y="45">property</text>
+<path d="M306 31h0"></path>
+<path d="M406 31h0"></path>
+<rect x="306" y="20" width="100" height="22"></rect>
+<text x="356" y="35">end&#95;object</text>
 </g>
-<path d="M338 41h10"></path>
+<path d="M406 31h10"></path>
 </g>
-<path d="M376 41h10"></path>
-<path d="M216 41a10 10 0 0 0 -10 10v10a10 10 0 0 0 10 10"></path>
-<g>
-<path d="M216 71h0"></path>
-<path d="M376 71h0"></path>
-<path d="M216 71h10"></path>
-<g>
-<path d="M226 71h0"></path>
-<path d="M366 71h0"></path>
-<rect x="226" y="60" width="140" height="22"></rect>
-<text x="296" y="75">value&#95;separator</text>
-</g>
-<path d="M366 71h10"></path>
-</g>
-<path d="M376 71a10 10 0 0 0 10 -10v-10a10 10 0 0 0 -10 -10"></path>
-</g>
-<path d="M386 41h10"></path>
-<path d="M396 41h10"></path>
-<g>
-<path d="M406 41h0"></path>
-<path d="M530 41h0"></path>
-<rect x="406" y="30" width="124" height="22"></rect>
-<text x="468" y="45">value&#95;sep&#95;opt</text>
-</g>
-<path d="M530 41h10"></path>
-</g>
-<path d="M540 41h20"></path>
-</g>
-<path d="M560 41h10"></path>
-<g>
-<path d="M570 41h0"></path>
-<path d="M670 41h0"></path>
-<rect x="570" y="30" width="100" height="22"></rect>
-<text x="620" y="45">end&#95;object</text>
-</g>
-<path d="M670 41h10"></path>
-</g>
-<path d="M 680 41 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
+<path d="M 416 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
 </g>
 </svg>
 
@@ -2797,15 +2362,191 @@ textarea.form-control.grammar-edit {
 					<div>
 						References:
 						<a href="#begin_object">begin_object</a>
-						<a href="#property">property</a>
-						<a href="#value_separator">value_separator</a>
-						<a href="#value_sep_opt">value_sep_opt</a>
+						<a href="#properties">properties</a>
 						<a href="#end_object">end_object</a>
 					</div>
 				</div>
 			  <div class="rule">
-					<h2 id=property>property</h2>
-					<div onclick=svgBlockClick>
+					<h2 id='begin_object'>begin_object</h2>
+					<div onclick='svgBlockClick(event)'>
+						<svg class="railroad-diagram" width="241" height="62" viewBox="0 0 241 62">
+<g transform="translate(.5 .5)">
+<path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
+<g>
+<path d="M40 31h0"></path>
+<path d="M200 31h0"></path>
+<path d="M40 31h10"></path>
+<g>
+<path d="M50 31h0"></path>
+<path d="M86 31h0"></path>
+<rect x="50" y="20" width="36" height="22"></rect>
+<text x="68" y="35">ws</text>
+</g>
+<path d="M86 31h10"></path>
+<path d="M96 31h10"></path>
+<g>
+<path d="M106 31h0"></path>
+<path d="M134 31h0"></path>
+<rect x="106" y="20" width="28" height="22" rx="10" ry="10"></rect>
+<text x="120" y="35">{</text>
+</g>
+<path d="M134 31h10"></path>
+<path d="M144 31h10"></path>
+<g>
+<path d="M154 31h0"></path>
+<path d="M190 31h0"></path>
+<rect x="154" y="20" width="36" height="22"></rect>
+<text x="172" y="35">ws</text>
+</g>
+<path d="M190 31h10"></path>
+</g>
+<path d="M 200 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
+</g>
+</svg>
+
+					</div>
+					<div>
+						Used by:
+						<a href="#json_object">json_object</a>
+						<a href="#mark_object">mark_object</a>
+					</div>
+					<div>
+						References:
+						<a href="#ws">ws</a>
+					</div>
+				</div>
+			  <div class="rule">
+					<h2 id='end_object'>end_object</h2>
+					<div onclick='svgBlockClick(event)'>
+						<svg class="railroad-diagram" width="241" height="62" viewBox="0 0 241 62">
+<g transform="translate(.5 .5)">
+<path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
+<g>
+<path d="M40 31h0"></path>
+<path d="M200 31h0"></path>
+<path d="M40 31h10"></path>
+<g>
+<path d="M50 31h0"></path>
+<path d="M86 31h0"></path>
+<rect x="50" y="20" width="36" height="22"></rect>
+<text x="68" y="35">ws</text>
+</g>
+<path d="M86 31h10"></path>
+<path d="M96 31h10"></path>
+<g>
+<path d="M106 31h0"></path>
+<path d="M134 31h0"></path>
+<rect x="106" y="20" width="28" height="22" rx="10" ry="10"></rect>
+<text x="120" y="35">}</text>
+</g>
+<path d="M134 31h10"></path>
+<path d="M144 31h10"></path>
+<g>
+<path d="M154 31h0"></path>
+<path d="M190 31h0"></path>
+<rect x="154" y="20" width="36" height="22"></rect>
+<text x="172" y="35">ws</text>
+</g>
+<path d="M190 31h10"></path>
+</g>
+<path d="M 200 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
+</g>
+</svg>
+
+					</div>
+					<div>
+						Used by:
+						<a href="#json_object">json_object</a>
+						<a href="#mark_object">mark_object</a>
+					</div>
+					<div>
+						References:
+						<a href="#ws">ws</a>
+					</div>
+				</div>
+			  <div class="rule">
+					<h2 id='properties'>properties</h2>
+					<div onclick='svgBlockClick(event)'>
+						<svg class="railroad-diagram" width="465" height="102" viewBox="0 0 465 102">
+<g transform="translate(.5 .5)">
+<path d="M 20 31 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
+<g>
+<path d="M40 41h0"></path>
+<path d="M424 41h0"></path>
+<path d="M40 41a10 10 0 0 0 10 -10v0a10 10 0 0 1 10 -10"></path>
+<g>
+<path d="M60 21h344"></path>
+</g>
+<path d="M404 21a10 10 0 0 1 10 10v0a10 10 0 0 0 10 10"></path>
+<path d="M40 41h20"></path>
+<g>
+<path d="M60 41h0"></path>
+<path d="M404 41h0"></path>
+<path d="M60 41h10"></path>
+<g>
+<path d="M70 41h0"></path>
+<path d="M250 41h0"></path>
+<path d="M70 41h10"></path>
+<g>
+<path d="M80 41h28"></path>
+<path d="M212 41h28"></path>
+<path d="M108 41h10"></path>
+<g>
+<path d="M118 41h0"></path>
+<path d="M202 41h0"></path>
+<rect x="118" y="30" width="84" height="22"></rect>
+<text x="160" y="45">property</text>
+</g>
+<path d="M202 41h10"></path>
+</g>
+<path d="M240 41h10"></path>
+<path d="M80 41a10 10 0 0 0 -10 10v10a10 10 0 0 0 10 10"></path>
+<g>
+<path d="M80 71h0"></path>
+<path d="M240 71h0"></path>
+<path d="M80 71h10"></path>
+<g>
+<path d="M90 71h0"></path>
+<path d="M230 71h0"></path>
+<rect x="90" y="60" width="140" height="22"></rect>
+<text x="160" y="75">value&#95;separator</text>
+</g>
+<path d="M230 71h10"></path>
+</g>
+<path d="M240 71a10 10 0 0 0 10 -10v-10a10 10 0 0 0 -10 -10"></path>
+</g>
+<path d="M250 41h10"></path>
+<path d="M260 41h10"></path>
+<g>
+<path d="M270 41h0"></path>
+<path d="M394 41h0"></path>
+<rect x="270" y="30" width="124" height="22"></rect>
+<text x="332" y="45">value&#95;sep&#95;opt</text>
+</g>
+<path d="M394 41h10"></path>
+</g>
+<path d="M404 41h20"></path>
+</g>
+<path d="M 424 41 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
+</g>
+</svg>
+
+					</div>
+					<div>
+						Used by:
+						<a href="#json_object">json_object</a>
+						<a href="#mark_object">mark_object</a>
+					</div>
+					<div>
+						References:
+						<a href="#property">property</a>
+						<a href="#value_separator">value_separator</a>
+						<a href="#value_sep_opt">value_sep_opt</a>
+					</div>
+				</div>
+			  <div class="rule">
+					<h2 id='property'>property</h2>
+					<div onclick='svgBlockClick(event)'>
 						<svg class="railroad-diagram" width="337" height="62" viewBox="0 0 337 62">
 <g transform="translate(.5 .5)">
 <path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
@@ -2844,8 +2585,7 @@ textarea.form-control.grammar-edit {
 					</div>
 					<div>
 						Used by:
-						<a href="#json_object">json_object</a>
-						<a href="#mark_object">mark_object</a>
+						<a href="#properties">properties</a>
 					</div>
 					<div>
 						References:
@@ -2855,8 +2595,56 @@ textarea.form-control.grammar-edit {
 					</div>
 				</div>
 			  <div class="rule">
-					<h2 id=key>key</h2>
-					<div onclick=svgBlockClick>
+					<h2 id='separator'>separator</h2>
+					<div onclick='svgBlockClick(event)'>
+						<svg class="railroad-diagram" width="241" height="62" viewBox="0 0 241 62">
+<g transform="translate(.5 .5)">
+<path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
+<g>
+<path d="M40 31h0"></path>
+<path d="M200 31h0"></path>
+<path d="M40 31h10"></path>
+<g>
+<path d="M50 31h0"></path>
+<path d="M86 31h0"></path>
+<rect x="50" y="20" width="36" height="22"></rect>
+<text x="68" y="35">ws</text>
+</g>
+<path d="M86 31h10"></path>
+<path d="M96 31h10"></path>
+<g>
+<path d="M106 31h0"></path>
+<path d="M134 31h0"></path>
+<rect x="106" y="20" width="28" height="22" rx="10" ry="10"></rect>
+<text x="120" y="35">:</text>
+</g>
+<path d="M134 31h10"></path>
+<path d="M144 31h10"></path>
+<g>
+<path d="M154 31h0"></path>
+<path d="M190 31h0"></path>
+<rect x="154" y="20" width="36" height="22"></rect>
+<text x="172" y="35">ws</text>
+</g>
+<path d="M190 31h10"></path>
+</g>
+<path d="M 200 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
+</g>
+</svg>
+
+					</div>
+					<div>
+						Used by:
+						<a href="#property">property</a>
+					</div>
+					<div>
+						References:
+						<a href="#ws">ws</a>
+					</div>
+				</div>
+			  <div class="rule">
+					<h2 id='key'>key</h2>
+					<div onclick='svgBlockClick(event)'>
 						<svg class="railroad-diagram" width="221" height="92" viewBox="0 0 221 92">
 <g transform="translate(.5 .5)">
 <path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
@@ -2896,98 +2684,8 @@ textarea.form-control.grammar-edit {
 					</div>
 				</div>
 			  <div class="rule">
-					<h2 id=begin_identifier>begin_identifier</h2>
-					<div onclick=svgBlockClick>
-						<svg class="railroad-diagram" width="189" height="122" viewBox="0 0 189 122">
-<g transform="translate(.5 .5)">
-<path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
-<g>
-<path d="M40 31h0"></path>
-<path d="M148 31h0"></path>
-<path d="M40 31h20"></path>
-<g>
-<path d="M60 31h4"></path>
-<path d="M124 31h4"></path>
-<rect x="64" y="20" width="60" height="22"></rect>
-<text x="94" y="35">ALPHA</text>
-</g>
-<path d="M128 31h20"></path>
-<path d="M40 31a10 10 0 0 1 10 10v10a10 10 0 0 0 10 10"></path>
-<g>
-<path d="M60 61h0"></path>
-<path d="M128 61h0"></path>
-<rect x="60" y="50" width="68" height="22" rx="10" ry="10"></rect>
-<text x="94" y="65">&#91;#x5F&#93;</text>
-</g>
-<path d="M128 61a10 10 0 0 0 10 -10v-10a10 10 0 0 1 10 -10"></path>
-<path d="M40 31a10 10 0 0 1 10 10v40a10 10 0 0 0 10 10"></path>
-<g>
-<path d="M60 91h0"></path>
-<path d="M128 91h0"></path>
-<rect x="60" y="80" width="68" height="22" rx="10" ry="10"></rect>
-<text x="94" y="95">&#91;#x24&#93;</text>
-</g>
-<path d="M128 91a10 10 0 0 0 10 -10v-40a10 10 0 0 1 10 -10"></path>
-</g>
-<path d="M 148 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
-</g>
-</svg>
-
-					</div>
-					<div>
-						Used by:
-						<a href="#continue_identifier">continue_identifier</a>
-						<a href="#identifier">identifier</a>
-					</div>
-					<div>
-						References:
-						<a href="#ALPHA">ALPHA</a>
-					</div>
-				</div>
-			  <div class="rule">
-					<h2 id=continue_identifier>continue_identifier</h2>
-					<div onclick=svgBlockClick>
-						<svg class="railroad-diagram" width="269" height="92" viewBox="0 0 269 92">
-<g transform="translate(.5 .5)">
-<path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
-<g>
-<path d="M40 31h0"></path>
-<path d="M228 31h0"></path>
-<path d="M40 31h20"></path>
-<g>
-<path d="M60 31h0"></path>
-<path d="M208 31h0"></path>
-<rect x="60" y="20" width="148" height="22"></rect>
-<text x="134" y="35">begin&#95;identifier</text>
-</g>
-<path d="M208 31h20"></path>
-<path d="M40 31a10 10 0 0 1 10 10v10a10 10 0 0 0 10 10"></path>
-<g>
-<path d="M60 61h44"></path>
-<path d="M164 61h44"></path>
-<rect x="104" y="50" width="60" height="22"></rect>
-<text x="134" y="65">DIGIT</text>
-</g>
-<path d="M208 61a10 10 0 0 0 10 -10v-10a10 10 0 0 1 10 -10"></path>
-</g>
-<path d="M 228 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
-</g>
-</svg>
-
-					</div>
-					<div>
-						Used by:
-						<a href="#identifier">identifier</a>
-					</div>
-					<div>
-						References:
-						<a href="#begin_identifier">begin_identifier</a>
-						<a href="#DIGIT">DIGIT</a>
-					</div>
-				</div>
-			  <div class="rule">
-					<h2 id=identifier>identifier</h2>
-					<div onclick=svgBlockClick>
+					<h2 id='identifier'>identifier</h2>
+					<div onclick='svgBlockClick(event)'>
 						<svg class="railroad-diagram" width="481" height="81" viewBox="0 0 481 81">
 <g transform="translate(.5 .5)">
 <path d="M 20 31 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
@@ -3048,151 +2746,188 @@ textarea.form-control.grammar-edit {
 					</div>
 				</div>
 			  <div class="rule">
-					<h2 id=mark_object>mark_object</h2>
-					<div onclick=svgBlockClick>
-						<svg class="railroad-diagram" width="969" height="102" viewBox="0 0 969 102">
+					<h2 id='begin_identifier'>begin_identifier</h2>
+					<div onclick='svgBlockClick(event)'>
+						<svg class="railroad-diagram" width="205" height="122" viewBox="0 0 205 122">
 <g transform="translate(.5 .5)">
-<path d="M 20 31 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
+<path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
 <g>
-<path d="M40 41h0"></path>
-<path d="M928 41h0"></path>
-<path d="M40 41h10"></path>
+<path d="M40 31h0"></path>
+<path d="M164 31h0"></path>
+<path d="M40 31h20"></path>
 <g>
-<path d="M50 41h0"></path>
-<path d="M166 41h0"></path>
-<rect x="50" y="30" width="116" height="22"></rect>
-<text x="108" y="45">begin&#95;object</text>
+<path d="M60 31h0"></path>
+<path d="M144 31h0"></path>
+<rect x="60" y="20" width="84" height="22" rx="10" ry="10"></rect>
+<text x="102" y="35">&#91;a-zA-Z&#93;</text>
 </g>
-<path d="M166 41h10"></path>
-<path d="M176 41h10"></path>
+<path d="M144 31h20"></path>
+<path d="M40 31a10 10 0 0 1 10 10v10a10 10 0 0 0 10 10"></path>
 <g>
-<path d="M186 41h0"></path>
-<path d="M278 41h0"></path>
-<rect x="186" y="30" width="92" height="22"></rect>
-<text x="232" y="45">type&#95;name</text>
+<path d="M60 61h28"></path>
+<path d="M116 61h28"></path>
+<rect x="88" y="50" width="28" height="22" rx="10" ry="10"></rect>
+<text x="102" y="65">&#95;</text>
 </g>
-<path d="M278 41h10"></path>
+<path d="M144 61a10 10 0 0 0 10 -10v-10a10 10 0 0 1 10 -10"></path>
+<path d="M40 31a10 10 0 0 1 10 10v40a10 10 0 0 0 10 10"></path>
 <g>
-<path d="M288 41h0"></path>
-<path d="M672 41h0"></path>
-<path d="M288 41a10 10 0 0 0 10 -10v0a10 10 0 0 1 10 -10"></path>
-<g>
-<path d="M308 21h344"></path>
+<path d="M60 91h28"></path>
+<path d="M116 91h28"></path>
+<rect x="88" y="80" width="28" height="22" rx="10" ry="10"></rect>
+<text x="102" y="95">$</text>
 </g>
-<path d="M652 21a10 10 0 0 1 10 10v0a10 10 0 0 0 10 10"></path>
-<path d="M288 41h20"></path>
-<g>
-<path d="M308 41h0"></path>
-<path d="M652 41h0"></path>
-<path d="M308 41h10"></path>
-<g>
-<path d="M318 41h0"></path>
-<path d="M498 41h0"></path>
-<path d="M318 41h10"></path>
-<g>
-<path d="M328 41h28"></path>
-<path d="M460 41h28"></path>
-<path d="M356 41h10"></path>
-<g>
-<path d="M366 41h0"></path>
-<path d="M450 41h0"></path>
-<rect x="366" y="30" width="84" height="22"></rect>
-<text x="408" y="45">property</text>
+<path d="M144 91a10 10 0 0 0 10 -10v-40a10 10 0 0 1 10 -10"></path>
 </g>
-<path d="M450 41h10"></path>
-</g>
-<path d="M488 41h10"></path>
-<path d="M328 41a10 10 0 0 0 -10 10v10a10 10 0 0 0 10 10"></path>
-<g>
-<path d="M328 71h0"></path>
-<path d="M488 71h0"></path>
-<path d="M328 71h10"></path>
-<g>
-<path d="M338 71h0"></path>
-<path d="M478 71h0"></path>
-<rect x="338" y="60" width="140" height="22"></rect>
-<text x="408" y="75">value&#95;separator</text>
-</g>
-<path d="M478 71h10"></path>
-</g>
-<path d="M488 71a10 10 0 0 0 10 -10v-10a10 10 0 0 0 -10 -10"></path>
-</g>
-<path d="M498 41h10"></path>
-<path d="M508 41h10"></path>
-<g>
-<path d="M518 41h0"></path>
-<path d="M642 41h0"></path>
-<rect x="518" y="30" width="124" height="22"></rect>
-<text x="580" y="45">value&#95;sep&#95;opt</text>
-</g>
-<path d="M642 41h10"></path>
-</g>
-<path d="M652 41h20"></path>
-</g>
-<g>
-<path d="M672 41h0"></path>
-<path d="M808 41h0"></path>
-<path d="M672 41a10 10 0 0 0 10 -10v0a10 10 0 0 1 10 -10"></path>
-<g>
-<path d="M692 21h96"></path>
-</g>
-<path d="M788 21a10 10 0 0 1 10 10v0a10 10 0 0 0 10 10"></path>
-<path d="M672 41h20"></path>
-<g>
-<path d="M692 41h0"></path>
-<path d="M788 41h0"></path>
-<path d="M692 41h10"></path>
-<g>
-<path d="M702 41h0"></path>
-<path d="M778 41h0"></path>
-<rect x="702" y="30" width="76" height="22"></rect>
-<text x="740" y="45">content</text>
-</g>
-<path d="M778 41h10"></path>
-<path d="M702 41a10 10 0 0 0 -10 10v0a10 10 0 0 0 10 10"></path>
-<g>
-<path d="M702 61h76"></path>
-</g>
-<path d="M778 61a10 10 0 0 0 10 -10v0a10 10 0 0 0 -10 -10"></path>
-</g>
-<path d="M788 41h20"></path>
-</g>
-<path d="M808 41h10"></path>
-<g>
-<path d="M818 41h0"></path>
-<path d="M918 41h0"></path>
-<rect x="818" y="30" width="100" height="22"></rect>
-<text x="868" y="45">end&#95;object</text>
-</g>
-<path d="M918 41h10"></path>
-</g>
-<path d="M 928 41 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
+<path d="M 164 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
 </g>
 </svg>
 
 					</div>
 					<div>
 						Used by:
-						<a href="#content">content</a>
+						<a href="#identifier">identifier</a>
+						<a href="#continue_identifier">continue_identifier</a>
+					</div>
+					<div>
+						References:
+					</div>
+				</div>
+			  <div class="rule">
+					<h2 id='continue_identifier'>continue_identifier</h2>
+					<div onclick='svgBlockClick(event)'>
+						<svg class="railroad-diagram" width="269" height="152" viewBox="0 0 269 152">
+<g transform="translate(.5 .5)">
+<path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
+<g>
+<path d="M40 31h0"></path>
+<path d="M228 31h0"></path>
+<path d="M40 31h20"></path>
+<g>
+<path d="M60 31h0"></path>
+<path d="M208 31h0"></path>
+<rect x="60" y="20" width="148" height="22"></rect>
+<text x="134" y="35">begin&#95;identifier</text>
+</g>
+<path d="M208 31h20"></path>
+<path d="M40 31a10 10 0 0 1 10 10v10a10 10 0 0 0 10 10"></path>
+<g>
+<path d="M60 61h44"></path>
+<path d="M164 61h44"></path>
+<rect x="104" y="50" width="60" height="22"></rect>
+<text x="134" y="65">digit</text>
+</g>
+<path d="M208 61a10 10 0 0 0 10 -10v-10a10 10 0 0 1 10 -10"></path>
+<path d="M40 31a10 10 0 0 1 10 10v40a10 10 0 0 0 10 10"></path>
+<g>
+<path d="M60 91h60"></path>
+<path d="M148 91h60"></path>
+<rect x="120" y="80" width="28" height="22" rx="10" ry="10"></rect>
+<text x="134" y="95">-</text>
+</g>
+<path d="M208 91a10 10 0 0 0 10 -10v-40a10 10 0 0 1 10 -10"></path>
+<path d="M40 31a10 10 0 0 1 10 10v70a10 10 0 0 0 10 10"></path>
+<g>
+<path d="M60 121h60"></path>
+<path d="M148 121h60"></path>
+<rect x="120" y="110" width="28" height="22" rx="10" ry="10"></rect>
+<text x="134" y="125">.</text>
+</g>
+<path d="M208 121a10 10 0 0 0 10 -10v-70a10 10 0 0 1 10 -10"></path>
+</g>
+<path d="M 228 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
+</g>
+</svg>
+
+					</div>
+					<div>
+						Used by:
+						<a href="#identifier">identifier</a>
+					</div>
+					<div>
+						References:
+						<a href="#begin_identifier">begin_identifier</a>
+						<a href="#digit">digit</a>
+					</div>
+				</div>
+			  <div class="rule">
+					<h2 id='mark_object'>mark_object</h2>
+					<div onclick='svgBlockClick(event)'>
+						<svg class="railroad-diagram" width="673" height="62" viewBox="0 0 673 62">
+<g transform="translate(.5 .5)">
+<path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
+<g>
+<path d="M40 31h0"></path>
+<path d="M632 31h0"></path>
+<path d="M40 31h10"></path>
+<g>
+<path d="M50 31h0"></path>
+<path d="M166 31h0"></path>
+<rect x="50" y="20" width="116" height="22"></rect>
+<text x="108" y="35">begin&#95;object</text>
+</g>
+<path d="M166 31h10"></path>
+<path d="M176 31h10"></path>
+<g>
+<path d="M186 31h0"></path>
+<path d="M278 31h0"></path>
+<rect x="186" y="20" width="92" height="22"></rect>
+<text x="232" y="35">type&#95;name</text>
+</g>
+<path d="M278 31h10"></path>
+<path d="M288 31h10"></path>
+<g>
+<path d="M298 31h0"></path>
+<path d="M398 31h0"></path>
+<rect x="298" y="20" width="100" height="22"></rect>
+<text x="348" y="35">properties</text>
+</g>
+<path d="M398 31h10"></path>
+<path d="M408 31h10"></path>
+<g>
+<path d="M418 31h0"></path>
+<path d="M502 31h0"></path>
+<rect x="418" y="20" width="84" height="22"></rect>
+<text x="460" y="35">contents</text>
+</g>
+<path d="M502 31h10"></path>
+<path d="M512 31h10"></path>
+<g>
+<path d="M522 31h0"></path>
+<path d="M622 31h0"></path>
+<rect x="522" y="20" width="100" height="22"></rect>
+<text x="572" y="35">end&#95;object</text>
+</g>
+<path d="M622 31h10"></path>
+</g>
+<path d="M 632 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
+</g>
+</svg>
+
+					</div>
+					<div>
+						Used by:
+						<a href="#contents">contents</a>
 						<a href="#value">value</a>
 					</div>
 					<div>
 						References:
 						<a href="#begin_object">begin_object</a>
 						<a href="#type_name">type_name</a>
-						<a href="#property">property</a>
-						<a href="#value_separator">value_separator</a>
-						<a href="#value_sep_opt">value_sep_opt</a>
-						<a href="#content">content</a>
+						<a href="#properties">properties</a>
+						<a href="#contents">contents</a>
 						<a href="#end_object">end_object</a>
 					</div>
 				</div>
 			  <div class="rule">
-					<h2 id=type_name>type_name</h2>
-					<div onclick=svgBlockClick>
-						<svg class="railroad-diagram" width="201" height="62" viewBox="0 0 201 62">
+					<h2 id='type_name'>type_name</h2>
+					<div onclick='svgBlockClick(event)'>
+						<svg class="railroad-diagram" width="257" height="62" viewBox="0 0 257 62">
 <g transform="translate(.5 .5)">
 <path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
+<g>
+<path d="M40 31h0"></path>
+<path d="M216 31h0"></path>
 <path d="M40 31h10"></path>
 <g>
 <path d="M50 31h0"></path>
@@ -3201,7 +2936,16 @@ textarea.form-control.grammar-edit {
 <text x="100" y="35">identifier</text>
 </g>
 <path d="M150 31h10"></path>
-<path d="M 160 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
+<path d="M160 31h10"></path>
+<g>
+<path d="M170 31h0"></path>
+<path d="M206 31h0"></path>
+<rect x="170" y="20" width="36" height="22"></rect>
+<text x="188" y="35">ws</text>
+</g>
+<path d="M206 31h10"></path>
+</g>
+<path d="M 216 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
 </g>
 </svg>
 
@@ -3213,35 +2957,74 @@ textarea.form-control.grammar-edit {
 					<div>
 						References:
 						<a href="#identifier">identifier</a>
+						<a href="#ws">ws</a>
 					</div>
 				</div>
 			  <div class="rule">
-					<h2 id=content>content</h2>
-					<div onclick=svgBlockClick>
-						<svg class="railroad-diagram" width="229" height="92" viewBox="0 0 229 92">
+					<h2 id='contents'>contents</h2>
+					<div onclick='svgBlockClick(event)'>
+						<svg class="railroad-diagram" width="297" height="170" viewBox="0 0 297 170">
 <g transform="translate(.5 .5)">
-<path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
+<path d="M 20 31 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
 <g>
-<path d="M40 31h0"></path>
-<path d="M188 31h0"></path>
-<path d="M40 31h20"></path>
+<path d="M40 41h0"></path>
+<path d="M256 41h0"></path>
+<path d="M40 41a10 10 0 0 0 10 -10v0a10 10 0 0 1 10 -10"></path>
 <g>
-<path d="M60 31h20"></path>
-<path d="M148 31h20"></path>
-<rect x="80" y="20" width="68" height="22"></rect>
-<text x="114" y="35">string</text>
+<path d="M60 21h176"></path>
 </g>
-<path d="M168 31h20"></path>
-<path d="M40 31a10 10 0 0 1 10 10v10a10 10 0 0 0 10 10"></path>
+<path d="M236 21a10 10 0 0 1 10 10v0a10 10 0 0 0 10 10"></path>
+<path d="M40 41h20"></path>
 <g>
-<path d="M60 61h0"></path>
-<path d="M168 61h0"></path>
-<rect x="60" y="50" width="108" height="22"></rect>
-<text x="114" y="65">mark&#95;object</text>
+<path d="M60 41h0"></path>
+<path d="M236 41h0"></path>
+<path d="M60 41h10"></path>
+<g>
+<path d="M70 41h0"></path>
+<path d="M226 41h0"></path>
+<path d="M70 41h20"></path>
+<g>
+<path d="M90 41h24"></path>
+<path d="M182 41h24"></path>
+<rect x="114" y="30" width="68" height="22"></rect>
+<text x="148" y="45">string</text>
 </g>
-<path d="M168 61a10 10 0 0 0 10 -10v-10a10 10 0 0 1 10 -10"></path>
+<path d="M206 41h20"></path>
+<path d="M70 41a10 10 0 0 1 10 10v10a10 10 0 0 0 10 10"></path>
+<g>
+<path d="M90 71h4"></path>
+<path d="M202 71h4"></path>
+<rect x="94" y="60" width="108" height="22"></rect>
+<text x="148" y="75">mark&#95;object</text>
 </g>
-<path d="M 188 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
+<path d="M206 71a10 10 0 0 0 10 -10v-10a10 10 0 0 1 10 -10"></path>
+<path d="M70 41a10 10 0 0 1 10 10v40a10 10 0 0 0 10 10"></path>
+<g>
+<path d="M90 101h0"></path>
+<path d="M206 101h0"></path>
+<rect x="90" y="90" width="116" height="22"></rect>
+<text x="148" y="105">mark&#95;comment</text>
+</g>
+<path d="M206 101a10 10 0 0 0 10 -10v-40a10 10 0 0 1 10 -10"></path>
+<path d="M70 41a10 10 0 0 1 10 10v70a10 10 0 0 0 10 10"></path>
+<g>
+<path d="M90 131h40"></path>
+<path d="M166 131h40"></path>
+<rect x="130" y="120" width="36" height="22"></rect>
+<text x="148" y="135">ws</text>
+</g>
+<path d="M206 131a10 10 0 0 0 10 -10v-70a10 10 0 0 1 10 -10"></path>
+</g>
+<path d="M226 41h10"></path>
+<path d="M70 41a10 10 0 0 0 -10 10v89a10 10 0 0 0 10 10"></path>
+<g>
+<path d="M70 150h156"></path>
+</g>
+<path d="M226 150a10 10 0 0 0 10 -10v-89a10 10 0 0 0 -10 -10"></path>
+</g>
+<path d="M236 41h20"></path>
+</g>
+<path d="M 256 41 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
 </g>
 </svg>
 
@@ -3254,11 +3037,148 @@ textarea.form-control.grammar-edit {
 						References:
 						<a href="#string">string</a>
 						<a href="#mark_object">mark_object</a>
+						<a href="#mark_comment">mark_comment</a>
+						<a href="#ws">ws</a>
 					</div>
 				</div>
 			  <div class="rule">
-					<h2 id=value>value</h2>
-					<div onclick=svgBlockClick>
+					<h2 id='mark_comment'>mark_comment</h2>
+					<div onclick='svgBlockClick(event)'>
+						<svg class="railroad-diagram" width="509" height="110" viewBox="0 0 509 110">
+<g transform="translate(.5 .5)">
+<path d="M 20 31 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
+<g>
+<path d="M40 41h0"></path>
+<path d="M468 41h0"></path>
+<path d="M40 41h10"></path>
+<g>
+<path d="M50 41h0"></path>
+<path d="M94 41h0"></path>
+<rect x="50" y="30" width="44" height="22" rx="10" ry="10"></rect>
+<text x="72" y="45">{--</text>
+</g>
+<path d="M94 41h10"></path>
+<g>
+<path d="M104 41h0"></path>
+<path d="M404 41h0"></path>
+<path d="M104 41a10 10 0 0 0 10 -10v0a10 10 0 0 1 10 -10"></path>
+<g>
+<path d="M124 21h260"></path>
+</g>
+<path d="M384 21a10 10 0 0 1 10 10v0a10 10 0 0 0 10 10"></path>
+<path d="M104 41h20"></path>
+<g>
+<path d="M124 41h0"></path>
+<path d="M384 41h0"></path>
+<path d="M124 41h10"></path>
+<g>
+<path d="M134 41h0"></path>
+<path d="M374 41h0"></path>
+<path d="M134 41h20"></path>
+<g>
+<path d="M154 41h34"></path>
+<path d="M320 41h34"></path>
+<rect x="188" y="30" width="132" height="22"></rect>
+<text x="254" y="45">p&#95;char&#95;no&#95;dash</text>
+</g>
+<path d="M354 41h20"></path>
+<path d="M134 41a10 10 0 0 1 10 10v10a10 10 0 0 0 10 10"></path>
+<g>
+<path d="M154 71h0"></path>
+<path d="M354 71h0"></path>
+<path d="M154 71h10"></path>
+<g>
+<path d="M164 71h0"></path>
+<path d="M192 71h0"></path>
+<rect x="164" y="60" width="28" height="22" rx="10" ry="10"></rect>
+<text x="178" y="75">-</text>
+</g>
+<path d="M192 71h10"></path>
+<path d="M202 71h10"></path>
+<g>
+<path d="M212 71h0"></path>
+<path d="M344 71h0"></path>
+<rect x="212" y="60" width="132" height="22"></rect>
+<text x="278" y="75">p&#95;char&#95;no&#95;dash</text>
+</g>
+<path d="M344 71h10"></path>
+</g>
+<path d="M354 71a10 10 0 0 0 10 -10v-10a10 10 0 0 1 10 -10"></path>
+</g>
+<path d="M374 41h10"></path>
+<path d="M134 41a10 10 0 0 0 -10 10v29a10 10 0 0 0 10 10"></path>
+<g>
+<path d="M134 90h240"></path>
+</g>
+<path d="M374 90a10 10 0 0 0 10 -10v-29a10 10 0 0 0 -10 -10"></path>
+</g>
+<path d="M384 41h20"></path>
+</g>
+<path d="M404 41h10"></path>
+<g>
+<path d="M414 41h0"></path>
+<path d="M458 41h0"></path>
+<rect x="414" y="30" width="44" height="22" rx="10" ry="10"></rect>
+<text x="436" y="45">--}</text>
+</g>
+<path d="M458 41h10"></path>
+</g>
+<path d="M 468 41 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
+</g>
+</svg>
+
+					</div>
+					<div>
+						Used by:
+						<a href="#contents">contents</a>
+					</div>
+					<div>
+						References:
+						<a href="#p_char_no_dash">p_char_no_dash</a>
+					</div>
+				</div>
+			  <div class="rule">
+					<h2 id='p_char_no_dash'>p_char_no_dash</h2>
+					<div onclick='svgBlockClick(event)'>
+						<svg class="railroad-diagram" width="261" height="92" viewBox="0 0 261 92">
+<g transform="translate(.5 .5)">
+<path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
+<g>
+<path d="M40 31h0"></path>
+<path d="M220 31h0"></path>
+<path d="M40 31h20"></path>
+<g>
+<path d="M60 31h16"></path>
+<path d="M184 31h16"></path>
+<rect x="76" y="20" width="108" height="22" rx="10" ry="10"></rect>
+<text x="130" y="35">&#91;#x20-#x2C&#93;</text>
+</g>
+<path d="M200 31h20"></path>
+<path d="M40 31a10 10 0 0 1 10 10v10a10 10 0 0 0 10 10"></path>
+<g>
+<path d="M60 61h0"></path>
+<path d="M200 61h0"></path>
+<rect x="60" y="50" width="140" height="22" rx="10" ry="10"></rect>
+<text x="130" y="65">&#91;#x2E-#x10FFFF&#93;</text>
+</g>
+<path d="M200 61a10 10 0 0 0 10 -10v-10a10 10 0 0 1 10 -10"></path>
+</g>
+<path d="M 220 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
+</g>
+</svg>
+
+					</div>
+					<div>
+						Used by:
+						<a href="#mark_comment">mark_comment</a>
+					</div>
+					<div>
+						References:
+					</div>
+				</div>
+			  <div class="rule">
+					<h2 id='value'>value</h2>
+					<div onclick='svgBlockClick(event)'>
 						<svg class="railroad-diagram" width="229" height="272" viewBox="0 0 229 272">
 <g transform="translate(.5 .5)">
 <path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
@@ -3354,8 +3274,8 @@ textarea.form-control.grammar-edit {
 					</div>
 				</div>
 			  <div class="rule">
-					<h2 id=Mark>Mark</h2>
-					<div onclick=svgBlockClick>
+					<h2 id='Mark'>Mark</h2>
+					<div onclick='svgBlockClick(event)'>
 						<svg class="railroad-diagram" width="273" height="62" viewBox="0 0 273 62">
 <g transform="translate(.5 .5)">
 <path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>

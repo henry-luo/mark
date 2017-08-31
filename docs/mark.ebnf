@@ -1,24 +1,25 @@
 /*--------------------------------------------------------
-Modified from JSON5 grammar at: https://github.com/json5/json5-spec/blob/master/json5.abnf
+Modified from JSON5 grammar at: 
+https://github.com/json5/json5-spec/blob/master/json5.abnf
 --------------------------------------------------------*/
 
 eol ::= LF | CRLF | CR          /* End-of-line */
 
-eof ::= [!.]           			/* End-of-input */
+eof ::= EOF           			/* End-of-input */
 
 /*--------------------------------------------------------*/
 
 comment ::= sl_comment | ml_comment
 
-sl_comment ::= begin_sl_comment ( p_char | ows )* ( eol | eof )
+sl_comment ::= begin_sl_comment (p_char | ows)* (eol | eof)
 
-ml_comment ::= begin_ml_comment ( p_char_non_star | ( '*' p_char_non_slash ) | ows | eol )* end_ml_comment
+ml_comment ::= begin_ml_comment (p_char_non_star | ('*' p_char_non_slash) | ows | eol)* end_ml_comment
 
-begin_sl_comment ::= [#x2F] [#x2F]    /* /* */
+begin_sl_comment ::= '//'
 
-begin_ml_comment ::= [#x2F] '*'    /* / * */
+begin_ml_comment ::= '/*'
 
-end_ml_comment   ::= '*' [#x2F]    /* * / */
+end_ml_comment   ::= '*/'
 
 p_char ::= [#x20-#x7E] | [#x80-#x10FFFF] /* Printable character */
 
@@ -28,64 +29,42 @@ p_char_non_slash ::= [#x20-#x2E] | [#x30-#x7E] | [#x80-#x10FFFF] /* Printable ch
 
 /*--------------------------------------------------------*/
 
-ws ::= (
-          SP |                /* Space */
-          ows |               /* Other space-like characters */
-          eol |               /* Line ending */
-		  comment             /* Comment */
-      )*
+ws ::= (SP |                /* Space */
+        ows |               /* Other space-like characters */
+        eol |               /* Line ending */
+		comment)*           /* Comment */
 
-ows ::= HTAB |                /* Horizontal tab */
-      [#xA0] |                /* NBSP */
-      [#xFEFF]                /* BOM */
+ows ::= HTAB |              /* Horizontal tab */
+      [#xA0] |              /* NBSP */
+      [#xFEFF]              /* BOM */
 
 /*--------------------------------------------------------*/
 
-begin_array     ::= ws '[' ws
+null  ::= 'null'
 
-begin_object    ::= ws '{' ws
+true  ::= 'true'
 
-end_array       ::= ws ']' ws
-
-end_object      ::= ws '}' ws
-
-separator  		::= ws ':' ws
-
-value_separator ::= ws ',' ws
-
-value_sep_opt   ::= (value_separator)?
-
-/*--------------------------------------------------------*/
-
-null  ::= [#x6E][#x75][#x6C][#x6C]         	/* null */
-
-true  ::= [#x74][#x72][#x75][#x65]         	/* true */
-
-false ::= [#x66][#x61][#x6C][#x73][#x65]    /* false */
+false ::= 'false'
 
 /*--------------------------------------------------------*/
 
 number ::= ('+' | '-')? (nan | inf | dec)
 
-nan ::= [#x4E][#x61][#x4E]              					/* NaN */
+nan ::= 'NaN'
 
-inf ::= [#x49][#x6E][#x66][#x69][#x6E][#x69][#x74][#x79] 	/* Infinity */
+inf ::= 'Infinity'
 
-dec ::= ( int (frac0)? | frac1 ) (exp)?
+dec ::= (int ('.' digit*)? | ('.' digit+)) (exp)?   
 
-decimal_point ::= '.'     
+exp ::= ('e' | 'E') ('+' | '-')? digit+
 
-exp ::= ('e' | 'E') ('+' | '-')? DIGIT+
+int ::= '0' | ([1-9] digit*)
 
-frac0 ::= decimal_point DIGIT*
-
-frac1 ::= decimal_point DIGIT+
-
-int ::= '0' | ( [0-9] DIGIT* )
+digit ::= [0-9]
 
 /*--------------------------------------------------------*/
 
-string ::= s_string | d_string
+string ::= ((s_string | d_string) ws)+
 
 d_string ::= '"' (char | "'")* '"'
 
@@ -103,13 +82,15 @@ char ::= unescaped |
            hex_char |     		/* xXX                  U+00XX */
            unicode_char |     	/* uXXXX                U+XXXX */
            eol |              	/* end-of-line -> empty string */
-           other-escape )     	/* the character itself */
+           other_escape )     	/* the character itself */
 		
-hex_char ::= [#x78] HEXDIG HEXDIG
+hex_char ::= 'x' hexdig hexdig
 
-unicode_char ::= [#x75] HEXDIG HEXDIG HEXDIG HEXDIG
+unicode_char ::= 'u' hexdig hexdig hexdig hexdig
 
-escape ::= [#x5C]                 /* \ backslash */
+hexdig ::= [0-9a-fA-F]
+
+escape ::= '\'                 /* \ backslash */
 
 unescaped ::= [#x20-#x21] | [#x23-#x26] | [#x28-#x5B] | [#x5D-#x7E] | [#x80-#x10FFFF]
 
@@ -119,27 +100,48 @@ other_escaped ::= [#x20-#x2F] | [#x3A-#x61] | [#x63-#x65] | [#x67-#x6D] | [#x6F-
 
 array ::= begin_array (value (value_separator value)* value_sep_opt)? end_array
 
+begin_array     ::= ws '[' ws
+
+end_array       ::= ws ']' ws
+
+value_separator ::= ws ',' ws
+
+value_sep_opt   ::= (value_separator)?
+
 /*--------------------------------------------------------*/
 
-json_object ::= begin_object (property (value_separator property)* value_sep_opt)? end_object
+json_object ::= begin_object properties end_object
+
+begin_object ::= ws '{' ws
+
+end_object ::= ws '}' ws
+
+properties ::= (property (value_separator property)* value_sep_opt)?
 
 property ::= key separator value
 
+separator ::= ws ':' ws
+
 key ::= string | identifier
-
-begin_identifier ::= ALPHA | [#x5F] | [#x24] /* ALPHA | "_" | "$" */
-
-continue_identifier ::= begin_identifier | DIGIT
 
 identifier ::= begin_identifier continue_identifier*
 
+begin_identifier ::= [a-zA-Z] | '_' | '$'
+
+continue_identifier ::= begin_identifier | digit | '-' | '.'
+
 /*--------------------------------------------------------*/
 
-mark_object ::= begin_object type_name (property (value_separator property)* value_sep_opt)? content* end_object
+/* Note: Mark property key cannot be numeric - this constraint cannot be directly expressed in BNF notation */ 
+mark_object ::= begin_object type_name properties contents end_object
 
-type_name ::= identifier
+type_name ::= identifier ws
 
-content ::= string | mark_object
+contents ::= (string | mark_object | mark_comment | ws)*
+
+mark_comment ::= '{--' (p_char_no_dash | ('-' p_char_no_dash))* '--}'
+
+p_char_no_dash ::= [#x20-#x2C] | [#x2E-#x10FFFF] /* Printable character except - */
 
 /*--------------------------------------------------------*/
 
