@@ -43,6 +43,9 @@ test('Parse Mark object', function(assert) {
 	assert.equal(Mark.parse('{!-- comment --}')[$comment], " comment ", "Mark comment");
 	assert.equal(Mark.parse('{div {!-- comment --}}')[0][$comment], " comment ", "Mark nested comment");
 	
+	// test multiline text
+	assert.equal(Mark.parse('{div "string"\n" 2nd line"\n\t\t" and 3rd"}')[0], "string 2nd line and 3rd", "Mark multiline text");
+	
 	// test unicode support
 	assert.equal(Mark.parse('{div "中文"}')[0], "中文", "Mark unicode support");
 	

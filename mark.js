@@ -275,6 +275,7 @@ Mark.parse = (function() {
 	// It is a simple, recursive descent parser. It does not use eval or regular expressions, 
 	// so it can be used as a model for implementing a Mark parser in other languages.
 	"use strict";
+	let UNEXPECT_END = "Unexpected end of input";
 	
     let at,           	// The index of the current character
         lineNumber,   	// The current line number
@@ -450,7 +451,7 @@ Mark.parse = (function() {
         },
 
 		// Parse a string value.
-        string = function () {			
+        string = function() {			
             var hex,
                 i,
                 string = '',
@@ -463,7 +464,7 @@ Mark.parse = (function() {
                 while (next()) {
                     if (ch === delim) {
                         next();
-                        return string;
+						return string;
                     } else if (ch === '\\') {
                         next();
                         if (ch === 'u') {
@@ -624,11 +625,10 @@ Mark.parse = (function() {
             var array = [];
 
             if (ch === '[') {
-                next('[');
-                white();
+                next();  white();
                 while (ch) {
                     if (ch === ']') {
-                        next(']');
+                        next();
                         return array;   // Potentially empty array
                     }
                     // ES5 allows omitting elements in arrays, e.g. [,] and [,null]. We don't allow this in Mark.
@@ -652,38 +652,71 @@ Mark.parse = (function() {
 
 		// Parse an object value
         object = function(markOnly, parent) {
-            var key, obj = {}, 
+            let key, obj = {}, 
 				extended = false, index = 0;  	// whether the is extended Mark object or legacy JSON object
 
-			var parseContent = function() {
+			let putText = function(text) {
+				// check preceding node
+				if (index > 0 && typeof obj[index-1] === 'string') { // merge with previous text
+					obj[index-1] += text;
+				} else {
+					Object.defineProperty(obj, index, {value:text, writable:true, configurable:true}); // make content non-enumerable
+					index++;
+				}
+			},
+			parseContent = function() {
 				while (ch) {
 					if (ch === '{') { // child object
 						Object.defineProperty(obj, index, {value:object(true, obj), writable:true, configurable:true}); // make content non-enumerable
-						index++;  white();
+						index++;
 					}
 					else if (ch === '"' || ch === "'") { // text node
-						Object.defineProperty(obj, index, {value:string(), writable:true, configurable:true}); // make content non-enumerable
-						index++;  white();
+						putText(string());
 					}
 					else if (ch === '}') { 
-						next('}');  obj[$length] = index;
+						next();  obj[$length] = index;
 						return;
 					}
 					else {
 						error("Unexpected character " + renderChar(ch));
 					}
+					white();
 				}
-				error("Expect character '}'");		
-			}
-			//var closeObject = function() {
-			//	obj[$length] = index;
-			//}
+				error(UNEXPECT_END);		
+			};
 			
             if (ch === '{') {
-                next('{');  white();
+                next();
+				if (ch === '!') { // got mark comment
+					next();  next('-');  next('-');
+					var comt = '';
+					while (ch) {
+						if (ch === '-') {
+							next();
+							if (ch === '-') {
+								next();
+								if (ch === '}') { // got comment node
+									next();
+									obj = Mark('!comment', null, null, parent);
+									obj[$comment] = comt;  // comment stored as Symbol
+									return obj;
+								} else {
+									error("Expect end of comment.");
+								}
+							}
+							comt += '-';
+						} else {
+							comt += ch;
+							next();
+						}
+					}
+					error(UNEXPECT_END);	
+				}
+				
+				white();
                 while (ch) {
                     if (ch === '}') { // end of the object
-                        next('}');  
+                        next();  
 						if (extended) { obj[$length] = index; }
                         return obj;   // potentially empty object
                     }
@@ -696,8 +729,7 @@ Mark.parse = (function() {
 							else { key = str; }
 						} else {
 							if (extended) { // got text node
-								Object.defineProperty(obj, index, {value:str, writable:true, configurable:true}); // make content non-enumerable
-								index++;
+								putText(str);
 								parseContent();
 								return obj;
 							}
@@ -709,31 +741,6 @@ Mark.parse = (function() {
 							parseContent();  return obj;
 						}
 						error("Unexpected character '{'");
-					}
-					else if (ch === '!') { // {!-- comment --}
-						next('!');  next('-');  next('-');
-						var comt = '';
-						while (ch) {
-							if (ch === '-') {
-								next('-');
-								if (ch === '-') {
-									next('-');
-									if (ch === '}') { // got comment node
-										next('}');
-										obj = Mark('!comment', null, null, parent);
-										obj[$comment] = comt;  // comment stored as Symbol
-										return obj;
-									} else {
-										error("Expect end of comment.");
-									}
-								}
-								comt += '-';
-							} else {
-								comt += ch;
-								next();
-							}
-						}
-						error("Unexpected end of input");				
 					}
 					else { // JSON5 or Mark object
 						var ident = identifier();
@@ -755,7 +762,7 @@ Mark.parse = (function() {
                     }
 					
 					if (ch == ':') { // key-value pair
-						next(':');
+						next();
 						var val = value();
 						if (extended && !isNaN(key*1)) { // any numeric key is rejected for Mark object
 							error("Numeric key not allowed as Mark property name");
@@ -763,11 +770,10 @@ Mark.parse = (function() {
 						obj[key] = val;
 						white();
 						if (ch === ',') {
-							next(',');
-							white();
+							next();  white();
 						} 
 						else if (ch === '}') { // end of the object
-							next('}');
+							next();
 							if (extended) { obj[$length] = index; }
 							return obj;   // Potentially empty object
 						}
@@ -781,7 +787,7 @@ Mark.parse = (function() {
 						error("Bad object");
 					}
                 }
-				error("Unexpected end of data");
+				error(UNEXPECT_END);
             }
             error("Bad object");
         };
@@ -817,7 +823,7 @@ Mark.parse = (function() {
         ch = ' ';
 		text = String(source);
 		
-		if (!source) { text = '';  error("Unexpected end of data"); }
+		if (!source) { text = '';  error(UNEXPECT_END); }
 		if (source.match(/^\s*</)) { // parse as html
 			if (!Mark.$html) { Mark.$html = require('./lib/mark.convert.js')(Mark); }
 			return Mark.$html.parse(source);

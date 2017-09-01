@@ -64,7 +64,7 @@ digit ::= [0-9]
 
 /*--------------------------------------------------------*/
 
-string ::= ((s_string | d_string) ws)+
+string ::= s_string | d_string
 
 d_string ::= '"' (char | "'")* '"'
 
@@ -122,7 +122,7 @@ property ::= key separator value
 
 separator ::= ws ':' ws
 
-key ::= s_string | d_string | identifier
+key ::= string | identifier
 
 identifier ::= begin_identifier continue_identifier*
 
@@ -145,6 +145,6 @@ p_char_no_dash ::= [#x20-#x2C] | [#x2E-#x10FFFF] /* Printable character except -
 
 /*--------------------------------------------------------*/
 
-value ::= null | true | false | number | string | array | json_object | mark_object
+value ::= null | true | false | number | string | array | json_object | mark_object | mark_comment
 
 Mark ::= ws value ws
