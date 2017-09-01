@@ -206,8 +206,12 @@ var Mark = (function() {
 				// todo: pick and patch other Array prototype functions
 				
 				toHtml: function() {
-					if (!Mark.$html) { Mark.$html = require('./lib/mark.convert.js')(Mark); }
-					return Mark.$html.toHtml(this);
+					if (!Mark.$convert) { Mark.$convert = require('./lib/mark.convert.js')(Mark); }
+					return Mark.$convert.toHtml(this);
+				},
+				toXml: function() {
+					if (!Mark.$convert) { Mark.$convert = require('./lib/mark.convert.js')(Mark); }
+					return Mark.$convert.toXml(this);
 				},
 				find: function(selector) {
 					if (!Mark.$select) { Mark.$select = require('./lib/mark.query.js'); }
