@@ -139,7 +139,7 @@ type_name ::= identifier ws
 
 contents ::= (string | mark_object | mark_comment | ws)*
 
-mark_comment ::= '{--' (p_char_no_dash | ('-' p_char_no_dash))* '--}'
+mark_comment ::= '{!--' (p_char_no_dash | ('-' p_char_no_dash))* '--}'
 
 p_char_no_dash ::= [#x20-#x2C] | [#x2E-#x10FFFF] /* Printable character except - */
 
