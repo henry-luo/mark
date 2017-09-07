@@ -38,6 +38,10 @@ test('Parse Mark object', function(assert) {
 	// test Mark in JSON
 	assert.equal(Mark.parse('{obj:{div "text"}}').obj.constructor.name, "div", "Mark object can be embedded in JSON");
 	
+	// test JSON in Mark
+	assert.equal(Mark.parse('{div {width:1}}')[0].width, 1, "JSON object allowed as Mark content");
+	assert.equal(Mark.parse('{div {"width":1}}')[0].width, 1, "JSON object allowed as Mark content");
+	
 	// test Mark comment
 	assert.equal(Mark.parse('{!-- comment --}').constructor.name, "!comment", "Mark comment");
 	assert.equal(Mark.parse('{!-- comment --}')[$comment], " comment ", "Mark comment");

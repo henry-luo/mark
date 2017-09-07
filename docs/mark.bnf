@@ -137,7 +137,7 @@ mark_object ::= begin_object type_name properties contents end_object
 
 type_name ::= identifier ws
 
-contents ::= (text | mark_object | mark_comment | ws)*
+contents ::= (text | json_object | mark_object | mark_comment | ws)*
 
 text ::= (string ws)+   /* Mark text can be multiple consecutive strings */
 

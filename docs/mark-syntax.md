@@ -17,7 +17,7 @@ type_name ::= identifier
 
 properties ::= (property (',' property)* ','?)?
 
-contents ::= ( text | mark_object | mark_comment )*
+contents ::= (text | json_object | mark_object | mark_comment)*
 
 property ::= key ':' value
 
@@ -26,7 +26,7 @@ key ::= s_string | d_string | identifier
 mark_comment ::= '{--' (p_char_no_dash | ('-' p_char_no_dash))* '--}'
 ```
 
-*(Note: for clarify, whitespace rules are omitted in the grammar above. You can refer to the [formal EBNF](mark.ebnf).)*
+*(Note: for clarify, whitespace rules are omitted in the grammar above. You can refer to the [formal BNF](mark.bnf).)*
 
 Comparing to a JSON object, a Mark object has two extensions:
 

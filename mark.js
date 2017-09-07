@@ -655,7 +655,7 @@ Mark.parse = (function() {
         },
 
 		// Parse an object value
-        object = function(markOnly, parent) {
+        object = function(parent) {
             let key, obj = {}, 
 				extended = false, index = 0;  	// whether the is extended Mark object or legacy JSON object
 
@@ -671,7 +671,7 @@ Mark.parse = (function() {
 			parseContent = function() {
 				while (ch) {
 					if (ch === '{') { // child object
-						Object.defineProperty(obj, index, {value:object(true, obj), writable:true, configurable:true}); // make content non-enumerable
+						Object.defineProperty(obj, index, {value:object(obj), writable:true, configurable:true}); // make content non-enumerable
 						index++;
 					}
 					else if (ch === '"' || ch === "'") { // text node
@@ -729,8 +729,7 @@ Mark.parse = (function() {
                     if (ch === '"' || ch === "'") { // legacy JSON
                         var str = string();  white();
 						if (ch==':') { // property
-							if (!key && markOnly) { error("JSON object not allowed as Mark content"); }
-							else { key = str; }
+							key = str;
 						} else {
 							if (extended) { // got text node
 								putText(str);
@@ -758,9 +757,7 @@ Mark.parse = (function() {
 								extended = true;  key = ident;
 								continue;
 							}
-							else { // JSON object
-								if (markOnly) { error("JSON object not allowed as Mark content"); }
-							}
+							// else // JSON object
 						}
                         key = ident;
                     }

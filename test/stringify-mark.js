@@ -13,5 +13,7 @@ test('Stringify Mark object', function(assert) {
 	assert.equal(Mark.stringify(Mark.parse('{div "text"}')), '{div "text"}', 'Stringify {div "text"}');
 	assert.equal(Mark.stringify(Mark.parse("{div 'text'}")), '{div "text"}', "Stringify {div 'text'}");
 	assert.equal(Mark.stringify(Mark.parse('{div {br}}')), '{div {br}}', "Stringify {div {br}}");
+	// JSON inside Mark
+	assert.equal(Mark.stringify(Mark.parse('{div {width:10}}')), '{div {width:10}}', "Stringify {div {width:10}}");
 	assert.end() ;
 });
