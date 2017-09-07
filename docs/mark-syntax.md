@@ -6,7 +6,7 @@ Mark syntax is a superset of JSON. The primary extension that Mark makes to JSON
 
 Below is the key grammar rules for the new Mark object notation in EBNF notation:
 
-```EBNF
+```BNF
 Mark ::= ws value ws
 
 value ::= null | true | false | number | string | array | json_object | mark_object
@@ -17,7 +17,7 @@ type_name ::= identifier
 
 properties ::= (property (',' property)* ','?)?
 
-contents ::= ( string | mark_object | mark_comment )*
+contents ::= ( text | mark_object | mark_comment )*
 
 property ::= key ':' value
 
@@ -75,7 +75,7 @@ continue_identifier ::= begin_identifier | digit | '-' | '.'
 
 ## Full Grammar Specification
 
-The formal grammar specification in EBNF is [here](mark.ebnf).
+The formal grammar specification in BNF is [here](mark.bnf).
 
 Following the JSON convention, a [railroad diagram](https://mark.js.org/mark-grammar.html) of the entire grammar is also provided to help you visualize the grammar. You can click on the grammar terms to navigate around. Below is just a small portion of it.
 

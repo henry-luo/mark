@@ -2,7 +2,7 @@
 <html>
 	<head>
     <meta charset="utf-8">
-    <title>Railroad diagram for mark.ebnf</title>
+    <title>Railroad diagram for mark.bnf</title>
 		<style>
 			svg.railroad-diagram {
   background-color: hsl(30,20%,95%);
@@ -706,6 +706,7 @@ textarea.form-control.grammar-edit {
 						<a href="#separator">separator</a>
 						<a href="#type_name">type_name</a>
 						<a href="#contents">contents</a>
+						<a href="#text">text</a>
 						<a href="#Mark">Mark</a>
 					</div>
 					<div>
@@ -1363,7 +1364,7 @@ textarea.form-control.grammar-edit {
 					<div>
 						Used by:
 						<a href="#key">key</a>
-						<a href="#contents">contents</a>
+						<a href="#text">text</a>
 						<a href="#value">value</a>
 					</div>
 					<div>
@@ -2957,10 +2958,10 @@ textarea.form-control.grammar-edit {
 <path d="M226 41h0"></path>
 <path d="M70 41h20"></path>
 <g>
-<path d="M90 41h24"></path>
-<path d="M182 41h24"></path>
-<rect x="114" y="30" width="68" height="22"></rect>
-<text x="148" y="45">string</text>
+<path d="M90 41h32"></path>
+<path d="M174 41h32"></path>
+<rect x="122" y="30" width="52" height="22"></rect>
+<text x="148" y="45">text</text>
 </g>
 <path d="M206 41h20"></path>
 <path d="M70 41a10 10 0 0 1 10 10v10a10 10 0 0 0 10 10"></path>
@@ -3008,9 +3009,63 @@ textarea.form-control.grammar-edit {
 					</div>
 					<div>
 						References:
-						<a href="#string">string</a>
+						<a href="#text">text</a>
 						<a href="#mark_object">mark_object</a>
 						<a href="#mark_comment">mark_comment</a>
+						<a href="#ws">ws</a>
+					</div>
+				</div>
+			  <div class="rule">
+					<h2 id='text'>text</h2>
+					<div onclick='svgBlockClick(event)'>
+						<svg class="railroad-diagram" width="265" height="71" viewBox="0 0 265 71">
+<g transform="translate(.5 .5)">
+<path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
+<path d="M40 31h10"></path>
+<g>
+<path d="M50 31h0"></path>
+<path d="M214 31h0"></path>
+<path d="M50 31h10"></path>
+<g>
+<path d="M60 31h0"></path>
+<path d="M204 31h0"></path>
+<path d="M60 31h10"></path>
+<g>
+<path d="M70 31h0"></path>
+<path d="M138 31h0"></path>
+<rect x="70" y="20" width="68" height="22"></rect>
+<text x="104" y="35">string</text>
+</g>
+<path d="M138 31h10"></path>
+<path d="M148 31h10"></path>
+<g>
+<path d="M158 31h0"></path>
+<path d="M194 31h0"></path>
+<rect x="158" y="20" width="36" height="22"></rect>
+<text x="176" y="35">ws</text>
+</g>
+<path d="M194 31h10"></path>
+</g>
+<path d="M204 31h10"></path>
+<path d="M60 31a10 10 0 0 0 -10 10v0a10 10 0 0 0 10 10"></path>
+<g>
+<path d="M60 51h144"></path>
+</g>
+<path d="M204 51a10 10 0 0 0 10 -10v0a10 10 0 0 0 -10 -10"></path>
+</g>
+<path d="M214 31h10"></path>
+<path d="M 224 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
+</g>
+</svg>
+
+					</div>
+					<div>
+						Used by:
+						<a href="#contents">contents</a>
+					</div>
+					<div>
+						References:
+						<a href="#string">string</a>
 						<a href="#ws">ws</a>
 					</div>
 				</div>
