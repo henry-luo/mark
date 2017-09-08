@@ -11,20 +11,20 @@ The core data structure in Mark is an compound object, which have the following 
 Below is a sample Mark object, representation a simple registration form:
 
 ```text
-{form                                                // object type-name
-  {!-- comment --}                                   // comment object, similar to HTML
-  {div class:"form-group"                            // nested Mark object
-    {label for:"email"                               // object with property 'for'
-      "Email address:"                               // text object
+{form                                             // object type-name
+  {!-- comment --}                                // comment object, similar to HTML
+  {div class:"form-group"                         // nested Mark object
+    {label for:"email"                            // object with property 'for'
+      "Email address:"                            // text object
     }
-    {input type:"email", id:"email"}                 // object without any contents
+    {input type:"email", id:"email"}              // object without any contents
   }
   {div class:"form-group"
     {label for:"pwd" "Password"}
     {input type:"password", id:"pwd"}
   }
-  {button type:"submit" class:['btn','btn-default']  // property with complex values
-    'Submit'                                         // text needs to be quoted
+  {button type:"submit", class:['btn','btn-info'] // property with complex values
+    'Submit'                                      // text needs to be quoted
   }
 }
 ```
