@@ -70,6 +70,11 @@ test('Mark Model', function(assert) {
 	div.pop();  item = div.pop();
 	assert.equal(item, undefined, "undefiend after pop");
 	
+	// delete API
+	div = Mark.parse('{div "text" {br} {p}}');  var item = div.delete(1);
+	assert.equal(Mark.stringify(div), '{div "text" {p}}', "Mark delete test");
+	assert.equal(div.length, 2, "div length after delete should be 2");
+	assert.equal(Mark.stringify(item), "{br}", "item deleted should be {br}");
 	assert.end();	
 });
 

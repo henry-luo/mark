@@ -202,6 +202,21 @@ var Mark = (function() {
 					}
 					return length;
 				},
+				delete: function() {
+					var deleted;
+					var length = this[$length];
+					if (arguments.length) {
+						// shift the items
+						var index = arguments[0];
+						if (index >=0 && index < length) {
+							deleted = this[index];
+							for (var i = index; i < length - 1; i++) { this[i] = this[i+1]; }
+							this[$length] = length - 1;
+						}
+						// else invalid index
+					}
+					return deleted;
+				},
 				filter: Array.prototype.filter,
 				// todo: pick and patch other Array prototype functions
 				
