@@ -10,7 +10,7 @@ const $contents = Symbol.for('Mark.contents');
 const $properties = Symbol.for('Mark.properties');
 const $length = Symbol.for('Mark.length');
 const $parent = Symbol.for('Mark.parent');
-const $comment = Symbol.for('Mark.comment');
+const $pragma = Symbol.for('Mark.pragma');
 const $target = Symbol('Mark.target');
 
 // construct Mark object, like virtual-dom hyperscript
@@ -282,9 +282,7 @@ var Mark = (function() {
 		}
 		obj[$length] = len;
 		
-		if (parent) {
-			obj[$parent] = parent;
-		}
+		if (parent) { obj[$parent] = parent; }
 		return obj;
 	};	
 })();
@@ -386,10 +384,10 @@ Mark.parse = (function() {
 
             // Subsequent characters can contain digits.
             while (next() && (
+				('a' <= ch && ch <= 'z') ||
+				('A' <= ch && ch <= 'Z') ||
+				('0' <= ch && ch <= '9') ||
 				ch === '_' || ch === '$' ||
-				(ch >= 'a' && ch <= 'z') ||
-				(ch >= 'A' && ch <= 'Z') ||
-				(ch >= '0' && ch <= '9') ||
 				ch === '.' || ch === '-'  // add 2 special chars commonly used in html and xml names, which are not valid JS name chars
 				)) {
                 key += ch;
@@ -400,14 +398,10 @@ Mark.parse = (function() {
 
 		// Parse a number value.
         number = function () {
-            let number,
-                sign = '',
-                string = '',
-                base = 10;
+            let number, sign = '', string = '', base = 10;
 
             if (ch === '-' || ch === '+') {
-                sign = ch;
-                next(ch);
+                sign = ch;  next(ch);
             }
 
             // support for Infinity (could tweak to allow other words):
@@ -471,20 +465,18 @@ Mark.parse = (function() {
 
 		// Parse a string value.
         string = function() {			
-            var hex,
-                i,
-                string = '',
+            var hex, i, string = '',
                 delim,      // double quote or single quote
                 uffff;
 
-			// When parsing for string values, we must look for ' or " and \ characters.
+			// when parsing for string values, we must look for ' or " and \ characters.
             if (ch === '"' || ch === "'") {
                 delim = ch;
                 while (next()) {
                     if (ch === delim) {
                         next();
 						return string;
-                    } else if (ch === '\\') {
+                    } else if (ch === '\\') { // escape sequence
                         next();
                         if (ch === 'u') {
                             uffff = 0;
@@ -505,13 +497,13 @@ Mark.parse = (function() {
                         } else {
                             break;
                         }
-                    } else if (ch === '\n') {
-                        // unescaped newlines are invalid; see:
-                        // https://github.com/json5/json5/issues/24
-                        // TODO this feels special-cased; are there other
-                        // invalid unescaped chars?
-                        break;
-                    } else {
+                    } 
+					// else if (ch === '\n') {
+                        // unescaped newlines are invalid in JSON, but valid in Mark; 
+                        // see: https://github.com/json5/json5/issues/24
+                        // break;
+                    // } 
+					else {
                         string += ch;
                     }
                 }
@@ -642,37 +634,35 @@ Mark.parse = (function() {
 		// parse an array value
         array = function () {
             var array = [];
-
-            if (ch === '[') {
-                next();  white();
-                while (ch) {
-                    if (ch === ']') {
-                        next();
-                        return array;   // Potentially empty array
-                    }
-                    // ES5 allows omitting elements in arrays, e.g. [,] and [,null]. We don't allow this in Mark.
-                    if (ch === ',') {
-                        error("Missing array element");
-                    } else {
-                        array.push(value());
-                    }
-                    white();
-                    // If there's no comma after this value, this needs to be the end of the array.
-                    if (ch !== ',') {
-                        next(']');
-                        return array;
-                    }
-                    next(',');
-                    white();
-                }
-            }
-            error("Bad array");
+			
+			next();  // skip the starting '['
+			white();
+			while (ch) {
+				if (ch === ']') {
+					next();
+					return array;   // Potentially empty array
+				}
+				// ES5 allows omitting elements in arrays, e.g. [,] and [,null]. We don't allow this in Mark.
+				if (ch === ',') {
+					error("Missing array element");
+				} else {
+					array.push(value());
+				}
+				white();
+				// If there's no comma after this value, this needs to be the end of the array.
+				if (ch !== ',') {
+					next(']');
+					return array;
+				}
+				next(',');
+				white();
+			}
         },
 
 		// Parse an object value
         object = function(parent) {
-            let key, obj = {}, 
-				extended = false, index = 0;  	// whether the is extended Mark object or legacy JSON object
+            let key, obj = {}, extended = false, index = 0;  	// whether the is extended Mark object or legacy JSON object
+			if (parent) { obj[$parent] = parent; }  // all 3 types: Mark object, JSON object, Mark pragma store parent 
 
 			let putText = function(text) {
 				// check preceding node
@@ -685,6 +675,7 @@ Mark.parse = (function() {
 			},
 			parseContent = function() {
 				while (ch) {
+					console.log(ch);
 					if (ch === '{') { // child object
 						Object.defineProperty(obj, index, {value:object(obj), writable:true, configurable:true}); // make content non-enumerable
 						index++;
@@ -704,108 +695,100 @@ Mark.parse = (function() {
 				error(UNEXPECT_END);		
 			};
 			
-            if (ch === '{') {
-                next();
-				if (ch === '!') { // got mark comment
-					next();  next('-');  next('-');
-					var comt = '';
-					while (ch) {
-						if (ch === '-') {
-							next();
-							if (ch === '-') {
-								next();
-								if (ch === '}') { // got comment node
-									next();
-									obj = Mark('!comment', null, null, parent);
-									obj[$comment] = comt;  // comment stored as Symbol
-									return obj;
-								} else {
-									error("Expect end of comment.");
-								}
-							}
-							comt += '-';
-						} else {
-							comt += ch;
-							next();
-						}
-					}
-					error(UNEXPECT_END);	
-				}
-				
-				white();
-                while (ch) {
-                    if (ch === '}') { // end of the object
-                        next();  
-						if (extended) { obj[$length] = index; }
-                        return obj;   // potentially empty object
-                    }
-
-                    // Keys can be unquoted. If they are, they need to be valid JS identifiers.
-                    if (ch === '"' || ch === "'") { // legacy JSON
-                        var str = string();  white();
-						if (ch==':') { // property
-							key = str;
-						} else {
-							if (extended) { // got text node
-								putText(str);
-								parseContent();
-								return obj;
-							}
-							else { error("Bad object"); }
-						}
-                    }
-					else if (ch === '{') { // child object
-						if (extended) {
-							parseContent();  return obj;
-						}
-						error("Unexpected character '{'");
-					}
-					else { // JSON5 or Mark object
-						var ident = identifier();
-						white();
-						if (!key) { // at the starting of the object						
-							if (ch != ':') { // assume is Mark object
-								// console.log("got Mark object of type: ", ident);
-								// create the object
-								// if (factory) ...
-								obj = Mark(ident, null, null, parent);
-								extended = true;  key = ident;
-								continue;
-							}
-							// else // JSON object
-						}
-                        key = ident;
-                    }
-					
-					if (ch == ':') { // key-value pair
+			next();  // skip the starting '{'
+			if (ch === '{') { // got Mark pragma
+				next();
+				let pragma = '';
+				while (ch) {
+					if (ch === '}') {
 						next();
-						var val = value();
-						if (extended && !isNaN(key*1)) { // any numeric key is rejected for Mark object
-							error("Numeric key not allowed as Mark property name");
-						}
-						obj[key] = val;
-						white();
-						if (ch === ',') {
-							next();  white();
-						} 
-						else if (ch === '}') { // end of the object
+						if (ch === '}') { // end of pragma
 							next();
-							if (extended) { obj[$length] = index; }
-							return obj;   // Potentially empty object
+							// pragma has no other property or content
+							obj[$pragma] = pragma;  // pragma conent stored as Symbol
+							return obj;
 						}
-						else if (extended && (ch === '"' || ch === "'" || ch === '{')) { 
+						pragma += '-';
+					} else {
+						pragma += ch;
+						next();
+					}
+				}
+				error(UNEXPECT_END);	
+			}
+			
+			white();
+			while (ch) {
+				if (ch === '}') { // end of the object
+					next();  
+					if (extended) { obj[$length] = index; }
+					return obj;   // potentially empty object
+				}
+
+				// Keys can be unquoted. If they are, they need to be valid JS identifiers.
+				if (ch === '"' || ch === "'") { // legacy JSON
+					var str = string();  white();
+					if (ch==':') { // property
+						key = str;
+					} else {
+						if (extended) { // got text node
+							putText(str);
 							parseContent();
 							return obj;
-						} else {
-							error("Expect character ':'");						
 						}
-					} else {
-						error("Bad object");
+						else { error("Bad object"); }
 					}
-                }
-				error(UNEXPECT_END);
-            }
-            error("Bad object");
+				}
+				else if (ch === '{') { // child object
+					if (extended) {
+						parseContent();  return obj;
+					}
+					error("Unexpected character '{'");
+				}
+				else { // JSON5 or Mark object
+					var ident = identifier();
+					white();
+					if (!key) { // at the starting of the object						
+						if (ch != ':') { // assume is Mark object
+							// console.log("got Mark object of type: ", ident);
+							// create the object
+							// if (factory) ...
+							obj = Mark(ident, null, null, parent);
+							extended = true;  key = ident;
+							continue;
+						}
+						// else // JSON object
+					}
+					key = ident;
+				}
+				
+				if (ch == ':') { // key-value pair
+					next();
+					var val = value();
+					if (extended && !isNaN(key*1)) { // any numeric key is rejected for Mark object
+						error("Numeric key not allowed as Mark property name");
+					}
+					obj[key] = val;
+					white();
+					if (ch === ',') {
+						next();  white();
+					} 
+					else if (ch === '}') { // end of the object
+						next();
+						if (extended) { obj[$length] = index; }
+						return obj;   // potentially empty object
+					}
+					else if (extended && (ch === '"' || ch === "'" || ch === '{')) { 
+						parseContent();
+						return obj;
+					} else {
+						error("Expect character ':'");						
+					}
+				} else {
+					error("Bad object");
+				}
+			}
+			error(UNEXPECT_END);
         };
 
 	// Parse a JSON value. 
@@ -888,16 +871,12 @@ Mark.stringify = function (obj, replacer, space) {
     };
 
     function isNameChar(c) {
-        return (c >= 'a' && c <= 'z') ||
-            (c >= 'A' && c <= 'Z') ||
-            (c >= '0' && c <= '9') ||
+        return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || ('0' <= c && c <= '9') ||
             c === '_' || c === '$' || '.' || '-';
     }
 
     function isNameStart(c) {
-        return (c >= 'a' && c <= 'z') ||
-            (c >= 'A' && c <= 'Z') ||
-            c === '_' || c === '$';
+        return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || c === '_' || c === '$';
     }
 
     function isName(key) {
@@ -1051,18 +1030,17 @@ Mark.stringify = function (obj, replacer, space) {
                     }
                     buffer += "]";
                 }
-				else if (obj_part.constructor.name === '!comment') {
-					return '{!--' + obj_part[$comment] + '--}';
-				}
 				else {
                     checkForCircular(obj_part);  // console.log('print obj', obj_part);
                     buffer = "{";
                     var nonEmpty = false;
                     objStack.push(obj_part);
-					// print object type
-					if (obj_part.constructor) {
-						if (obj_part.constructor.name != 'Object') { 
-							buffer += obj_part.constructor.name;  nonEmpty = true;
+					// print object type-name, if any
+					if (obj_part.constructor.name != 'Object') { 
+						buffer += obj_part.constructor.name;  nonEmpty = true;
+					} else { // JSON or Mark pragma
+						if (obj_part[$pragma]) {
+							return '{{' + obj_part[$pragma] + '}}';
 						}
 					}
 					// print object attributes

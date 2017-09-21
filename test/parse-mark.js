@@ -1,6 +1,6 @@
-﻿const test = require('tape') ;
+﻿const test = require('tape');
 const Mark = require('./../mark.js');
-const $comment = Symbol.for('Mark.comment');
+const $pragma = Symbol.for('Mark.pragma');
 
 test('Parse Mark object', function(assert) {
 	assert.equal(Mark.parse('{obj}').constructor.name, 'obj', "Mark object constructor.name should be 'obj'");
@@ -42,10 +42,10 @@ test('Parse Mark object', function(assert) {
 	assert.equal(Mark.parse('{div {width:1}}')[0].width, 1, "JSON object allowed as Mark content");
 	assert.equal(Mark.parse('{div {"width":1}}')[0].width, 1, "JSON object allowed as Mark content");
 	
-	// test Mark comment
-	assert.equal(Mark.parse('{!-- comment --}').constructor.name, "!comment", "Mark comment");
-	assert.equal(Mark.parse('{!-- comment --}')[$comment], " comment ", "Mark comment");
-	assert.equal(Mark.parse('{div {!-- comment --}}')[0][$comment], " comment ", "Mark nested comment");
+	// test Mark pragma
+	assert.equal(Mark.parse('{{!-- comment }}').constructor.name, "Object", "Mark pragma");
+	assert.equal(Mark.parse('{{!-- comment }}')[$pragma], "!-- comment ", "Mark pragma as root");
+	assert.equal(Mark.parse('{div {{!-- comment }} }')[0][$pragma], "!-- comment ", "Mark pragma as content");
 	
 	// test multiline text
 	assert.equal(Mark.parse('{div "string"\n" 2nd line"\n\t\t" and 3rd"}')[0], "string 2nd line and 3rd", "Mark multiline text");
