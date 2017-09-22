@@ -675,7 +675,6 @@ Mark.parse = (function() {
 			},
 			parseContent = function() {
 				while (ch) {
-					console.log(ch);
 					if (ch === '{') { // child object
 						Object.defineProperty(obj, index, {value:object(obj), writable:true, configurable:true}); // make content non-enumerable
 						index++;
