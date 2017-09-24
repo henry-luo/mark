@@ -777,7 +777,8 @@ Mark.parse = (function() {
 			catch (e) {
 				if (hasBrace) { throw e; } // cannot be parsed as Mark pragma and throw the error again, as brace needs to be escaped in Mark pragma
 				// restore parsing position, and try parse as Mark pragma
-				let at = bkAt, lineNumber = bkLineNumber, columnNumber = bkColumnNumber;
+				at = bkAt;  lineNumber = bkLineNumber;  columnNumber = bkColumnNumber;
+				ch = text.charAt(at - 1);
 
 				let pragma = '';
 				while (ch) {
