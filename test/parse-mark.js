@@ -50,6 +50,8 @@ test('Parse Mark object', function(assert) {
 	let pragma = Mark.parse("{div width:'100%' 'text'!}");
 	assert.equal(pragma[$pragma], "div width:'100%' 'text'!", "Mark pragma parsing that needs backtracking");
 	assert.equal(pragma.constructor.name, "Object", "Mark pragma constructor.name should be 'Object'");
+	pragma = Mark.parse("{field name:'test', required:{this.context.user.hasRole('admin')}}");
+	assert.equal(pragma.required[$pragma], "this.context.user.hasRole('admin')", "Mark pragma parsing that needs backtracking");
 	
 	// test multiline text
 	assert.equal(Mark.parse('{div "string"\n" 2nd line"\n\t\t" and 3rd"}')[0], "string 2nd line and 3rd", "Mark multiline text");
