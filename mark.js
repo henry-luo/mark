@@ -780,6 +780,8 @@ Mark.parse = (function() {
 				at = bkAt;  lineNumber = bkLineNumber;  columnNumber = bkColumnNumber;
 				ch = text.charAt(at - 1);
 
+				obj = {};  if (parent) { obj[$parent] = parent; } // reset object
+				
 				let pragma = '';
 				while (ch) {
 					if (ch === '}') { // end of pragma
