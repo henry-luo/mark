@@ -4,12 +4,12 @@ Mark syntax is a superset of JSON. The primary extension that Mark makes to JSON
 
 ## Mark Object
 
-Below is the key grammar rules for the new Mark object notation in EBNF notation:
+Below is the key grammar rules for the new Mark object notation in BNF notation:
 
 ```BNF
 Mark ::= ws value ws
 
-value ::= null | true | false | number | string | array | json_object | mark_object
+value ::= null | boolean | number | string | array | json_object | mark_object | mark_pragma
 
 mark_object ::= '{' type_name properties contents '}'
 
@@ -17,13 +17,13 @@ type_name ::= identifier
 
 properties ::= (property (',' property)* ','?)?
 
-contents ::= (text | json_object | mark_object | mark_comment)*
+contents ::= (text | json_object | mark_object | mark_pragma)*
 
 property ::= key ':' value
 
 key ::= s_string | d_string | identifier
 
-mark_comment ::= '{--' (p_char_no_dash | ('-' p_char_no_dash))* '--}'
+mark_pragma ::= '{--' (pchar_no_dash | ('-' pchar_no_dash))* '--}'
 ```
 
 *(Note: for clarify, whitespace rules are omitted in the grammar above. You can refer to the [formal BNF](mark.bnf).)*
@@ -33,6 +33,12 @@ Comparing to a JSON object, a Mark object has two extensions:
 - A **type name**: which corresponds to class name or type name of an object. In JavaScript, that is the `obj.constructor.name`. In HTML and XML, that's the element name.
 - Optional list of **content** values following the properties: the content values corresponds to child nodes in markup data.
 - Mark comment is defined to make it fully compatible with HTML content model, so that HTML can be mapped into Mark without any data loss.
+
+## Mark Pragma
+
+Another syntax extension to JSON is Mark pragma, it is a sequence of characters enclosed in '{' and '}'. It can contain any printable character except '{' and '}', which need to be escaped using backslash '\'.
+
+It is design to support markup content like HTML comment and XML processing instruction.
 
 ## Other Syntax Extensions to JSON
 

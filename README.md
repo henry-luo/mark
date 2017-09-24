@@ -11,20 +11,20 @@ The core data structure in Mark is an compound object, which have the following 
 Below is a sample Mark object, representation a simple registration form:
 
 ```text
-{form                                             // object type-name
-  {!-- comment --}                                // comment object, similar to HTML
-  {div class:"form-group"                         // nested Mark object
-    {label for:"email"                            // object with property 'for'
-      "Email address:"                            // text object
+{form                                   // object type-name 'form'
+  {!-- comment --}                      // Mark pragma, similar to HTML comment
+  {div class:"form-group"               // nested Mark object
+    {label for:"email"                  // object with property 'for'
+      "Email address:"                  // text needs to be quoted
     }
-    {input type:"email", id:"email"}              // object without any contents
+    {input type:"email", id:"email"}    // object without any contents
   }
   {div class:"form-group"
     {label for:"pwd" "Password"}
     {input type:"password", id:"pwd"}
   }
-  {button type:"submit", class:['btn','btn-info'] // property with complex values
-    'Submit'                                      // text needs to be quoted
+  {button class:['btn','btn-info']      // property with complex values
+    'Submit'                            // text can be quoted with " or '
   }
 }
 ```
@@ -85,7 +85,7 @@ Then in your node script, use it as:
 
 ```
 const Mark = require('mark-js');
-var obj = Mark.parse(`{div {mark 'Hello World!' }}`);  // using ES6 backtick
+var obj = Mark.parse(`{div {span 'Hello World!' }}`);  // using ES6 backtick
 console.log("Greeting from Mark: " + Mark.stringify(obj));
 ```
 
@@ -94,7 +94,7 @@ To use the library in browser, you can include the `mark.js` under `dist` direct
 ```
 <script src='mark.js'></script>
 <script>
-var obj = Mark.parse(`{div {mark 'Hello World!' }}`);  // using ES6 backtick
+var obj = Mark.parse(`{div {span 'Hello World!' }}`);  // using ES6 backtick
 console.log("Greeting from Mark: " + Mark.stringify(obj));
 </script>
 ```

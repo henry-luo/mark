@@ -298,6 +298,7 @@ Mark.parse = (function() {
         lineNumber,   	// The current line number
         columnNumber, 	// The current column number
         ch,           	// The current character
+		text,			// The text being parsed
 		
         escapee = {
             "'":  "'",
@@ -321,8 +322,7 @@ Mark.parse = (function() {
             '\xA0',
             '\uFEFF'
         ],
-        text,
-
+        
         renderChar = function(chr) {
             return chr === '' ? 'EOF' : "'" + chr + "'";
         },
@@ -519,7 +519,6 @@ Mark.parse = (function() {
             if (ch !== '/') {
                 error("Not an inline comment");
             }
-
             do {
                 next();
                 if (ch === '\n' || ch === '\r') {
@@ -538,7 +537,6 @@ Mark.parse = (function() {
             if (ch !== '*') {
                 error("Not a block comment");
             }
-
             do {
                 next();
                 while (ch === '*') {
@@ -560,9 +558,7 @@ Mark.parse = (function() {
             if (ch !== '/') {
                 error("Not a comment");
             }
-
             next('/');
-
             if (ch === '/') {
                 inlineComment();
             } else if (ch === '*') {
@@ -661,133 +657,148 @@ Mark.parse = (function() {
 
 		// Parse an object value
         object = function(parent) {
-            let key, obj = {}, extended = false, index = 0;  	// whether the is extended Mark object or legacy JSON object
-			if (parent) { obj[$parent] = parent; }  // all 3 types: Mark object, JSON object, Mark pragma store parent 
+            let key, obj = {}, 
+				extended = false, // whether the is extended Mark object or legacy JSON object
+				hasBrace = false, // whether the object has any unescaped brace
+				index = 0;  	
+			// all 3 types: Mark object, JSON object, Mark pragma store reference to parent 
+			if (parent) { obj[$parent] = parent; } 
 
-			let putText = function(text) {
-				// check preceding node
-				if (index > 0 && typeof obj[index-1] === 'string') { // merge with previous text
-					obj[index-1] += text;
-				} else {
-					Object.defineProperty(obj, index, {value:text, writable:true, configurable:true}); // make content non-enumerable
-					index++;
-				}
-			},
-			parseContent = function() {
-				while (ch) {
-					if (ch === '{') { // child object
-						Object.defineProperty(obj, index, {value:object(obj), writable:true, configurable:true}); // make content non-enumerable
+			next();  // skip the starting '{'
+			// store the current source position, in case we need to backtrack later
+			let bkAt = at, bkLineNumber = lineNumber, bkColumnNumber = columnNumber;
+
+			try {
+				let putText = function(text) {
+					// check preceding node
+					if (index > 0 && typeof obj[index-1] === 'string') { // merge with previous text
+						obj[index-1] += text;
+					} else {
+						Object.defineProperty(obj, index, {value:text, writable:true, configurable:true}); // make content non-enumerable
 						index++;
 					}
-					else if (ch === '"' || ch === "'") { // text node
-						putText(string());
-					}
-					else if (ch === '}') { 
-						next();  obj[$length] = index;
-						return;
-					}
-					else {
-						error("Unexpected character " + renderChar(ch));
-					}
-					white();
-				}
-				error(UNEXPECT_END);		
-			};
-			
-			next();  // skip the starting '{'
-			if (ch === '{') { // got Mark pragma
-				next();
-				let pragma = '';
-				while (ch) {
-					if (ch === '}') {
-						next();
-						if (ch === '}') { // end of pragma
-							next();
-							// pragma has no other property or content
-							obj[$pragma] = pragma;  // pragma conent stored as Symbol
-							return obj;
+				},
+				parseContent = function() {
+					while (ch) {
+						if (ch === '{') { // child object
+							hasBrace = true;
+							Object.defineProperty(obj, index, {value:object(obj), writable:true, configurable:true}); // make content non-enumerable
+							index++;  
 						}
-						pragma += '-';
-					} else {
-						pragma += ch;
-						next();
-					}
-				}
-				error(UNEXPECT_END);	
-			}
-			
-			white();
-			while (ch) {
-				if (ch === '}') { // end of the object
-					next();  
-					if (extended) { obj[$length] = index; }
-					return obj;   // potentially empty object
-				}
-
-				// Keys can be unquoted. If they are, they need to be valid JS identifiers.
-				if (ch === '"' || ch === "'") { // legacy JSON
-					var str = string();  white();
-					if (ch==':') { // property
-						key = str;
-					} else {
-						if (extended) { // got text node
-							putText(str);
-							parseContent();
-							return obj;
+						else if (ch === '"' || ch === "'") { // text node
+							putText(string());
 						}
-						else { error("Bad object"); }
-					}
-				}
-				else if (ch === '{') { // child object
-					if (extended) {
-						parseContent();  return obj;
-					}
-					error("Unexpected character '{'");
-				}
-				else { // JSON5 or Mark object
-					var ident = identifier();
-					white();
-					if (!key) { // at the starting of the object						
-						if (ch != ':') { // assume is Mark object
-							// console.log("got Mark object of type: ", ident);
-							// create the object
-							// if (factory) ...
-							obj = Mark(ident, null, null, parent);
-							extended = true;  key = ident;
-							continue;
+						else if (ch === '}') { 
+							next();  obj[$length] = index;
+							return;
 						}
-						// else // JSON object
+						else {
+							error("Unexpected character " + renderChar(ch));
+						}
+						white();
 					}
-					key = ident;
-				}
+					error(UNEXPECT_END);		
+				};
 				
-				if (ch == ':') { // key-value pair
-					next();
-					var val = value();
-					if (extended && !isNaN(key*1)) { // any numeric key is rejected for Mark object
-						error("Numeric key not allowed as Mark property name");
-					}
-					obj[key] = val;
-					white();
-					if (ch === ',') {
-						next();  white();
-					} 
-					else if (ch === '}') { // end of the object
-						next();
+				white();
+				while (ch) {
+					if (ch === '}') { // end of the object
+						next();  
 						if (extended) { obj[$length] = index; }
 						return obj;   // potentially empty object
 					}
-					else if (extended && (ch === '"' || ch === "'" || ch === '{')) { 
-						parseContent();
-						return obj;
-					} else {
-						error("Expect character ':'");						
+
+					// Keys can be unquoted. If they are, they need to be valid JS identifiers.
+					if (ch === '"' || ch === "'") { // legacy JSON
+						var str = string();  white();
+						if (ch==':') { // property
+							key = str;
+						} else {
+							if (extended) { // got text node
+								putText(str);
+								parseContent();
+								return obj;
+							}
+							else { error("Bad object"); }
+						}
 					}
-				} else {
-					error("Bad object");
+					else if (ch === '{') { // child object
+						if (extended) {
+							hasBrace = true;  parseContent();  return obj;
+						}
+						error("Unexpected character '{'");
+					}
+					else { // JSON5 or Mark object
+						var ident = identifier();
+						white();
+						if (!key) { // at the starting of the object						
+							if (ch != ':') { // assume is Mark object
+								// console.log("got Mark object of type: ", ident);
+								// create the object
+								// if (factory) ...
+								obj = Mark(ident, null, null, parent);
+								extended = true;  key = ident;
+								continue;
+							}
+							// else // JSON object
+						}
+						key = ident;
+					}
+					
+					if (ch == ':') { // key-value pair
+						next();
+						if (ch === '{') { hasBrace = true; }
+						var val = value();
+						if (extended && !isNaN(key*1)) { // any numeric key is rejected for Mark object
+							error("Numeric key not allowed as Mark property name");
+						}
+						obj[key] = val;
+						white();
+						if (ch === ',') {
+							next();  white();
+						} 
+						else if (ch === '}') { // end of the object
+							next();
+							if (extended) { obj[$length] = index; }
+							return obj;   // potentially empty object
+						}
+						else if (extended && (ch === '"' || ch === "'" || ch === '{')) { 
+							parseContent();
+							return obj;
+						} else {
+							error("Expect character ':'");						
+						}
+					} else {
+						error("Bad object");
+					}
 				}
+				error(UNEXPECT_END);
 			}
-			error(UNEXPECT_END);
+			catch (e) {
+				if (hasBrace) { throw e; } // cannot be parsed as Mark pragma and throw the error again, as brace needs to be escaped in Mark pragma
+				// restore parsing position, and try parse as Mark pragma
+				let at = bkAt, lineNumber = bkLineNumber, columnNumber = bkColumnNumber;
+
+				let pragma = '';
+				while (ch) {
+					if (ch === '}') { // end of pragma
+						next();
+						// pragma has no other property or content
+						obj[$pragma] = pragma;  // pragma conent stored as Symbol
+						return obj;
+					}				
+					else if (ch === '\\') {
+						next();
+						if (ch !== '{' && ch !== '}') { pragma += '\\'; }
+					}
+					else if (ch === '{' || ch === '}') {
+						error("Brace character '"+ ch +"' should be escaped in Mark pragma");				
+					}
+					pragma += ch;
+					next();
+				}
+				error(UNEXPECT_END);
+			}
         };
 
 	// Parse a JSON value. 
