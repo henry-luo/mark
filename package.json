@@ -24,9 +24,9 @@
     "build-mark-all": "browserify -x htmlparser2 -x he --standalone Mark mark.js | uglifyjs > dist/mark.all.js",
     "build-find": "browserify --full-paths -x debug ./dev/mark.find.js | discify --open",
     "list-mark": "browserify --full-paths -x ./lib/mark.convert.js -x ./lib/mark.query.js -x htmlparser2 -x he mark.js | discify --open",
-	"list-convert": "browserify --full-paths -x htmlparser2 -x he ./lib/mark.convert.js | discify --open",
-	"list-query": "browserify --full-paths ./lib/mark.query.js | discify --open",
-	"list-mark-all": "browserify --full-paths -x htmlparser2 -x he mark.js | discify --open",
+    "list-convert": "browserify --full-paths -x htmlparser2 -x he ./lib/mark.convert.js | discify --open",
+    "list-query": "browserify --full-paths ./lib/mark.query.js | discify --open",
+    "list-mark-all": "browserify --full-paths -x htmlparser2 -x he mark.js | discify --open",
     "dev": "watchify mark.js --standalone Mark -o dist/mark.js -v",
     "gen-mark-diagram": "cp-cli dev/viewer.html node_modules/grammkit/template/viewer.html && grammkit docs/mark.bnf -o docs/mark-grammar.html"
   },
@@ -50,7 +50,6 @@
     "commander": "^2.11.0",
     "css-select": "^1.3.0-rc0",
     "debug": "^2.6.8",
-    "he": "^1.1.1",
     "helmsman": "^1.0.3",
     "htmlparser2": "^3.9.2"
   },

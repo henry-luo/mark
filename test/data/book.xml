@@ -2,7 +2,7 @@
 <catalog>
    <book id="bk101">
       <author>Gambardella, Matthew</author>
-      <title>XML Developer's Guide</title>
+      <title>XML Developer&#x27;s Guide</title>
       <genre>Computer</genre>
       <price>44.95</price>
       <publish_date>2000-10-01</publish_date>
@@ -31,7 +31,7 @@
    </book>
    <book id="bk104">
       <author>Corets, Eva</author>
-      <title>Oberon's Legacy</title>
+      <title>Oberon&#x27;s Legacy</title>
       <genre>Fantasy</genre>
       <price>5.95</price>
       <publish_date>2001-03-10</publish_date>
@@ -48,7 +48,7 @@
       <publish_date>2001-09-10</publish_date>
       <description>The two daughters of Maeve, half-sisters, 
       battle one another for control of England. Sequel to 
-      Oberon's Legacy.</description>
+      Oberon&#x27;s Legacy.</description>
    </book>
    <book id="bk106">
       <author>Randall, Cynthia</author>
@@ -88,16 +88,16 @@
       of being quantum.</description>
    </book>
    <book id="bk110">
-      <author>O'Brien, Tim</author>
+      <author>O&#x27;Brien, Tim</author>
       <title>Microsoft .NET: The Programming Bible</title>
       <genre>Computer</genre>
       <price>36.95</price>
       <publish_date>2000-12-09</publish_date>
-      <description>Microsoft's .NET initiative is explored in 
-      detail in this deep programmer's reference.</description>
+      <description>Microsoft&#x27;s .NET initiative is explored in 
+      detail in this deep programmer&#x27;s reference.</description>
    </book>
    <book id="bk111">
-      <author>O'Brien, Tim</author>
+      <author>O&#x27;Brien, Tim</author>
       <title>MSXML3: A Comprehensive Guide</title>
       <genre>Computer</genre>
       <price>36.95</price>
