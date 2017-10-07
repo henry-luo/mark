@@ -53,23 +53,22 @@ var MARK = (function() {
 				for (let val of items) {
 					let t = typeof val;
 					if (t === 'string') {
+						if (!val.length) continue; // skip empty text '', ""
 						if (prev_type === 'string') { 
 							len--;  val = obj[len] + val;  // merge text nodes
 						}
 					}
-					else {
-						if (t === 'object') {
-							if (val === null) continue; // skip null value
-							else if (val instanceof Array) { // expanded it inline
-								addContents(val);  continue;
-							}
-							// else, assume Mark object
+					else if (t === 'object') {
+						if (val === null) continue; // skip null value
+						else if (val instanceof Array) { // expanded it inline
+							addContents(val);  continue;
 						}
-						else { // other primitive values
-							val = val.toString(); // convert to string, as Mark only accept text and Mark object as content
-							if (prev_type === 'string') {
-								len--;  val = obj[len] + val;  // merge text nodes
-							}
+						// else, assume Mark object
+					}
+					else { // other primitive values
+						val = val.toString(); // convert to string, as Mark only accept text and Mark object as content
+						if (prev_type === 'string') {
+							len--;  val = obj[len] + val;  // merge text nodes
 						}
 					}
 					Object.defineProperty(obj, len, {value:val, writable:true, configurable:true}); // make content non-enumerable
@@ -606,7 +605,9 @@ MARK.parse = (function() {
 							index++;  
 						}
 						else if (ch === '"' || ch === "'") { // text node
-							putText(string());
+							let str = string();
+							// only output non empty text
+							if (str) putText(str);
 						}
 						else if (ch === '}') { 
 							next();  obj[$length] = index;
@@ -635,7 +636,8 @@ MARK.parse = (function() {
 							key = str;
 						} else {
 							if (extended) { // got text node
-								putText(str);
+								// only output non-empty text
+								if (str) putText(str);
 								parseContent();
 								return obj;
 							}
