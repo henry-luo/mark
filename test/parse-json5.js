@@ -1,11 +1,11 @@
 const test = require('tape') ;
 const Mark = require('./../mark.js');
 
-test('Parse JSON object', function(assert) {
-	assert.deepEqual(Mark.parse('{"obj":123}'), {"obj":123}, 'Parse object {"obj":123}');
-	assert.deepEqual(Mark.parse('[123, "string", true]'), [123, "string", true], 'Parse array [123, "string", true]');
-	assert.equal(Mark.parse('"string"'), "string", 'Parse "string"');
-	assert.equal(Mark.parse('123.456'), 123.456, 'Parse number 123.456');
+test('Parse JSON5 object', function(assert) {
+	assert.deepEqual(Mark.parse('{obj:123}'), {obj:123}, 'Parse object {obj:123}');
+	assert.deepEqual(Mark.parse("{'obj':123}"), {'obj':123}, "Parse object {'obj':123}");
+	assert.deepEqual(Mark.parse("{'obj':123,}"), {'obj':123,}, "Parse object {'obj':123,}");
+	assert.deepEqual(Mark.parse("{'obj':123,/*comment*/}"), {'obj':123,/*comment*/}, "Parse object {'obj':123,/*comment*/}");
 	
 	assert.deepEqual(Mark.parse("{a:12.4, b:true, c:false, d:'str', e:null, g:1, h:[1,2,3], i:-12, j:[], k:{}, l:'', m:\"\", n:0, o:1E12, p:1e-2}"), 
 		{a:12.4, b:true, c:false, d:'str', e:null, g:1, h:[1,2,3], i:-12, j:[], k:{}, l:'', m:"", n:0, o:1E12, p:1e-2}, 'Parse object with literal values');
