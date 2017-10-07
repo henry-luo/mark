@@ -30,6 +30,11 @@ test('Mark Model', function(assert) {
 	assert.equal(div.length, 12, "length of Mark object should be 12");
 	assert.equal(div.contents().length, 1, "length of Mark object contents should be 1");
 	assert.looseEqual(Object.keys(div), ['length', 'width'], "Mark object keys() should be ['length', 'width']");
+
+	// length API
+	assert.equal(typeof Mark.length, 'function', "Mark.length API should be a function");
+	assert.equal(Mark.length.call(div), 1, "div content length should be 1");
+	assert.equal(Object.getPrototypeOf(div).length.call(div), 1, "div content length should be 1");
 	
 	// contents API
 	div = Mark.parse('{div class:"test" "text"}');

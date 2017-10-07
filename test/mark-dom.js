@@ -8,5 +8,11 @@ test('Mark DOM', function(assert) {
 	assert.equal(div[1].parent().constructor.name, 'div', "Parent of br should be div");
 	assert.equal(div[2].parent, undefined, "Parent of text node is undefined");
 	assert.equal(div[3][$parent].constructor.name, 'div', "Parent of pragma should be div");
+	
+	// test Mark object with 'parent' overridden
+	div = Mark.parse("{div {span class:'bold', parent:'a property'}}");
+	assert.equal(Object.getPrototypeOf(div[0]).parent.call(div[0]).constructor.name, 'div', "parent() of span should be div");
+	assert.equal(Mark.parent.call(div[0]).constructor.name, 'div', "parent() of span should be div");
+	assert.equal(div[0].parent, 'a property', ".parent of span should be 'a property'");
 	assert.end();	
 });

@@ -187,14 +187,19 @@ var MARK = (function() {
 	};
 	// set the APIs
 	for (let a in api) {
+		let func = {value:api[a], writable:true, configurable:true};
 		// Mark.prototype[a] = api[a];  // direct assignment will make the API functions enumerable
-		Object.defineProperty(Mark.prototype, a, {value:api[a], writable:true, configurable:true});  // make API functions non-enumerable
+		Object.defineProperty(Mark.prototype, a, func);  // make API functions non-enumerable
+		
+		// also set the APIs on static MARK object
+		// Mark[a] = api[a];  // cannot use assignment, as 'length' is predefined to be readonly
+		Object.defineProperty(Mark, a, func);  // make API functions non-enumerable
 	}
 	// define object iterator API
 	Mark.prototype[Symbol.iterator] = function*() {
 		var length = this[$length];
 		for (let i = 0; i < length; i++) { yield this[i]; }
-	};	
+	};
 	return Mark;
 })();
 
