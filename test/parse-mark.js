@@ -20,7 +20,6 @@ test('Parse Mark object', function(assert) {
 	assert.equal(Mark.parse('{div "class":"large"}').class, "large", 'Object {div "class":"large"}.class should be "large"');
 	assert.equal(Mark.parse("{div 'class':'large'}").class, "large", 'Object {div "class":"large"}.class should be "large"');
 	assert.equal(Mark.parse("{obj length:100}").length, 100, 'Object {obj length:100}.length should be 100');
-	assert.equal(Mark.parse("{obj length:100}").properties.length, 100, 'Object {obj length:100}.properties.length should be 100');
 	assert.deepEqual(Object.keys(Mark.parse('{obj}')), [], 'Object {obj}.keys() should be empty');
 	assert.deepEqual(Object.keys(Mark.parse('{div class:"test", style:{color:"red"}}')), ['class','style'], 
 		'Object {div class:"test", style:{color:"red"}} keys should be ["class","style"]');
@@ -29,9 +28,9 @@ test('Parse Mark object', function(assert) {
 		[{kind:'back'}, 'save', {action:'submit', class:'btn btn-warning'}] , "form buttons with array of data");
 	
 	// test content model
-	assert.equal(Mark.parse('{obj}').length, 0, "Object {obj}.length should be 0");
-	assert.equal(Mark.parse('{div "text"}').length, 1, 'Object {div "text"}.length should be 1');
-	assert.equal(Mark.parse('{div "text" {br}}').length, 2, 'Object {div "text" {br}}.length should be 2');
+	assert.equal(Mark.parse('{obj}').length(), 0, "Object {obj}.length should be 0");
+	assert.equal(Mark.parse('{div "text"}').length(), 1, 'Object {div "text"}.length should be 1');
+	assert.equal(Mark.parse('{div "text" {br}}').length(), 2, 'Object {div "text" {br}}.length should be 2');
 	assert.equal(Mark.parse('{div "text"}')[0], "text", 'Object {div "text"}[0] should be "text"');
 	assert.equal(Mark.parse('{div {br}}')[0].constructor.name, "br", 'Object {div {br}}.constructor.name should be "br"');
 		

@@ -1,6 +1,6 @@
 const test = require('tape');
 const Mark = require('./../mark.js');
-const selector = require('./../lib/mark.query.js');
+const selector = require('./../lib/mark.selector.js');
 
 test('Mark Select', function(assert) {
 	let vtree = Mark.parse("{div {span class:'bold', width:'100px' 'text' {b 'bold'}} {br}}");

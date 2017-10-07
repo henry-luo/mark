@@ -6,251 +6,145 @@
 // which is further based of Douglas Crockford's json_parse.js:
 // https://github.com/douglascrockford/JSON-js/blob/master/json_parse.js
 
-const $contents = Symbol.for('Mark.contents');
-const $properties = Symbol.for('Mark.properties');
 const $length = Symbol.for('Mark.length');
 const $parent = Symbol.for('Mark.parent');
 const $pragma = Symbol.for('Mark.pragma');
-const $target = Symbol('Mark.target');
 
-// construct Mark object, like virtual-dom hyperscript
-var Mark = (function() {
+// static Mark object
+var MARK = (function() {
 	"use strict";
 	// cached constructors/prototypes for the Mark objects
-	var constructors = {};
+	var constructors = {};	
 	
-	// traps for contents API, a proxy to make object array-like; contents does not inherit				
-	const contentsTraps = {
-		getPrototypeOf() {
-			return Array.prototype;
+	// Mark object API functions
+	var api = {
+		// object 'properties': just use JS Object.keys(), Object.values(), Object.entries() to work with the properties	
+		contents: function() { 
+			let list = [];
+			for (let c of this) { list.push(c); }
+			return list;
 		},
+		length: function() { return this[$length]; },				
+		parent: function() { return this[$parent]; },
 		
-		// trap for 'in' operator
-		has(target, property) {
-			return property === 'length' || target[$target].hasOwnProperty(property) && Number.isInteger(Number(property));
+		push: function(item) {
+			// copy the arguments
+			var length = this[$length];
+			for (var i=0; i<arguments.length; i++) {
+				Object.defineProperty(this, length+i, {value:arguments[i], writable:true, configurable:true}); // make content item non-enumerable
+			}
+			length += arguments.length;
+			this[$length] = length;
+			return length;
 		},
-		
-		get(target, property, receiver) {
-			switch (property) {
-			case 'length': // maps to length symbol
-				return target[$target][$length];
-			case Symbol.iterator:
-				return function* () {
-					var length = target[$target][$length];
-					for (let i = 0; i < length; i++) {
-						yield target[$target][i];
-					}
-				};
-			case Symbol.toStringTag:
-				return 'Array';
-			case Symbol.isConcatSpreadable:
-				return true;  // contents API is spreadable
-			case 'toString':
-				return Object.prototype.toString.bind(receiver);
+		pop: function(item) {
+			var length = this[$length];
+			if (length > 0) {
+				var item = this[length-1];  delete this[length-1];
+				this[$length] = length - 1;
+				return item;
+			} else {
+				return undefined;
 			}
-			if (target[$target].hasOwnProperty(property)) { // hide non-numeric properties
-				return Number.isInteger(Number(property)) ? target[$target][property]:undefined;
-			}
-			else { // other prototype properties
-				const method = Array.prototype[property];
-				if (method) {
-					// console.log('wrapping method', method, target, target[$target]);
-					return method.bind(receiver);
+		},
+		shift: function() {
+			var length = this[$length];
+			if (length > 0) {
+				var item = this[0];
+				for (var i=0; i<length-1; i++) {
+					Object.defineProperty(this, i, {value:this[i+1], writable:true, configurable:true});
 				}
+				this[$length] = length - 1;
+				return item;
+			} else {
+				return undefined;
 			}
 		},
-
-		// to keep it simple, we make contents API read-only
-		set(target, property, value, receiver) {
-			return false;
+		unshift: function() {
+			var args = arguments.length;  var length = this[$length];
+			if (args) {
+				// shift the items
+				for (var i = length+args-1; i > args-1; i--) {
+					Object.defineProperty(this, i, {value:this[i-args], writable:true, configurable:true});
+				}
+				// copy the arguments
+				for (var i=0; i<args; i++) {
+					Object.defineProperty(this, i, {value:arguments[i], writable:true, configurable:true});
+				}
+				this[$length] = length += args;
+			}
+			return length;
+		},
+		remove: function() {
+			var deleted;
+			var length = this[$length];
+			if (arguments.length) {
+				// shift the items
+				var index = arguments[0];
+				if (index >=0 && index < length) {
+					deleted = this[index];
+					for (var i = index; i < length - 1; i++) { this[i] = this[i+1]; }
+					this[$length] = length - 1;
+				}
+				// else invalid index
+			}
+			return deleted;
+		},
+		// todo: function addContent(item, index)
+		// todo: pick and imp other useful Array prototype functions
+		
+		// conversion APIs
+		toHtml: function() {
+			if (!MARK.$convert) { MARK.$convert = require('./lib/mark.convert.js')(Mark); }
+			return MARK.$convert.toHtml(this);
+		},
+		toXml: function() {
+			if (!MARK.$convert) { MARK.$convert = require('./lib/mark.convert.js')(Mark); }
+			return MARK.$convert.toXml(this);
 		},
 		
-		// trap or Relect.ownKeys(), returns numeric keys and 'length', like default Array behavior
-		ownKeys: function(target) {
-			let keys = [], length = target[$target][$length];
-			for (var i=0; i<length; i++) { keys.push(i.toString()); }
-			keys.push('length');
-			return keys;
-		}
+		// query APIs
+		filter: Array.prototype.filter,				
+		find: function(selector) {
+			if (!MARK.$select) { MARK.$select = require('./lib/mark.selector.js'); }
+			return MARK.$select(this).find(selector);
+		},
+		matches: function(selector) {
+			if (!MARK.$select) { MARK.$select = require('./lib/mark.selector.js'); }
+			return MARK.$select(this).matches(selector);
+		},
 	};
-
-	// traps for properties API, returns only enumerable properties and hides the contents; properties may inherit			
-	const propsTraps = {
-		getPrototypeOf() {
-			return Object.prototype;
-		},
-		
-		// trap for 'in' operator
-		has(target, property) {
-			return isNaN(property*1) && property in target;
-		},
-		
-		get(target, property, receiver) {
-			return target.propertyIsEnumerable(property) && isNaN(property*1) ? target[property]:undefined;
-		},
-
-		set(target, property, value, receiver) {
-			if (!isNaN(property*1)) { return false; } // reject any numeric key
-			target[property] = value;  return true;
-		},
-		
-		// trap or Relect.ownKeys();
-		ownKeys: function(target) {
-			let keys = Object.keys(target);  // console.log('got prop keys', keys);
-			// todo: should add inherited enumerable keys
-			return keys;
-		}
-	};	
 	
-	return function(typeName, props, contents, parent) {
+	// Mark object constructor
+	function Mark(typeName, props, contents, parent) {
 		"use strict";
+		// 1. prepare the constructor
 		var con = constructors[typeName];
 		if (!con) { 
 			con = constructors[typeName] = function(){};
 			// con.prototype.constructor is set to con by JS
-			// con.prototype.__proto__ = Array.prototype; // Mark no longer extends Array; Mark is array like, but not array.
+			// sets the type name
 			Object.defineProperty(con, 'name', {value:typeName, configurable:true}); // non-writable, as we don't want the name to be changed
-			
-			// define object 'properties' API;  todo: properties should hide content
-			Object.defineProperty(con.prototype, 'properties', {get:function() {
-				if (!this[$properties]) { this[$properties] = new Proxy(this, propsTraps); }
-				return this[$properties];
-			}, configurable:true});  // non-enumerable
-			
-			// define object 'contents' API
-			Object.defineProperty(con.prototype, 'contents', {get:function() { 
-				if (!this[$contents]) {
-					let array = [];  array[$target] = this;
-					this[$contents] = new Proxy(array, contentsTraps); 
-				}
-				return this[$contents];
-			}, configurable:true});  // non-enumerable
-			
-			// define object 'parent' API
-			Object.defineProperty(con.prototype, 'parent', {
-				get:function() { return this[$parent]; },
-				set:function(parent) {
-					// sets the 'parent' property directly as normal property
-					Object.defineProperty(this, 'parent', {value:parent, writable:true, configurable:true, enumerable:true});
-				},
-			configurable:true});  // non-enumerable
-			
-			// define object 'length' API
-			Object.defineProperty(con.prototype, 'length', {
-				get:function() { return this[$length]; },
-				set:function(length) {
-					// sets the 'length' property directly as normal property
-					Object.defineProperty(this, 'length', {value:length, writable:true, configurable:true, enumerable:true});
-				},
-			configurable:true}); 		
-			
-			// define object iterator API
-			con.prototype[Symbol.iterator] = function*() {
-				var length = this[$length];
-				for (let i = 0; i < length; i++) { yield this[i]; }
-			}; 		
-			
-			// todo: function addContent(item, index)
-			
-			// make object compatible with array API
-			var api = {
-				push: function(item) {
-					// copy the arguments
-					var length = this[$length];
-					for (var i=0; i<arguments.length; i++) {
-						Object.defineProperty(this, length+i, {value:arguments[i], writable:true, configurable:true}); // make content item non-enumerable
-					}
-					length += arguments.length;
-					this[$length] = length;
-					return length;
-				},
-				pop: function(item) {
-					var length = this[$length];
-					if (length > 0) {
-						var item = this[length-1];  delete this[length-1];
-						this[$length] = length - 1;
-						return item;
-					} else {
-						return undefined;
-					}
-				},
-				shift: function() {
-					var length = this[$length];
-					if (length > 0) {
-						var item = this[0];
-						for (var i=0; i<length-1; i++) {
-							Object.defineProperty(this, i, {value:this[i+1], writable:true, configurable:true});
-						}
-						this[$length] = length - 1;
-						return item;
-					} else {
-						return undefined;
-					}
-				},
-				unshift: function() {
-					var args = arguments.length;  var length = this[$length];
-					if (args) {
-						// shift the items
-						for (var i = length+args-1; i > args-1; i--) {
-							Object.defineProperty(this, i, {value:this[i-args], writable:true, configurable:true});
-						}
-						// copy the arguments
-						for (var i=0; i<args; i++) {
-							Object.defineProperty(this, i, {value:arguments[i], writable:true, configurable:true});
-						}
-						this[$length] = length += args;
-					}
-					return length;
-				},
-				delete: function() {
-					var deleted;
-					var length = this[$length];
-					if (arguments.length) {
-						// shift the items
-						var index = arguments[0];
-						if (index >=0 && index < length) {
-							deleted = this[index];
-							for (var i = index; i < length - 1; i++) { this[i] = this[i+1]; }
-							this[$length] = length - 1;
-						}
-						// else invalid index
-					}
-					return deleted;
-				},
-				filter: Array.prototype.filter,
-				// todo: pick and patch other Array prototype functions
-				
-				toHtml: function() {
-					if (!Mark.$convert) { Mark.$convert = require('./lib/mark.convert.js')(Mark); }
-					return Mark.$convert.toHtml(this);
-				},
-				toXml: function() {
-					if (!Mark.$convert) { Mark.$convert = require('./lib/mark.convert.js')(Mark); }
-					return Mark.$convert.toXml(this);
-				},
-				find: function(selector) {
-					if (!Mark.$select) { Mark.$select = require('./lib/mark.query.js'); }
-					return Mark.$select(this).find(selector);
-				},
-				matches: function(selector) {
-					if (!Mark.$select) { Mark.$select = require('./lib/mark.query.js'); }
-					return Mark.$select(this).matches(selector);
-				},
-			};
-			for (let a in api) {
-				Object.defineProperty(con.prototype, a, {value:api[a], writable:true, configurable:true});  // make method non-enumerable
-			}		
+
+			// con.prototype.__proto__ = Array.prototype; // Mark no longer extends Array; Mark is array like, but not array.
+			// con is set to extend Mark, instead of copying all the API functions
+			// for (let a in api) { Object.defineProperty(con.prototype, a, {value:api[a], writable:true, configurable:true}); } // make API functions non-enumerable
+			Object.setPrototypeOf(con.prototype, Mark.prototype);
 		}
 		
-		// create object
+		// 2. create object
 		var obj = Object.create(con.prototype);
 		
-		// copy properties, numeric keys are not allowed
+		// 3. copy properties, numeric keys are not allowed
 		if (props) { 
-			for (let p in props) { propsTraps.set(obj, p, props[p]); }
+			for (let p in props) { 
+				// propsTraps.set(obj, p, props[p]); 
+				// accept only non-numeric key
+				if (isNaN(p*1)) { obj[p] = props[p]; }
+			}
 		}
 		
-		// copy contents if any
+		// 4. copy contents if any
 		let len = 0;
 		if (contents) { 
 			let prev_type = null;
@@ -280,14 +174,28 @@ var Mark = (function() {
 			}
 			addContents(contents);
 		}
+		// set $length
 		obj[$length] = len;
 		
+		// set $parent
 		if (parent) { obj[$parent] = parent; }
 		return obj;
+	};
+	
+	// set the APIs
+	for (let a in api) {
+		// mk[a] = api[a];  // does not work for 'length', which is predefined as readonly
+		Object.defineProperty(Mark.prototype, a, {value:api[a], writable:true, configurable:true});  // make API functions non-enumerable
+	}
+	// define object iterator API
+	Mark.prototype[Symbol.iterator] = function*() {
+		var length = this[$length];
+		for (let i = 0; i < length; i++) { yield this[i]; }
 	};	
+	return Mark;
 })();
 
-Mark.parse = (function() {
+MARK.parse = (function() {
 	// This is a function that can parse a Mark text, producing a JavaScript data structure. 
 	// It is a simple, recursive descent parser. It does not use eval or regular expressions, 
 	// so it can be used as a model for implementing a Mark parser in other languages.
@@ -736,7 +644,7 @@ Mark.parse = (function() {
 								// console.log("got Mark object of type: ", ident);
 								// create the object
 								// if (factory) ...
-								obj = Mark(ident, null, null, parent);
+								obj = MARK(ident, null, null, parent);
 								extended = true;  key = ident;
 								continue;
 							}
@@ -837,8 +745,8 @@ Mark.parse = (function() {
 		
 		if (!source) { text = '';  error(UNEXPECT_END); }
 		if (source.match(/^\s*</)) { // parse as html
-			if (!Mark.$html) { Mark.$html = require('./lib/mark.convert.js')(Mark); }
-			return Mark.$html.parse(source);
+			if (!MARK.$html) { MARK.$html = require('./lib/mark.convert.js')(MARK); }
+			return MARK.$html.parse(source);
 		} 
 		// else // parse as Mark		
 		
@@ -855,7 +763,7 @@ Mark.parse = (function() {
 }());
 
 // Mark stringify will not quote keys where appropriate
-Mark.stringify = function (obj, replacer, space) {
+MARK.stringify = function(obj, replacer, space) {
 	"use strict";
     if (replacer && (typeof(replacer) !== "function" && !isArray(replacer))) {
         throw new Error('Replacer must be a function or an array');
@@ -910,7 +818,7 @@ Mark.stringify = function (obj, replacer, space) {
     }
 
     // export for use in tests
-    Mark.isName = isName;
+    MARK.isName = isName;
 
     // polyfills
     function isArray(obj) {
@@ -1113,4 +1021,4 @@ Mark.stringify = function (obj, replacer, space) {
 
 // export the Mark interface
 if (typeof module === 'object')
-module.exports = Mark;
+module.exports = MARK;

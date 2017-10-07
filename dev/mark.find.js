@@ -1,9 +1,9 @@
 const debug = function() {}; // require('debug')('mark:find');
 
 var selector = require("cssauron")({
-	tag: function(node) { debug('tag', node.constructor.name);  return node.constructor.name; },
-	children: function(node) { return node.contents; },
-	parent: function(node) { debug('parent of', node.constructor.name);  return node.parent; },
+	tag: function(node) { return node.constructor.name; },
+	children: function(node) { return node.contents(); },
+	parent: function(node) { return node.parent(); },
 	contents: function(node) { return (typeof node === 'string') ? node:null; },
 	attr: function(node, attr) { return node[attr]; },
 	class: 'class',
