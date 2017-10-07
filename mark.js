@@ -10,12 +10,79 @@ const $length = Symbol.for('Mark.length');
 const $parent = Symbol.for('Mark.parent');
 const $pragma = Symbol.for('Mark.pragma');
 
-// static Mark object
+// static Mark API
 var MARK = (function() {
 	"use strict";
-	// cached constructors/prototypes for the Mark objects
+	// cached constructors for the Mark objects
 	var constructors = {};	
-	
+
+	// Mark object constructor
+	function Mark(typeName, props, contents, parent) {
+		"use strict";
+		// 1. prepare the constructor
+		var con = constructors[typeName];
+		if (!con) { 
+			con = constructors[typeName] = function(){};
+			// con.prototype.constructor is set to con by JS
+			// sets the type name
+			Object.defineProperty(con, 'name', {value:typeName, configurable:true}); // non-writable, as we don't want the name to be changed
+
+			// con.prototype.__proto__ = Array.prototype; // Mark no longer extends Array; Mark is array like, but not array.
+			// con is set to extend Mark, instead of copying all the API functions
+			// for (let a in api) { Object.defineProperty(con.prototype, a, {value:api[a], writable:true, configurable:true}); } // make API functions non-enumerable
+			Object.setPrototypeOf(con.prototype, Mark.prototype);
+		}
+		
+		// 2. create object
+		var obj = Object.create(con.prototype);
+		
+		// 3. copy properties, numeric keys are not allowed
+		if (props) { 
+			for (let p in props) { 
+				// propsTraps.set(obj, p, props[p]); 
+				// accept only non-numeric key
+				if (isNaN(p*1)) { obj[p] = props[p]; }
+			}
+		}
+		
+		// 4. copy contents if any
+		let len = 0;
+		if (contents) { 
+			let prev_type = null;
+			function addContents(items) {
+				for (let val of items) {
+					let t = typeof val;
+					if (t === 'string') {
+						if (prev_type === 'string') { 
+							len--;  val = obj[len] + val;  // merge text nodes
+						}
+					}
+					else {
+						if (t === 'object') {
+							if (val === null) continue; // skip null value
+							else if (val instanceof Array) { // expanded it inline
+								addContents(val);  continue;
+							}
+							// else, assume Mark object
+						}
+						else { // other primitive values
+							val = val.toString(); // convert to string, as Mark only accept text and Mark object as content
+						}
+					}
+					Object.defineProperty(obj, len, {value:val, writable:true, configurable:true}); // make content non-enumerable
+					prev_type = t;  len++;
+				}
+			}
+			addContents(contents);
+		}
+		// set $length
+		obj[$length] = len;
+		
+		// set $parent
+		if (parent) { obj[$parent] = parent; }
+		return obj;
+	};
+		
 	// Mark object API functions
 	var api = {
 		// object 'properties': just use JS Object.keys(), Object.values(), Object.entries() to work with the properties	
@@ -95,10 +162,12 @@ var MARK = (function() {
 		
 		// conversion APIs
 		toHtml: function() {
+			// load helper on demand
 			if (!MARK.$convert) { MARK.$convert = require('./lib/mark.convert.js')(Mark); }
 			return MARK.$convert.toHtml(this);
 		},
 		toXml: function() {
+			// load helper on demand
 			if (!MARK.$convert) { MARK.$convert = require('./lib/mark.convert.js')(Mark); }
 			return MARK.$convert.toXml(this);
 		},
@@ -106,85 +175,19 @@ var MARK = (function() {
 		// query APIs
 		filter: Array.prototype.filter,				
 		find: function(selector) {
+			// load helper on demand
 			if (!MARK.$select) { MARK.$select = require('./lib/mark.selector.js'); }
 			return MARK.$select(this).find(selector);
 		},
 		matches: function(selector) {
+			// load helper on demand
 			if (!MARK.$select) { MARK.$select = require('./lib/mark.selector.js'); }
 			return MARK.$select(this).matches(selector);
 		},
 	};
-	
-	// Mark object constructor
-	function Mark(typeName, props, contents, parent) {
-		"use strict";
-		// 1. prepare the constructor
-		var con = constructors[typeName];
-		if (!con) { 
-			con = constructors[typeName] = function(){};
-			// con.prototype.constructor is set to con by JS
-			// sets the type name
-			Object.defineProperty(con, 'name', {value:typeName, configurable:true}); // non-writable, as we don't want the name to be changed
-
-			// con.prototype.__proto__ = Array.prototype; // Mark no longer extends Array; Mark is array like, but not array.
-			// con is set to extend Mark, instead of copying all the API functions
-			// for (let a in api) { Object.defineProperty(con.prototype, a, {value:api[a], writable:true, configurable:true}); } // make API functions non-enumerable
-			Object.setPrototypeOf(con.prototype, Mark.prototype);
-		}
-		
-		// 2. create object
-		var obj = Object.create(con.prototype);
-		
-		// 3. copy properties, numeric keys are not allowed
-		if (props) { 
-			for (let p in props) { 
-				// propsTraps.set(obj, p, props[p]); 
-				// accept only non-numeric key
-				if (isNaN(p*1)) { obj[p] = props[p]; }
-			}
-		}
-		
-		// 4. copy contents if any
-		let len = 0;
-		if (contents) { 
-			let prev_type = null;
-			function addContents(items) {
-				for (let val of items) {
-					let t = typeof val;
-					if (t === 'string') {
-						if (prev_type === 'string') { 
-							len--;  val = obj[len] + val;  // merge text nodes
-						}
-					}
-					else {
-						if (t === 'object') {
-							if (val === null) continue; // skip null value
-							else if (val instanceof Array) { // expanded it inline
-								addContents(val);  continue;
-							}
-							// else, assume Mark object
-						}
-						else { // other primitive values
-							val = val.toString(); // convert to string, as Mark only accept text and Mark object as content
-						}
-					}
-					Object.defineProperty(obj, len, {value:val, writable:true, configurable:true}); // make content non-enumerable
-					prev_type = t;  len++;
-				}
-			}
-			addContents(contents);
-		}
-		// set $length
-		obj[$length] = len;
-		
-		// set $parent
-		if (parent) { obj[$parent] = parent; }
-		return obj;
-	};
-	
 	// set the APIs
 	for (let a in api) {
-		// mk[a] = api[a];  // does not work for 'length', which is predefined as readonly
+		// Mark.prototype[a] = api[a];  // direct assignment will make the API functions enumerable
 		Object.defineProperty(Mark.prototype, a, {value:api[a], writable:true, configurable:true});  // make API functions non-enumerable
 	}
 	// define object iterator API
@@ -195,6 +198,7 @@ var MARK = (function() {
 	return Mark;
 })();
 
+// parse() is only defined on the static Mark API
 MARK.parse = (function() {
 	// This is a function that can parse a Mark text, producing a JavaScript data structure. 
 	// It is a simple, recursive descent parser. It does not use eval or regular expressions, 
@@ -762,6 +766,7 @@ MARK.parse = (function() {
     };
 }());
 
+// stringify() is only defined on the static Mark API
 // Mark stringify will not quote keys where appropriate
 MARK.stringify = function(obj, replacer, space) {
 	"use strict";

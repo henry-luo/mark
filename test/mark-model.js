@@ -18,10 +18,15 @@ function arrayEqual(array1, array2) {
 }
 
 test('Mark Model', function(assert) {
+	// type name
+	var div = Mark.parse('{div}');
+	assert.equal(div.constructor.name, 'div', "div.constructor.name should be 'div'");
+	assert.equal(div instanceof Mark, true, "div should be instance of Mark");
+
 	// properties API
 	assert.deepEqual(Object.keys(Mark.parse('{div}')), [], "Mark object {div} keys should be empty");
 	assert.deepEqual(Object.keys(Mark.parse('{div class:"test"}')), ['class'], "Mark object {div class:'test'} keys should be ['class']");
-	var div = Mark.parse('{div length:12, width:20 "text"}');
+	div = Mark.parse('{div length:12, width:20 "text"}');
 	assert.equal(div.length, 12, "length of Mark object should be 12");
 	assert.equal(div.contents().length, 1, "length of Mark object contents should be 1");
 	assert.looseEqual(Object.keys(div), ['length', 'width'], "Mark object keys() should be ['length', 'width']");
