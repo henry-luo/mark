@@ -67,6 +67,9 @@ var MARK = (function() {
 						}
 						else { // other primitive values
 							val = val.toString(); // convert to string, as Mark only accept text and Mark object as content
+							if (prev_type === 'string') {
+								len--;  val = obj[len] + val;  // merge text nodes
+							}
 						}
 					}
 					Object.defineProperty(obj, len, {value:val, writable:true, configurable:true}); // make content non-enumerable
@@ -943,7 +946,7 @@ MARK.stringify = function(obj, replacer, space) {
 
                     for (var i = 0; i < obj_part.length; i++) {
                         res = internalStringify(obj_part, i, false);
-                        buffer += makeIndent(indentStr, objStack.length);
+                        if (indentStr) buffer += makeIndent(indentStr, objStack.length);
                         if (res === null || typeof res === "undefined") {
                             buffer += "null";
                         } else {
@@ -956,8 +959,8 @@ MARK.stringify = function(obj, replacer, space) {
                         }
                     }
                     objStack.pop();
-                    if (obj_part.length) {
-                        buffer += makeIndent(indentStr, objStack.length, true)
+                    if (obj_part.length && indentStr) {
+                        buffer += makeIndent(indentStr, objStack.length, true);
                     }
                     buffer += "]";
                 }
@@ -993,11 +996,11 @@ MARK.stringify = function(obj, replacer, space) {
 							buffer += ' ';
 							var item = obj_part[i];
 							if (typeof item === "string") {
-								buffer += makeIndent(indentStr, objStack.length);
+								if (indentStr) buffer += makeIndent(indentStr, objStack.length);
 								buffer += escapeString(item.toString());
 							}
 							else if (typeof item === "object") {
-								buffer += makeIndent(indentStr, objStack.length);
+								if (indentStr) buffer += makeIndent(indentStr, objStack.length);
 								buffer += internalStringify({"":item}, '', false);
 							}
 							else { console.log("unknown object", item); }
@@ -1006,7 +1009,7 @@ MARK.stringify = function(obj, replacer, space) {
                     objStack.pop();
                     if (nonEmpty ) {
                         // buffer = buffer.substring(0, buffer.length-1) + makeIndent(indentStr, objStack.length) + "}";
-						if (length) { buffer += makeIndent(indentStr, objStack.length); }
+						if (length && indentStr) { buffer += makeIndent(indentStr, objStack.length); }
 						buffer += "}";
                     } else {
                         buffer = '{}';

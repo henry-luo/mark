@@ -18,6 +18,13 @@ function arrayEqual(array1, array2) {
 }
 
 test('Mark Model', function(assert) {
+	// Mark constructor
+	assert.equal(Mark('div').constructor.name, 'div', "div.constructor.name should be 'div'");
+	assert.equal(Mark('div').constructor(), undefined, "div.constructor returns nothing"); // for test coverage
+	assert.equal(Mark.stringify(Mark('div', {width:123})), '{div width:123}', "div with width");
+	assert.equal(Mark.stringify(Mark('div', {width:123}, ['text', '', Mark('br')])), '{div width:123 "text" {br}}', "div with prop and contents");
+	assert.equal(Mark.stringify(Mark('div', null, ['text', '', 123, Mark('br'), ['nested'], null])), '{div "text123" {br} "nested"}', "div with nested contents");
+	
 	// type name
 	var div = Mark.parse('{div}');
 	assert.equal(div.constructor.name, 'div', "div.constructor.name should be 'div'");

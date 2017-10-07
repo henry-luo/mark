@@ -15,5 +15,7 @@ test('Stringify Mark object', function(assert) {
 	assert.equal(Mark.stringify(Mark.parse('{div {br}}')), '{div {br}}', "Stringify {div {br}}");
 	// JSON inside Mark
 	assert.equal(Mark.stringify(Mark.parse('{div {width:10}}')), '{div {width:10}}', "Stringify {div {width:10}}");
+	// stringify with identation
+	assert.equal(Mark.stringify(Mark.parse('{div width:10 "test"}'), null, '  '), '{div width:10 \n  "test"\n}', "Stringify with ident");
 	assert.end() ;
 });
