@@ -36,6 +36,8 @@ test('Parse Mark object', function(assert) {
 	assert.equal(Mark.parse('{div "text"}').length(), 1, 'Object {div "text"}.length should be 1');
 	assert.equal(Mark.parse('{div "text" {br}}').length(), 2, 'Object {div "text" {br}}.length should be 2');
 	assert.equal(Mark.parse('{div "text"}')[0], "text", 'Object {div "text"}[0] should be "text"');
+	assert.equal(Mark.parse('{div "text" "" "merged"}')[0], "textmerged", 'Object text merged');
+	
 	assert.equal(Mark.parse('{div {br}}')[0].constructor.name, "br", 'Object {div {br}}.constructor.name should be "br"');
 		
 	// test Mark in JSON
