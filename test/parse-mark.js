@@ -1,6 +1,5 @@
 ﻿const test = require('tape');
 const Mark = require('./../mark.js');
-const $pragma = Symbol.for('Mark.pragma');
 
 test('Parse Mark object', function(assert) {
 	assert.equal(Mark.parse('{obj}').constructor.name, 'obj', "Mark object constructor.name should be 'obj'");
@@ -23,7 +22,7 @@ test('Parse Mark object', function(assert) {
 	assert.equal(Mark.parse('{div style:{width:"10px"}}').style.width, "10px", 'Object {div style:{width:"10px"}}.style.width should be "10px"');
 	assert.equal(Mark.parse('{div "class":"large"}').class, "large", 'Object {div "class":"large"}.class should be "large"');
 	assert.equal(Mark.parse("{div 'class':'large'}").class, "large", 'Object {div "class":"large"}.class should be "large"');
-	assert.equal(Mark.parse("{obj length:100}").length, 100, 'Object {obj length:100}.length should be 100');
+	assert.equal(Mark.parse("{obj length:100}").prop('length'), 100, "Object {obj length:100}.prop('length') should be 100");
 	assert.deepEqual(Object.keys(Mark.parse('{obj}')), [], 'Object {obj}.keys() should be empty');
 	assert.deepEqual(Object.keys(Mark.parse('{div class:"test", style:{color:"red"}}')), ['class','style'], 
 		'Object {div class:"test", style:{color:"red"}} keys should be ["class","style"]');
@@ -32,12 +31,12 @@ test('Parse Mark object', function(assert) {
 		[{kind:'back'}, 'save', {action:'submit', class:'btn btn-warning'}] , "form buttons with array of data");
 	
 	// test content model
-	assert.equal(Mark.parse('{obj}').length(), 0, "Object {obj}.length should be 0");
-	assert.equal(Mark.parse('{div "text"}').length(), 1, 'Object {div "text"}.length should be 1');
-	assert.equal(Mark.parse('{div "text" {br}}').length(), 2, 'Object {div "text" {br}}.length should be 2');
+	assert.equal(Mark.parse('{obj}').length, 0, "Object {obj}.length should be 0");
+	assert.equal(Mark.parse('{div "text"}').length, 1, 'Object {div "text"}.length should be 1');
+	assert.equal(Mark.parse('{div "text" {br}}').length, 2, 'Object {div "text" {br}}.length should be 2');
 	assert.equal(Mark.parse('{div "text"}')[0], "text", 'Object {div "text"}[0] should be "text"');
 	assert.equal(Mark.parse('{div "text" "" "merged"}')[0], "textmerged", 'Object text merged');
-	assert.equal(Mark.parse('{div ""}').length(), 0, 'Empty text skipped');
+	assert.equal(Mark.parse('{div ""}').length, 0, 'Empty text skipped');
 	
 	assert.equal(Mark.parse('{div {br}}')[0].constructor.name, "br", 'Object {div {br}}.constructor.name should be "br"');
 		
@@ -50,14 +49,14 @@ test('Parse Mark object', function(assert) {
 	
 	// test Mark pragma
 	assert.equal(Mark.parse('{!-- comment --}').constructor.name, "Object", "Mark pragma");
-	assert.equal(Mark.parse('{!-- comment --}')[$pragma], "!-- comment --", "Mark pragma as root");
-	assert.equal(Mark.parse('{div {!-- comment --} }')[0][$pragma], "!-- comment --", "Mark pragma as content");
-	assert.equal(Mark.parse("{'some text' + ' and more'}")[$pragma], "'some text' + ' and more'", "Mark pragma parsing that needs backtracking");
+	assert.equal(Mark.parse('{!-- comment --}').pragma(), "!-- comment --", "Mark pragma as root");
+	assert.equal(Mark.parse('{div {!-- comment --} }')[0].pragma(), "!-- comment --", "Mark pragma as content");
+	assert.equal(Mark.parse("{'some text' + ' and more'}").pragma(), "'some text' + ' and more'", "Mark pragma parsing that needs backtracking");
 	let pragma = Mark.parse("{div width:'100%' 'text'!}");
-	assert.equal(pragma[$pragma], "div width:'100%' 'text'!", "Mark pragma parsing that needs backtracking");
+	assert.equal(pragma.pragma(), "div width:'100%' 'text'!", "Mark pragma parsing that needs backtracking");
 	assert.equal(pragma.constructor.name, "Object", "Mark pragma constructor.name should be 'Object'");
 	pragma = Mark.parse("{field name:'test', required:{this.context.user.hasRole('admin')}}");
-	assert.equal(pragma.required[$pragma], "this.context.user.hasRole('admin')", "Mark pragma parsing that needs backtracking");
+	assert.equal(pragma.required.pragma(), "this.context.user.hasRole('admin')", "Mark pragma parsing that needs backtracking");
 	
 	// test multiline text
 	assert.equal(Mark.parse('{div "string"\n" 2nd line"\n\t\t" and 3rd"}')[0], "string 2nd line and 3rd", "Mark multiline text");

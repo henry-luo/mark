@@ -6,9 +6,11 @@
 // which is further based of Douglas Crockford's json_parse.js:
 // https://github.com/douglascrockford/JSON-js/blob/master/json_parse.js
 
-const $length = Symbol.for('Mark.length');
-const $parent = Symbol.for('Mark.parent');
-const $pragma = Symbol.for('Mark.pragma');
+// symbols used internally
+const $length = Symbol('Mark.length');
+const $$length = Symbol('Mark.property.length');
+const $parent = Symbol('Mark.parent');
+const $pragma = Symbol('Mark.pragma');
 
 // static Mark API
 var MARK = (function() {
@@ -28,6 +30,7 @@ var MARK = (function() {
 			Object.defineProperty(con, 'name', {value:typeName, configurable:true}); // non-writable, as we don't want the name to be changed
 
 			// con.prototype.__proto__ = Array.prototype; // Mark no longer extends Array; Mark is array like, but not array.
+			
 			// con is set to extend Mark, instead of copying all the API functions
 			// for (let a in api) { Object.defineProperty(con.prototype, a, {value:api[a], writable:true, configurable:true}); } // make API functions non-enumerable
 			Object.setPrototypeOf(con.prototype, Mark.prototype);
@@ -93,8 +96,24 @@ var MARK = (function() {
 			for (let c of this) { list.push(c); }
 			return list;
 		},
-		length: function() { return this[$length]; },				
-		parent: function() { return this[$parent]; },
+		prop: function(name, value) {
+			// accept only non-numeric key
+			if (isNaN(name*1)) { 
+				if (value !== undefined) this[name] = value; 
+				else return name === 'length' ? this[$$length]:this[name];				
+			}
+			else { throw "Property name should not be numeric"; }
+		},
+		// to set or get parent
+		parent: function(pa) {
+			if (pa !== undefined) this[$parent] = pa;
+			else return this[$parent];
+		},
+		// to set or get pragma content
+		pragma: function(value) {
+			if (value !== undefined) this[$pragma] = value;
+			else return this[$pragma];
+		},
 		
 		push: function(item) {
 			// copy the arguments
@@ -186,7 +205,7 @@ var MARK = (function() {
 			if (!MARK.$select) { MARK.$select = require('./lib/mark.selector.js'); }
 			return MARK.$select(this).matches(selector);
 		},
-	};
+	}
 	// set the APIs
 	for (let a in api) {
 		let func = {value:api[a], writable:true, configurable:true};
@@ -197,11 +216,31 @@ var MARK = (function() {
 		// Mark[a] = api[a];  // cannot use assignment, as 'length' is predefined to be readonly
 		Object.defineProperty(Mark, a, func);  // make API functions non-enumerable
 	}
-	// define object iterator API
+	
+	// define additional APIs on Mark prototype
+	// iterator
 	Mark.prototype[Symbol.iterator] = function*() {
 		var length = this[$length];
 		for (let i = 0; i < length; i++) { yield this[i]; }
-	};
+	}
+	// 'length' property
+	Object.defineProperty(Mark.prototype, 'length', {
+		get:function() { return this[$length]; },
+		set:function(length) { // treated as length property
+			this[$$length] = length;  // should we throw a warning here?
+		}
+	});
+	
+	// Mark pragma constructor
+	Mark.pragma = function(pragma, parent) {
+		let obj = {}; // pragma has no other property or content
+		obj[$pragma] = pragma;  // pragma conent stored as Symbol
+		if (parent) { obj[$parent] = parent; }
+		Object.defineProperty(obj, 'pragma', {value:api.pragma});
+		Object.defineProperty(obj, 'parent', {value:api.parent});
+		return obj;
+	}
+	
 	return Mark;
 })();
 
@@ -701,16 +740,12 @@ MARK.parse = (function() {
 				// restore parsing position, and try parse as Mark pragma
 				at = bkAt;  lineNumber = bkLineNumber;  columnNumber = bkColumnNumber;
 				ch = text.charAt(at - 1);
-
-				obj = {};  if (parent) { obj[$parent] = parent; } // reset object
 				
 				let pragma = '';
 				while (ch) {
 					if (ch === '}') { // end of pragma
 						next();
-						// pragma has no other property or content
-						obj[$pragma] = pragma;  // pragma conent stored as Symbol
-						return obj;
+						return MARK.pragma(pragma, parent);
 					}				
 					else if (ch === '\\') {
 						next();
@@ -976,7 +1011,7 @@ MARK.stringify = function(obj, replacer, space) {
 						buffer += obj_part.constructor.name;  nonEmpty = true;
 					} else { // JSON or Mark pragma
 						if (obj_part[$pragma]) {
-							return '{{' + obj_part[$pragma] + '}}';
+							return '{' + obj_part[$pragma] + '}';
 						}
 					}
 					// print object attributes
