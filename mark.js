@@ -24,7 +24,7 @@ var MARK = (function() {
 		// 1. prepare the constructor
 		var con = constructors[typeName];
 		if (!con) {
-			// if (!MARK.isName(typeName)) { throw "Invalid type name"; }
+			if (!Mark.isName(typeName)) { throw "Invalid type name '" + typeName +"'"; }
 			con = constructors[typeName] = function(){};
 			// con.prototype.constructor is set to con by JS
 			// sets the type name
@@ -220,7 +220,7 @@ var MARK = (function() {
 	}
 	
 	// define additional APIs on Mark prototype
-	// iterator
+	// content iterator
 	Mark.prototype[Symbol.iterator] = function*() {
 		var length = this[$length];
 		for (let i = 0; i < length; i++) { yield this[i]; }
@@ -251,6 +251,31 @@ var MARK = (function() {
 		if (parent) { obj[$parent] = parent; }
 		return obj;
 	}
+	
+    function isNameChar(c) {
+        return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || ('0' <= c && c <= '9') ||
+            c === '_' || c === '$' || '.' || '-';
+    }
+    function isNameStart(c) {
+        return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || c === '_' || c === '$';
+    }
+	// exported for convenience
+    Mark.isName = function(key) {
+        if (typeof key !== 'string') {
+            return false;
+        }
+        if (!isNameStart(key[0])) {
+            return false;
+        }
+        var i = 1, length = key.length;
+        while (i < length) {
+            if (!isNameChar(key[i])) {
+                return false;
+            }
+            i++;
+        }
+        return true;
+    }	
 	
 	return Mark;
 })();
@@ -707,8 +732,7 @@ MARK.parse = (function() {
 							if (ch != ':') { // assume is Mark object
 								// console.log("got Mark object of type: ", ident);
 								// create the object
-								// if (factory) ...
-								obj = MARK(ident, null, null, parent);
+								obj = MARK(ident, null, null, parent); // todo: 
 								extended = true;  key = ident;
 								continue;
 							}
@@ -850,35 +874,6 @@ MARK.stringify = function(obj, replacer, space) {
             return value;
         }
     };
-
-    function isNameChar(c) {
-        return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || ('0' <= c && c <= '9') ||
-            c === '_' || c === '$' || '.' || '-';
-    }
-
-    function isNameStart(c) {
-        return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || c === '_' || c === '$';
-    }
-
-    function isName(key) {
-        if (typeof key !== 'string') {
-            return false;
-        }
-        if (!isNameStart(key[0])) {
-            return false;
-        }
-        var i = 1, length = key.length;
-        while (i < length) {
-            if (!isNameChar(key[i])) {
-                return false;
-            }
-            i++;
-        }
-        return true;
-    }
-
-    // export for use in tests
-    MARK.isName = isName;
 
     // polyfills
     function isArray(obj) {
@@ -1032,7 +1027,7 @@ MARK.stringify = function(obj, replacer, space) {
 						isTopLevel = false;
 						if (typeof value !== "undefined" && value !== null) {
 							// buffer += makeIndent(indentStr, objStack.length);                            
-							key = isName(prop) ? prop : escapeString(prop);
+							key = MARK.isName(prop) ? prop : escapeString(prop);
 							buffer += (hasAttr ? ', ':(nonEmpty ? ' ':''))+ key +":" + value;
 							hasAttr = true;  nonEmpty = true;
 						}
