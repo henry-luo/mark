@@ -48,13 +48,12 @@ test('Parse Mark object', function(assert) {
 	assert.equal(Mark.parse('{div {"width":1}}')[0].width, 1, "JSON object allowed as Mark content");
 	
 	// test Mark pragma
-	assert.equal(Mark.parse('{!-- comment --}').constructor.name, "Object", "Mark pragma");
+	assert.equal(Mark.parse('{!-- comment --}').constructor, undefined, "Mark pragma");
 	assert.equal(Mark.parse('{!-- comment --}').pragma(), "!-- comment --", "Mark pragma as root");
 	assert.equal(Mark.parse('{div {!-- comment --} }')[0].pragma(), "!-- comment --", "Mark pragma as content");
 	assert.equal(Mark.parse("{'some text' + ' and more'}").pragma(), "'some text' + ' and more'", "Mark pragma parsing that needs backtracking");
 	let pragma = Mark.parse("{div width:'100%' 'text'!}");
 	assert.equal(pragma.pragma(), "div width:'100%' 'text'!", "Mark pragma parsing that needs backtracking");
-	assert.equal(pragma.constructor.name, "Object", "Mark pragma constructor.name should be 'Object'");
 	pragma = Mark.parse("{field name:'test', required:{this.context.user.hasRole('admin')}}");
 	assert.equal(pragma.required.pragma(), "this.context.user.hasRole('admin')", "Mark pragma parsing that needs backtracking");
 	

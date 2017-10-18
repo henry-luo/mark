@@ -16,14 +16,15 @@ const $pragma = Symbol('Mark.pragma');
 var MARK = (function() {
 	"use strict";
 	// cached constructors for the Mark objects
-	var constructors = {};	
+	let constructors = {};	
 
 	// Mark object constructor
 	function Mark(typeName, props, contents, parent) {
 		"use strict";
 		// 1. prepare the constructor
 		var con = constructors[typeName];
-		if (!con) { 
+		if (!con) {
+			// if (!MARK.isName(typeName)) { throw "Invalid type name"; }
 			con = constructors[typeName] = function(){};
 			// con.prototype.constructor is set to con by JS
 			// sets the type name
@@ -96,6 +97,7 @@ var MARK = (function() {
 			for (let c of this) { list.push(c); }
 			return list;
 		},
+		// to set or get a property
 		prop: function(name, value) {
 			// accept only non-numeric key
 			if (isNaN(name*1)) { 
@@ -234,10 +236,19 @@ var MARK = (function() {
 	// Mark pragma constructor
 	Mark.pragma = function(pragma, parent) {
 		let obj = {}; // pragma has no other property or content
+		let con = constructors['!pragma'];
+		if (!con) {
+			con = {};  Object.setPrototypeOf(con, null);
+			Object.defineProperty(con, 'pragma', {value:api.pragma});
+			Object.defineProperty(con, 'parent', {value:api.parent});
+			Object.defineProperty(con, 'valueOf', {value:Object.valueOf});
+			Object.defineProperty(con, 'toString', {value:Object.toString});
+			// any other API?
+			constructors['!pragma'] = con;
+		}
+		Object.setPrototypeOf(obj, con);
 		obj[$pragma] = pragma;  // pragma conent stored as Symbol
 		if (parent) { obj[$parent] = parent; }
-		Object.defineProperty(obj, 'pragma', {value:api.pragma});
-		Object.defineProperty(obj, 'parent', {value:api.parent});
 		return obj;
 	}
 	
@@ -797,8 +808,7 @@ MARK.parse = (function() {
 			if (!MARK.$html) { MARK.$html = require('./lib/mark.convert.js')(MARK); }
 			return MARK.$html.parse(source);
 		} 
-		// else // parse as Mark		
-		
+		// else // parse as Mark
         
 		// start parsing as a JSON value
         var result = value();
@@ -900,12 +910,10 @@ MARK.stringify = function(obj, replacer, space) {
         if (str.length > 10) {
             str = str.substring(0, 10);
         }
-
         var indent = noNewLine ? "" : "\n";
         for (var i = 0; i < num; i++) {
             indent += str;
         }
-
         return indent;
     }
 
@@ -960,7 +968,7 @@ MARK.stringify = function(obj, replacer, space) {
             // don't unbox dates, since will turn it into number
             obj_part = obj_part.valueOf();
         }
-        switch(typeof obj_part) {
+        switch (typeof obj_part) {
             case "boolean":
                 return obj_part.toString();
 
@@ -1007,13 +1015,16 @@ MARK.stringify = function(obj, replacer, space) {
                     var nonEmpty = false;
                     objStack.push(obj_part);
 					// print object type-name, if any
+					if (!obj_part.constructor) { // assume Mark pragma
+						// todo: should escape '{','}' in $pragma
+						return obj_part[$pragma] ? '{' + obj_part[$pragma] + '}':
+							'null' /* unknown object */;
+					}
 					if (obj_part.constructor.name != 'Object') { 
 						buffer += obj_part.constructor.name;  nonEmpty = true;
-					} else { // JSON or Mark pragma
-						if (obj_part[$pragma]) {
-							return '{' + obj_part[$pragma] + '}';
-						}
-					}
+					} 
+					// else // JSON 
+
 					// print object attributes
 					var hasAttr = false;
                     for (var prop in obj_part) {
