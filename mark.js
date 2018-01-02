@@ -459,21 +459,33 @@ MARK.parse = (function() {
 
 		// Parse a string value.
         string = function() {			
-            var hex, i, string = '',
+            var hex, i, string = '', triple = false,
                 delim,      // double quote or single quote
                 uffff;
 
 			// when parsing for string values, we must look for ' or " and \ characters.
             if (ch === '"' || ch === "'") {
                 delim = ch;
+				if (peek() === delim && text.charAt(at+1) === delim) { // got tripple quote
+					triple = true;  next();  next();
+				}
                 while (next()) {
                     if (ch === delim) {
                         next();
-						return string;
-                    } else if (ch === '\\') { // escape sequence
-                        next();
-                        if (ch === 'u') {
-                            uffff = 0;
+						if (!triple) { // end of string
+							return string;
+						}
+						else if (ch === delim && peek() === delim) { // end of tripple quoted text
+							next();  next();  return string;
+						}
+						else {
+							string += delim;
+						}
+						// continue
+                    }
+					if (ch === '\\') { // escape sequence
+                        if (peek() === 'u') { // unicode escape sequence
+                            next();  uffff = 0;
                             for (i = 0; i < 4; i += 1) {
                                 hex = parseInt(next(), 16);
                                 if (!isFinite(hex)) {
@@ -482,22 +494,29 @@ MARK.parse = (function() {
                                 uffff = uffff * 16 + hex;
                             }
                             string += String.fromCharCode(uffff);
-                        } else if (ch === '\r') {
-                            if (peek() === '\n') {
-                                next();
-                            }
-                        } else if (typeof escapee[ch] === 'string') {
-                            string += escapee[ch];
-                        } else {
-                            break;
-                        }
+                        } 
+						else { // control-char escape sequence
+							if (triple) { string += '\\'; } // treated as normal char
+							else { 
+								next();
+								if (ch === '\r') { // ignore the line-end
+									if (peek() === '\n') {
+										next();
+									}
+								} else if (typeof escapee[ch] === 'string') {
+									string += escapee[ch];
+								} else { // bad escape
+									break;
+								}
+							}				
+						}
                     } 
 					// else if (ch === '\n') {
                         // unescaped newlines are invalid in JSON, but valid in Mark; 
                         // see: https://github.com/json5/json5/issues/24
                         // break;
                     // } 
-					else {
+					else { // normal char
                         string += ch;
                     }
                 }

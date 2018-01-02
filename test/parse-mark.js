@@ -62,6 +62,11 @@ test('Parse Mark object', function(assert) {
 	// test text escape
 	assert.equal(Mark.parse('"\\u002B\\r\\n\\t"'), "+\r\n\t", "Mark text escape");
 	assert.equal(Mark.parse('"text\\\rcombined\\\r\ntogether"'), "textcombinedtogether", "Mark text combined together");
+	// test triple quote text
+	assert.equal(Mark.parse('"""triple quote"""'), "triple quote", "Mark string in triple quote");
+	assert.equal(Mark.parse("'''triple quote'''"), "triple quote", "Mark string in triple quote");
+	assert.equal(Mark.parse("'''escape \\u0020'''"), "escape  ", "Unicode escapes are interpreted in triple quote");
+	assert.equal(Mark.parse("'''escape \\t'''"), "escape \\t", "Control char escapes are not interpreted in triple quote");
 	
 	// test unicode support
 	assert.equal(Mark.parse('{div "中文"}')[0], "中文", "Mark unicode support");

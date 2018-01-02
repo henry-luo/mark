@@ -62,11 +62,14 @@ digit ::= [0-9]
 
 /*--------------------------------------------------------*/
 
-string ::= s_string | d_string
+string ::= s_string | d_string | t_string
 
 d_string ::= '"' (char | "'")* '"'
 
 s_string ::= "'" (char | '"')* "'"
+
+/* tripple quoted string */
+t_string ::= ("'''" tripple_quoted_text "'''") | ('"""' tripple_quoted_text '"""')
 
 char ::= unescaped |
        escape (

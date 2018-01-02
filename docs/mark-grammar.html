@@ -1318,7 +1318,7 @@ textarea.form-control.grammar-edit {
 			  <div class="rule">
 					<h2 id='string'>string</h2>
 					<div onclick='svgBlockClick(event)'>
-						<svg class="railroad-diagram" width="205" height="92" viewBox="0 0 205 92">
+						<svg class="railroad-diagram" width="205" height="122" viewBox="0 0 205 122">
 <g transform="translate(.5 .5)">
 <path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
 <g>
@@ -1340,6 +1340,14 @@ textarea.form-control.grammar-edit {
 <text x="102" y="65">d&#95;string</text>
 </g>
 <path d="M144 61a10 10 0 0 0 10 -10v-10a10 10 0 0 1 10 -10"></path>
+<path d="M40 31a10 10 0 0 1 10 10v40a10 10 0 0 0 10 10"></path>
+<g>
+<path d="M60 91h0"></path>
+<path d="M144 91h0"></path>
+<rect x="60" y="80" width="84" height="22"></rect>
+<text x="102" y="95">t&#95;string</text>
+</g>
+<path d="M144 91a10 10 0 0 0 10 -10v-40a10 10 0 0 1 10 -10"></path>
 </g>
 <path d="M 164 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
 </g>
@@ -1356,6 +1364,7 @@ textarea.form-control.grammar-edit {
 						References:
 						<a href="#s_string">s_string</a>
 						<a href="#d_string">d_string</a>
+						<a href="#t_string">t_string</a>
 					</div>
 				</div>
 			  <div class="rule">
@@ -1520,6 +1529,90 @@ textarea.form-control.grammar-edit {
 					<div>
 						References:
 						<a href="#char">char</a>
+					</div>
+				</div>
+			  <div class="rule">
+					<h2 id='t_string'>t_string</h2>
+					<div onclick='svgBlockClick(event)'>
+						<svg class="railroad-diagram" width="441" height="92" viewBox="0 0 441 92">
+<g transform="translate(.5 .5)">
+<path d="M 20 21 v 20 m 10 -20 v 20 m -10 -10 h 20.5"></path>
+<g>
+<path d="M40 31h0"></path>
+<path d="M400 31h0"></path>
+<path d="M40 31h20"></path>
+<g>
+<path d="M60 31h0"></path>
+<path d="M380 31h0"></path>
+<path d="M60 31h10"></path>
+<g>
+<path d="M70 31h0"></path>
+<path d="M114 31h0"></path>
+<rect x="70" y="20" width="44" height="22" rx="10" ry="10"></rect>
+<text x="92" y="35">'''</text>
+</g>
+<path d="M114 31h10"></path>
+<path d="M124 31h10"></path>
+<g>
+<path d="M134 31h0"></path>
+<path d="M306 31h0"></path>
+<rect x="134" y="20" width="172" height="22"></rect>
+<text x="220" y="35">tripple&#95;quoted&#95;text</text>
+</g>
+<path d="M306 31h10"></path>
+<path d="M316 31h10"></path>
+<g>
+<path d="M326 31h0"></path>
+<path d="M370 31h0"></path>
+<rect x="326" y="20" width="44" height="22" rx="10" ry="10"></rect>
+<text x="348" y="35">'''</text>
+</g>
+<path d="M370 31h10"></path>
+</g>
+<path d="M380 31h20"></path>
+<path d="M40 31a10 10 0 0 1 10 10v10a10 10 0 0 0 10 10"></path>
+<g>
+<path d="M60 61h0"></path>
+<path d="M380 61h0"></path>
+<path d="M60 61h10"></path>
+<g>
+<path d="M70 61h0"></path>
+<path d="M114 61h0"></path>
+<rect x="70" y="50" width="44" height="22" rx="10" ry="10"></rect>
+<text x="92" y="65">"""</text>
+</g>
+<path d="M114 61h10"></path>
+<path d="M124 61h10"></path>
+<g>
+<path d="M134 61h0"></path>
+<path d="M306 61h0"></path>
+<rect x="134" y="50" width="172" height="22"></rect>
+<text x="220" y="65">tripple&#95;quoted&#95;text</text>
+</g>
+<path d="M306 61h10"></path>
+<path d="M316 61h10"></path>
+<g>
+<path d="M326 61h0"></path>
+<path d="M370 61h0"></path>
+<rect x="326" y="50" width="44" height="22" rx="10" ry="10"></rect>
+<text x="348" y="65">"""</text>
+</g>
+<path d="M370 61h10"></path>
+</g>
+<path d="M380 61a10 10 0 0 0 10 -10v-10a10 10 0 0 1 10 -10"></path>
+</g>
+<path d="M 400 31 h 20 m -10 -10 v 20 m 10 -20 v 20"></path>
+</g>
+</svg>
+
+					</div>
+					<div>
+						Used by:
+						<a href="#string">string</a>
+					</div>
+					<div>
+						References:
+						<a href="#tripple_quoted_text">tripple_quoted_text</a>
 					</div>
 				</div>
 			  <div class="rule">
