@@ -51,6 +51,7 @@ test('Parse Mark object', function(assert) {
 	// test Mark pragma
 	assert.equal(Mark.parse('{!-- comment --}').constructor, undefined, "Mark pragma");
 	assert.equal(Mark.parse('{!-- comment --}').pragma(), "!-- comment --", "Mark pragma as root");
+	assert.equal(Mark.parse('{!-- comment with escape \\{\\} \\ --}').pragma(), "!-- comment with escape {} \\ --", "Mark pragma with escape");
 	assert.equal(Mark.parse('{div {!-- comment --} }')[0].pragma(), "!-- comment --", "Mark pragma as content");
 	assert.equal(Mark.parse("{'some text' + ' and more'}").pragma(), "'some text' + ' and more'", "Mark pragma parsing that needs backtracking");
 	let pragma = Mark.parse("{div width:'100%' 'text'!}");
@@ -64,9 +65,9 @@ test('Parse Mark object', function(assert) {
 	assert.equal(Mark.parse('"\\u002B\\r\\n\\t"'), "+\r\n\t", "Mark text escape");
 	assert.equal(Mark.parse('"text\\\rcombined\\\r\ntogether"'), "textcombinedtogether", "Mark text combined together");
 	// test triple quote text
-	assert.equal(Mark.parse('"""triple quote"""'), "triple quote", "Mark string in triple quote");
-	assert.equal(Mark.parse("'''triple quote'''"), "triple quote", "Mark string in triple quote");
-	assert.equal(Mark.parse("'''escape \\u0020'''"), "escape  ", "Unicode escapes are interpreted in triple quote");
+	assert.equal(Mark.parse('"""triple "" quote"""'), 'triple "" quote', "Mark string in triple quote");
+	assert.equal(Mark.parse("'''triple '' quote'''"), "triple '' quote", "Mark string in triple quote");
+	assert.equal(Mark.parse("'''escape \\u0020'''"), "escape \\u0020", "Unicode escapes are not interpreted in triple quote");
 	assert.equal(Mark.parse("'''escape \\t'''"), "escape \\t", "Control char escapes are not interpreted in triple quote");
 	
 	// test unicode support

@@ -24,7 +24,7 @@ var MARK = (function() {
 		// 1. prepare the constructor
 		var con = constructors[typeName];
 		if (!con) {
-			if (!Mark.isName(typeName)) { throw "Invalid type name '" + typeName +"'"; }
+			if (typeof typeName !== 'string') { throw "Type name should be a string"; }
 			con = constructors[typeName] = function(){};
 			// con.prototype.constructor is set to con by JS
 			// sets the type name
@@ -256,7 +256,7 @@ var MARK = (function() {
 	
     function isNameChar(c) {
         return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || ('0' <= c && c <= '9') ||
-            c === '_' || c === '$' || '.' || '-';
+            c === '_' || c === '$' || c === '.' || c === '-';
     }
     function isNameStart(c) {
         return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || c === '_' || c === '$';
