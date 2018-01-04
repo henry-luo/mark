@@ -67,8 +67,8 @@ continue_identifier ::= begin_identifier | digit | '-' | '.'
 
 - Strings can be single, double quoted.
 - Strings can be split across multiple lines.
-- String can also be triple-quoted with single or double quote, similar to Python or Scala.
-  - The quoted sequence of characters is arbitrary, except that it may contain three or more consecutive quote characters only at the very end. Characters are not necessarily be printable; newlines or other control characters are also permitted. Unicode escapes work as everywhere else, but none of the single control character escape sequences are interpreted.
+- String can also be triple-quoted with single or double quote character, similar to Python or Scala.
+  - The quoted sequence of characters is arbitrary, except that it may contain three or more consecutive quote characters only at the very end. Escape sequences are not interpreted.
 
 ### Numbers
 
