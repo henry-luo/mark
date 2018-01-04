@@ -13,7 +13,7 @@ value ::= null | boolean | number | string | array | json_object | mark_object |
 
 mark_object ::= '{' type_name properties contents '}'
 
-type_name ::= identifier
+type_name ::= key
 
 properties ::= (property (',' property)* ','?)?
 
@@ -21,7 +21,7 @@ contents ::= (text | json_object | mark_object | mark_pragma)*
 
 property ::= key ':' value
 
-key ::= s_string | d_string | identifier
+key ::= string | identifier
 
 mark_pragma ::= '{--' (pchar_no_dash | ('-' pchar_no_dash))* '--}'
 ```
@@ -32,13 +32,12 @@ Comparing to a JSON object, a Mark object has two extensions:
 
 - A **type name**: which corresponds to class name or type name of an object. In JavaScript, that is the `obj.constructor.name`. In HTML and XML, that's the element name.
 - Optional list of **content** values following the properties: the content values corresponds to child nodes in markup data.
-- Mark comment is defined to make it fully compatible with HTML content model, so that HTML can be mapped into Mark without any data loss.
 
 ## Mark Pragma
 
-Another syntax extension to JSON is Mark pragma, it is a sequence of characters enclosed in '{' and '}'. It can contain any printable character except '{' and '}', which need to be escaped using backslash '\'.
+Another syntax extension to JSON is Mark pragma, it is a sequence of characters enclosed in '{' and '}'. It can contain any character except '{' and '}', which need to be escaped using backslash '\'.
 
-It is design to support markup content like HTML comment and XML processing instruction.
+It is designed to support markup content like HTML comment and XML processing instruction.
 
 ## Other Syntax Extensions to JSON
 
@@ -56,7 +55,8 @@ continue_identifier ::= begin_identifier | digit | '-' | '.'
 
 - Property keys can be unquoted if they’re valid identifiers. Yes, even reserved keywords (like `default`) are valid unquoted keys in ES5.
 - Comparing to JSON5 and JS identifiers, Mark identifier allows dash '-' and dot '.' in it. These two special characters are commonly used in markup data, like HTML, CSS, XML.
-- Property keys can also be single-quoted.
+- Property keys can also be single or double quoted.
+- Property keys **must not be a number**, as they are reserved for indexed Mark contents.
 - Last property can have trailing comma.
 
 ### Arrays
@@ -65,8 +65,10 @@ continue_identifier ::= begin_identifier | digit | '-' | '.'
 
 ### Strings
 
-- Strings can be single-quoted.
+- Strings can be single, double quoted.
 - Strings can be split across multiple lines.
+- String can also be triple-quoted with single or double quote, similar to Python or Scala.
+  - The quoted sequence of characters is arbitrary, except that it may contain three or more consecutive quote characters only at the very end. Characters are not necessarily be printable; newlines or other control characters are also permitted. Unicode escapes work as everywhere else, but none of the single control character escape sequences are interpreted.
 
 ### Numbers
 

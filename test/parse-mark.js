@@ -14,6 +14,7 @@ test('Parse Mark object', function(assert) {
 	assert.equal(Mark.parse('{_dashed-name}').constructor.name, '_dashed-name', "Mark object constructor.name should be '_dashed-name'");
 	assert.equal(Mark.parse('{name123}').constructor.name, 'name123', "Mark object constructor.name should be 'name123'");
 	assert.equal(Mark.parse('{obj $length:12}').$length, 12, "Mark object $length should be 12");
+	assert.equal(Mark.parse('{"quoted name"}').constructor.name, 'quoted name', "Mark object constructor.name should be 'quoted name'");
 	
 	// test properties
 	assert.equal(Mark.parse('{div margin:-10}').margin, -10, "Object margin should be -10");

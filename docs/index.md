@@ -1,4 +1,6 @@
-Objective Markup Notation, abbreviated as Mark or {mark}, is a new unified notation for both object and markup data. The notation is a superset of what can be represented by JSON and HTML, but overcomes many limitations these two popular data formats, yet still having a very clean syntax and simple data model.
+# {mark}
+<img src='https://api.travis-ci.org/henry-luo/mark.svg?branch=master'>
+*Objective Markup Notation*, abbreviated as **Mark** or **{mark}**, is a new unified notation for both object and markup data. The notation is a superset of what can be represented by JSON and HTML, but overcomes many limitations these two popular data formats, yet still having a very clean syntax and simple data model.
 
 The core data structure in Mark is an compound object, which have the following 3 facets of data:
 
@@ -6,7 +8,7 @@ The core data structure in Mark is an compound object, which have the following 
 - **Properties**: which is a collect of named values, like JSON;
 - **Contents**: which is a list of text object, comment object or nested Mark object;
 
-Below is a sample Mark object, representation a simple registration form:
+Below is a sample Mark object, representing a simple registration form:
 
 ```text
 {form                                   // object type-name 'form'
@@ -22,7 +24,7 @@ Below is a sample Mark object, representation a simple registration form:
     {input type:"password", id:"pwd"}
   }
   {button class:['btn','btn-info']      // property with complex values
-    'Submit'                            // text can be quoted with " or '
+    'Submit'                            // text quoted with single quote
   }
 }
 ```
@@ -51,13 +53,21 @@ Comparing to HTML, Mark has the following advantages:
 - Its objects are always properly closed, like JSON and XHTML; whereas HTML self-closing tag rules are non-extensible and error-prone.
 - The DOM produced under Mark model, is just a hierarchy of POJO objects, which can be easily processed using the built-in JS functions or 3rd party libraries, making Mark an ideal candidate for virtual DOM and other application usages.
 
+## Mark vs. XML
+
+Comparing to XML, Mark has the following advantages:
+
+- Mark properties can have complex object as value; whereas XML attribute values always need to be quoted and cannot have complex object as value, which is not flexible in syntax and data model.
+- Mark syntax is much cleaner than XML. It does not have all the legacy things like DTD, and it does not have whitespace ambiguity.
+- The data model produced by Mark is fully typed, like JSON; whereas XML is only semi-typed without schema.
+
 ## Mark Data Model
 
 Mark object has a very clean and simple data model. Each Mark object has 3 facets of data:
 
-- Type name, which is mapped to `object.constructor.name` under JavaScript.
-- Properties, are normal JavaScript *named properties*.
-- Contents, which are stored as *indexed properties* inside the same JavaScript object.
+- **Type name**, which is mapped to `object.constructor.name` under JavaScript.
+- **Properties**, which are normal JavaScript *named properties*.
+- **Contents**, which are stored as *indexed properties* inside the same JavaScript object.
 
 Mark utilizes a novel feature in JavaScript that an plain JS object is actually *array-like*, it can contain both named properties and indexed properties.
 
@@ -65,11 +75,11 @@ So each Mark object is mapped to just one plain JavaScript object, which is very
 
 ## mark.js
 
-This library consists of 3 modules:
+`mark.js` is the JS library to work with data in Mark format. It consists of 3 modules:
 
-- The core module `mark.js`, which provides `parse()` and `stringify()` functions, like JSON, and a direct Mark object construction function `Mark()`.
-- Sub-module `mark.convert.js`, which provides conversion between Mark format and other formats like HTML, XML, etc. *(still under development)*
-- Sub-module `mark.query.js`, which provides CSS selector based query interface on the Mark object model, like jQuery. *(still under development)*
+- The core module `mark.js`, which provides `parse()` and `stringify()` functions, like JSON, and a direct Mark object construction function `Mark()`. *(in beta)*
+- Sub-module `mark.convert.js`, which provides conversion between Mark format and other formats like HTML, XML, etc. *(in beta)*
+- Sub-module `mark.selector.js`, which provides CSS selector based query interface on the Mark object model, like jQuery. *(in beta)*
 
 ## Usage
 
@@ -87,7 +97,7 @@ var obj = Mark.parse(`{div {span 'Hello World!' }}`);  // using ES6 backtick
 console.log("Greeting from Mark: " + Mark.stringify(obj));
 ```
 
-To use the library in browser, you can include the `mark.js` under `dist` directory, into your html page, e.g.:
+To use the library in browser, you can include the `mark.js` under `/dist` directory, into your html page, e.g.:
 
 ```
 <script src='mark.js'></script>

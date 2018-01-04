@@ -44,7 +44,7 @@ null  ::= 'null'
 
 boolean  ::= 'true' | 'false'
 
-/*--------------------------------------------------------*/
+/*-- number ------------------------------------------------------*/
 
 number ::= ('+' | '-')? (nan | inf | dec)
 
@@ -60,7 +60,7 @@ int ::= '0' | ([1-9] digit*)
 
 digit ::= [0-9]
 
-/*--------------------------------------------------------*/
+/*-- string ------------------------------------------------------*/
 
 string ::= s_string | d_string | t_string
 
@@ -69,35 +69,37 @@ d_string ::= '"' (char | "'")* '"'
 s_string ::= "'" (char | '"')* "'"
 
 /* tripple quoted string */
-t_string ::= ("'''" tripple_quoted_text "'''") | ('"""' tripple_quoted_text '"""')
+t_string ::= ("'''" triple_single "'''") | ('"""' triple_double '"""')
 
-char ::= unescaped |
-       escape (
-           [#x30] |             /* 0    nul             U+0000 */
-           [#x62] |             /* b    backspace       U+0008 */
-           [#x66] |             /* f    form feed       U+000C */
-           [#x6E] |             /* n    line feed       U+000A */
-           [#x72] |             /* r    carriage return U+000D */
-           [#x74] |             /* t    tab             U+0009 */
-           [#x76] |             /* v    vtab            U+000B */
-           hex_char |     		/* xXX                  U+00XX */
-           unicode_char |     	/* uXXXX                U+XXXX */
-           eol |              	/* end-of-line -> empty string */
-           other_escape )     	/* the character itself */
-		
-hex_char ::= 'x' hexdig hexdig
+tchar ::= [#x20-#x21] | [#x23-#x26] | [#x28-#x7E] | [#x80-#x10FFFF] /* printable characters except " and ' */
 
-unicode_char ::= 'u' hexdig hexdig hexdig hexdig
+triple_single ::= (tchar | '"' | ("'" tchar) | ("''" tchar))* "'"? "'"? /* chars without tripple single quote */
+
+triple_double ::= (tchar | "'" | ('"' tchar) | ('""' tchar))* '"'? '"'? /* chars without tripple double quote */
+
+char ::= unescaped | escaped
+
+unescaped ::= [#x20-#x21] | [#x23-#x26] | [#x28-#x5B] | [#x5D-#x7E] | [#x80-#x10FFFF]
+   
+escaped ::= escape (
+   [#x30] |             /* 0    nul             U+0000 */
+   [#x62] |             /* b    backspace       U+0008 */
+   [#x66] |             /* f    form feed       U+000C */
+   [#x6E] |             /* n    line feed       U+000A */
+   [#x72] |             /* r    carriage return U+000D */
+   [#x74] |             /* t    tab             U+0009 */
+   unicode|				/* uXXXX                U+XXXX */
+   [#x76] |             /* v    vtab            U+000B */
+   eol              	/* end-of-line -> empty string */
+   )
+
+unicode ::= 'u' hexdig hexdig hexdig hexdig	
 
 hexdig ::= [0-9a-fA-F]
 
-escape ::= '\'                 /* \ backslash */
+escape ::= '\'                 /* backslash */
 
-unescaped ::= [#x20-#x21] | [#x23-#x26] | [#x28-#x5B] | [#x5D-#x7E] | [#x80-#x10FFFF]
-
-other_escaped ::= [#x20-#x2F] | [#x3A-#x61] | [#x63-#x65] | [#x67-#x6D] | [#x6F-#x71] | [#x73] | [#x77] | [#x79-#x7E] | [#x80-#x10FFFF]
-
-/*--------------------------------------------------------*/
+/*-- array ------------------------------------------------------*/
 
 array ::= begin_array (value (value_separator value)* value_sep_opt)? end_array
 
@@ -109,7 +111,7 @@ value_separator ::= ws ',' ws
 
 value_sep_opt   ::= (value_separator)?
 
-/*--------------------------------------------------------*/
+/*-- JSON object ------------------------------------------------------*/
 
 json_object ::= begin_object properties end_object
 
@@ -131,12 +133,12 @@ begin_identifier ::= [a-zA-Z] | '_' | '$'
 
 continue_identifier ::= begin_identifier | digit | '-' | '.'
 
-/*--------------------------------------------------------*/
+/*-- Mark object ------------------------------------------------------*/
 
 /* Note: Mark property key cannot be numeric - this constraint cannot be directly expressed in BNF notation */ 
 mark_object ::= begin_object type_name properties contents end_object
 
-type_name ::= identifier ws
+type_name ::= key ws
 
 contents ::= (text | json_object | mark_object | mark_pragma | ws)*
 
@@ -146,7 +148,7 @@ mark_pragma ::= '{' (pchar_no_brace | '\{' | '\}')* '}'
 
 pchar_no_brace ::= [#x20-#x7A] | '|' | [#x7E-#x10FFFF] /* Printable character except {, } */
 
-/*--------------------------------------------------------*/
+/*-- root ------------------------------------------------------*/
 
 value ::= null | boolean | number | string | array | json_object | mark_object | mark_pragma
 
