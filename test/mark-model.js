@@ -25,6 +25,7 @@ test('Mark Model', function(assert) {
 	assert.equal(Mark.stringify(Mark('div', {width:123}, ['text', '', Mark('br')])), '{div width:123 "text" {br}}', "div with prop and contents");
 	assert.equal(Mark.stringify(Mark('div', null, ['text', '', 123, Mark('br'), ['nested'], null])), '{div "text123" {br} "nested"}', "div with nested contents");
 	assert.equal(Mark.stringify(Mark('div', null, [''])), '{div}', "div with empty text");
+	assert.equal(Mark.stringify(Mark('div', null, ['text', 'merged', ''])), '{div "textmerged"}', "merging text nodes");
 	
 	// type name
 	var div = Mark.parse('{div}');
@@ -88,7 +89,15 @@ test('Mark Model', function(assert) {
 	assert.equal(Mark.stringify(div), '{div "text" {p}}', "Mark remove() test");
 	assert.equal(div.length, 2, "div length after delete should be 2");
 	assert.equal(Mark.stringify(item), "{br}", "item deleted should be {br}");
-	assert.end();	
+	
+	
+	// isName
+	assert.equal(Mark.isName(123), false, "123 is not name");
+	assert.equal(Mark.isName(':123'), false, "name should not start with :");
+	assert.equal(Mark.isName('name:name'), false, "name should not contain :");
+	assert.equal(Mark.isName('$name_-.'), true, "$name_-. is valid name");
+	assert.end();
+	
 });
 
 test('Mark shift() API', function(assert) {

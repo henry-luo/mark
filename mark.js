@@ -24,7 +24,7 @@ var MARK = (function() {
 		// 1. prepare the constructor
 		var con = constructors[typeName];
 		if (!con) {
-			if (!Mark.isName(typeName)) { throw "Invalid type name '" + typeName +"'"; }
+			if (typeof typeName !== 'string') { throw "Type name should be a string"; }
 			con = constructors[typeName] = function(){};
 			// con.prototype.constructor is set to con by JS
 			// sets the type name
@@ -117,6 +117,7 @@ var MARK = (function() {
 			else return this[$pragma];
 		},
 		
+		// should push be alias as 'append'?
 		push: function(item) {
 			// copy the arguments
 			var length = this[$length];
@@ -150,6 +151,7 @@ var MARK = (function() {
 				return undefined;
 			}
 		},
+		// should unshift be aliased as 'prepand'?
 		unshift: function() {
 			var args = arguments.length;  var length = this[$length];
 			if (args) {
@@ -180,8 +182,21 @@ var MARK = (function() {
 			}
 			return deleted;
 		},
-		// todo: function addContent(item, index)
-		// todo: pick and imp other useful Array prototype functions
+		// todo: another useful jQuery API?
+		
+		// query APIs
+		filter: Array.prototype.filter,				
+		find: function(selector) { // similar to jQuery find(), diff from Array.prototype.find
+			// load helper on demand
+			if (!MARK.$select) { MARK.$select = require('./lib/mark.selector.js'); }
+			return MARK.$select(this).find(selector);
+		},
+		matches: function(selector) {
+			// load helper on demand
+			if (!MARK.$select) { MARK.$select = require('./lib/mark.selector.js'); }
+			return MARK.$select(this).matches(selector);
+		},
+		// todo: pick and imp other useful Array prototype functions, map? reduce?, every?, some?
 		
 		// conversion APIs
 		toHtml: function() {
@@ -193,20 +208,7 @@ var MARK = (function() {
 			// load helper on demand
 			if (!MARK.$convert) { MARK.$convert = require('./lib/mark.convert.js')(Mark); }
 			return MARK.$convert.toXml(this);
-		},
-		
-		// query APIs
-		filter: Array.prototype.filter,				
-		find: function(selector) {
-			// load helper on demand
-			if (!MARK.$select) { MARK.$select = require('./lib/mark.selector.js'); }
-			return MARK.$select(this).find(selector);
-		},
-		matches: function(selector) {
-			// load helper on demand
-			if (!MARK.$select) { MARK.$select = require('./lib/mark.selector.js'); }
-			return MARK.$select(this).matches(selector);
-		},
+		},		
 	}
 	// set the APIs
 	for (let a in api) {
@@ -254,7 +256,7 @@ var MARK = (function() {
 	
     function isNameChar(c) {
         return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || ('0' <= c && c <= '9') ||
-            c === '_' || c === '$' || '.' || '-';
+            c === '_' || c === '$' || c === '.' || c === '-';
     }
     function isNameStart(c) {
         return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || c === '_' || c === '$';
@@ -459,45 +461,62 @@ MARK.parse = (function() {
 
 		// Parse a string value.
         string = function() {			
-            var hex, i, string = '',
+            var hex, i, string = '', triple = false,
                 delim,      // double quote or single quote
                 uffff;
 
 			// when parsing for string values, we must look for ' or " and \ characters.
             if (ch === '"' || ch === "'") {
                 delim = ch;
+				if (peek() === delim && text.charAt(at+1) === delim) { // got tripple quote
+					triple = true;  next();  next();
+				}
                 while (next()) {
                     if (ch === delim) {
                         next();
-						return string;
-                    } else if (ch === '\\') { // escape sequence
-                        next();
-                        if (ch === 'u') {
-                            uffff = 0;
-                            for (i = 0; i < 4; i += 1) {
-                                hex = parseInt(next(), 16);
-                                if (!isFinite(hex)) {
-                                    break;
-                                }
-                                uffff = uffff * 16 + hex;
-                            }
-                            string += String.fromCharCode(uffff);
-                        } else if (ch === '\r') {
-                            if (peek() === '\n') {
-                                next();
-                            }
-                        } else if (typeof escapee[ch] === 'string') {
-                            string += escapee[ch];
-                        } else {
-                            break;
-                        }
+						if (!triple) { // end of string
+							return string;
+						}
+						else if (ch === delim && peek() === delim) { // end of tripple quoted text
+							next();  next();  return string;
+						}
+						else {
+							string += delim;
+						}
+						// continue
+                    }
+					if (ch === '\\') { // escape sequence
+						if (triple) { string += '\\'; } // treated as normal char
+						else { // escape sequence
+							next();
+							if (ch === 'u') { // unicode escape sequence
+								uffff = 0;
+								for (i = 0; i < 4; i += 1) {
+									hex = parseInt(next(), 16);
+									if (!isFinite(hex)) {
+										break;
+									}
+									uffff = uffff * 16 + hex;
+								}
+								string += String.fromCharCode(uffff);
+							} 
+							else if (ch === '\r') { // ignore the line-end, as defined in ES5
+								if (peek() === '\n') {
+									next();
+								}
+							} else if (typeof escapee[ch] === 'string') {
+								string += escapee[ch];
+							} else { 
+								break;  // bad escape
+							}
+						}
                     } 
 					// else if (ch === '\n') {
                         // unescaped newlines are invalid in JSON, but valid in Mark; 
                         // see: https://github.com/json5/json5/issues/24
                         // break;
                     // } 
-					else {
+					else { // normal char
                         string += ch;
                     }
                 }
@@ -704,10 +723,10 @@ MARK.parse = (function() {
 						return obj;   // potentially empty object
 					}
 
-					// Keys can be unquoted. If they are, they need to be valid JS identifiers.
-					if (ch === '"' || ch === "'") { // legacy JSON
+					// scan the key
+					if (ch === '"' || ch === "'") { // quoted key
 						var str = string();  white();
-						if (ch==':') { // property
+						if (ch == ':') { // property, legacy JSON
 							key = str;
 						} else {
 							if (extended) { // got text node
@@ -716,7 +735,13 @@ MARK.parse = (function() {
 								parseContent();
 								return obj;
 							}
-							else { error("Bad object"); }
+							else if (!key) { // at the starting of the object
+								// create the object
+								obj = MARK(str, null, null, parent);
+								extended = true;  key = str;
+								continue;							
+							}
+							// else bad object
 						}
 					}
 					else if (ch === '{') { // child object
@@ -725,14 +750,14 @@ MARK.parse = (function() {
 						}
 						error("Unexpected character '{'");
 					}
-					else { // JSON5 or Mark object
+					else { // JSON5 or Mark unquoted key, which needs to be valid JS identifier.
 						var ident = identifier();
 						white();
 						if (!key) { // at the starting of the object						
 							if (ch != ':') { // assume is Mark object
 								// console.log("got Mark object of type: ", ident);
 								// create the object
-								obj = MARK(ident, null, null, parent); // todo: 
+								obj = MARK(ident, null, null, parent);
 								extended = true;  key = ident;
 								continue;
 							}
@@ -782,7 +807,7 @@ MARK.parse = (function() {
 						next();
 						return MARK.pragma(pragma, parent);
 					}				
-					else if (ch === '\\') {
+					else if (ch === '\\') { // as html, xml comment may contain '{' and '}'
 						next();
 						if (ch !== '{' && ch !== '}') { pragma += '\\'; }
 					}

@@ -1,6 +1,6 @@
 {
   "name": "mark-js",
-  "version": "0.2.8",
+  "version": "0.2.10",
   "description": "The core library for Mark, an unified notation for both object and markup data.",
   "main": "mark.js",
   "directories": {
@@ -17,16 +17,16 @@
   "scripts": {
     "test": "clear && tape test/*.js | tap-spec",
     "test-coverage": "istanbul cover node_modules/tape/bin/tape ./test/*.js",
-    "build": "npm-run-all --parallel build-mark build-convert build-selector && npm run build-mark-all",
-    "build-mark": "browserify -x ./lib/mark.convert.js -x ./lib/mark.selector.js -x htmlparser2 --standalone Mark mark.js | uglifyjs > dist/mark.js",
+    "build": "npm-run-all --parallel build-core build-convert build-selector && npm run build-mark",
+    "build-core": "browserify -x ./lib/mark.convert.js -x ./lib/mark.selector.js -x htmlparser2 --standalone Mark mark.js | uglifyjs > dist/mark.core.js",
     "build-convert": "browserify -x htmlparser2 --standalone MarkConvert -r ./lib/mark.convert.js | uglifyjs > dist/mark.convert.js",
     "build-selector": "browserify --standalone MarkSelector -r ./lib/mark.selector.js | uglifyjs > dist/mark.selector.js",
-    "build-mark-all": "browserify -x htmlparser2 --standalone Mark mark.js | uglifyjs > dist/mark.all.js",
+    "build-mark": "browserify -x htmlparser2 --standalone Mark mark.js | uglifyjs > dist/mark.js",
     "build-find": "browserify --full-paths -x debug ./dev/mark.find.js | discify --open",
-    "list-mark": "browserify --full-paths -x ./lib/mark.convert.js -x ./lib/mark.selector.js -x htmlparser2 mark.js | discify --open",
+    "list-core": "browserify --full-paths -x ./lib/mark.convert.js -x ./lib/mark.selector.js -x htmlparser2 mark.core.js | discify --open",
     "list-convert": "browserify --full-paths -x htmlparser2 ./lib/mark.convert.js | discify --open",
     "list-selector": "browserify --full-paths ./lib/mark.selector.js | discify --open",
-    "list-mark-all": "browserify --full-paths -x htmlparser2 mark.js | discify --open",
+    "list-mark": "browserify --full-paths -x htmlparser2 mark.js | discify --open",
     "dev": "watchify mark.js --standalone Mark -o dist/mark.js -v",
     "gen-mark-diagram": "cp-cli dev/viewer.html node_modules/grammkit/template/viewer.html && grammkit docs/mark.bnf -o docs/mark-grammar.html"
   },
