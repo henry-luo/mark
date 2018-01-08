@@ -8,7 +8,6 @@
 
 // symbols used internally
 const $length = Symbol('Mark.length');
-const $$length = Symbol('Mark.property.length');
 const $parent = Symbol('Mark.parent');
 const $pragma = Symbol('Mark.pragma');
 
@@ -97,12 +96,16 @@ var MARK = (function() {
 			for (let c of this) { list.push(c); }
 			return list;
 		},
+		// get contents length
+		length: function() {
+			return this[$length];
+		},
 		// to set or get a property
 		prop: function(name, value) {
 			// accept only non-numeric key
-			if (isNaN(name*1)) { 
+			if (typeof name === 'string' && isNaN(name*1)) { 
 				if (value !== undefined) this[name] = value; 
-				else return name === 'length' ? this[$$length]:this[name];				
+				else return this[name];				
 			}
 			else { throw "Property name should not be numeric"; }
 		},
@@ -227,13 +230,6 @@ var MARK = (function() {
 		var length = this[$length];
 		for (let i = 0; i < length; i++) { yield this[i]; }
 	}
-	// 'length' property
-	Object.defineProperty(Mark.prototype, 'length', {
-		get:function() { return this[$length]; },
-		set:function(length) { // treated as length property
-			this[$$length] = length;  // should we throw a warning here?
-		}
-	});
 	
 	// Mark pragma constructor
 	Mark.pragma = function(pragma, parent) {
