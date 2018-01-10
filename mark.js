@@ -840,7 +840,7 @@ MARK.parse = (function() {
 
 	// Return the json_parse function. It will have access to all of the above
 	// functions and variables.
-    return function(source, factory) {	
+    return function(source, reviver) {	
 		// initialize the contextual variables
         at = 0;
         lineNumber = 1;
@@ -861,8 +861,28 @@ MARK.parse = (function() {
         if (ch) {
             error("Syntax error");
         }
-
-        return result;
+		
+		// Supporting the legacy JSON reviver function:
+		// If there is a reviver function, we recursively walk the new structure,
+		// passing each name/value pair to the reviver function for possible
+		// transformation, starting with a temporary root object that holds the result
+		// in an empty key. If there is not a reviver function, we simply return the result.
+        return typeof reviver === 'function' ? (function walk(holder, key) {
+            var k, v, value = holder[key];
+            if (value && typeof value === 'object') {
+                for (k in value) {
+                    if (Object.prototype.hasOwnProperty.call(value, k)) {
+                        v = walk(value, k);
+                        if (v !== undefined) {
+                            value[k] = v;
+                        } else {
+                            delete value[k];
+                        }
+                    }
+                }
+            }
+            return reviver.call(holder, key, value);
+        }({'': result}, '')) : result;
     };
 }());
 

@@ -7,5 +7,14 @@ test('Parse JSON object', function(assert) {
 	assert.deepEqual(Mark.parse('[123, "string", true]'), [123, "string", true], 'Parse array [123, "string", true]');
 	assert.equal(Mark.parse('"string"'), "string", 'Parse "string"');
 	assert.equal(Mark.parse('123.456'), 123.456, 'Parse number 123.456');	
+	
+	// test JSON reviver
+	var book = Mark.parse('{"title":"JavaScript: The Definitive Guide", "author":"David Flanagan", "edition":6}', function(name, value) {
+        if (name === 'edition') { return undefined; }
+        // otherwise return value
+        return value; 
+    });
+	assert.deepEqual(book, {"title":"JavaScript: The Definitive Guide", "author":"David Flanagan"}, 'Parse with reviver');	
+	
 	assert.end() ;
 });
