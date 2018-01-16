@@ -187,12 +187,72 @@ var MARK = (function() {
 		},
 		// todo: another useful jQuery API?
 		
-		// query APIs
-		//filter: Array.prototype.filter,
-		//map: Array.prototype.map,
-		//reduce: Array.prototype.reduce,			
-			
-		find: function(selector) { // similar to jQuery find(), diff from Array.prototype.find
+
+		// filter: like Array.prototype.filter
+		filter: function(func, thisArg) {
+			if (!(typeof func === 'function' && this)) throw new TypeError();
+			const obj = Object(this);
+			let res = [], i = 0;
+			for (const n of obj) {
+				if (func.call(thisArg || obj, n, i, obj)) { res.push(n); }
+				i++;
+			}
+			return res;
+		},
+		
+		// map: like Array.prototype.map
+		map: function(func, thisArg) {
+			if (!(typeof func === 'function' && this)) throw new TypeError();
+			const obj = Object(this);
+			let res = [], i = 0;
+			for (const n of obj) {
+				res[i] = func.call(thisArg || obj, n, i, obj);
+				i++;
+			}
+			return res;
+		},
+		
+		// reduce: like Array.prototype.reduce
+		reduce: function(func) {
+			if (!(typeof func === 'function' && this)) throw new TypeError();
+			let obj = Object(this), len = obj[$length], k = 0, value;
+			if (arguments.length == 2) { value = arguments[1]; } 
+			else {
+				if (k >= len) { throw new TypeError('Reduce of empty contents with no initial value'); }
+				value = obj[k++];
+			}
+			for (; k < len; k++) {
+				value = func(value, obj[k], k, obj);
+			}
+			return value;		
+		},
+		
+		// every: like Array.prototype.every
+		every: function(func, thisArg) {
+			if (!(typeof func === 'function' && this)) throw new TypeError();
+			let i = 0, obj = Object(this);
+			for (const n of obj) {
+				var result = func.call(thisArg || obj, n, i, obj);
+				if (!result) { return false; }
+				i++;
+			}
+			return true;
+		},
+		
+		// some: like Array.prototype.some
+		some: function(func, thisArg) {
+			if (!(typeof func === 'function' && this)) throw new TypeError();
+			let i = 0, obj = Object(this);
+			for (const n of obj) {
+				if (func.call(thisArg || obj, n, i, obj)) { return true; }
+				i++;
+			}
+			return false;
+		},
+		
+		// Mark selector APIs
+		// find() is similar to jQuery find(), diff from Array.prototype.find()
+		find: function(selector) { 
 			// load helper on demand
 			if (!MARK.$select) { MARK.$select = require('./lib/mark.selector.js'); }
 			return MARK.$select(this).find(selector);
@@ -202,7 +262,6 @@ var MARK = (function() {
 			if (!MARK.$select) { MARK.$select = require('./lib/mark.selector.js'); }
 			return MARK.$select(this).matches(selector);
 		},
-		// todo: pick and imp other useful Array prototype functions, map? reduce?, every?, some?
 		
 		// conversion APIs
 		toHtml: function() {

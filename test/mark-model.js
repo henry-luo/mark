@@ -64,9 +64,18 @@ test('Mark Model', function(assert) {
 	assert.equal(arrayEqual(div_contents, ["text"]), true, "Mark object div contents should be ['text']");
 	
 	// filter
-	//div = Mark.parse('{div "text" {br} "more" {b "bold"} {!-- comment --}}');
-	//div.length = 5;
-	//assert.equal(div.filter(function (n) { console.log('n', n); return typeof n === 'string'; }), ["text", "more"], "Mark filter API");
+	div = Mark.parse('{div "text" {br} "more" {b "bold"} {!-- comment --}}');
+	assert.deepEqual(div.filter(n => typeof n === 'string'), ["text", "more"], "Mark filter API");
+	// map
+	assert.deepEqual(div.map(n => typeof n), ["string", "object", "string", "object", "object"], "Mark map API");
+	// reduce
+	assert.equal(div.reduce((result, n, i) => result + (i?', ':'') + (typeof n), 'type: '), "type: string, object, string, object, object", "Mark reduce API");
+	// every
+	assert.equal(div.every(n => typeof n != 'number'), true, "Mark every API");
+	assert.equal(div.every(n => typeof n != 'object'), false, "Mark every API");
+	// some
+	assert.equal(div.some(n => n.constructor && n.constructor.name == 'b'), true, "Mark some API");
+	assert.equal(div.some(n => n.constructor && n.constructor.name == 'div'), false, "Mark some API");
 	
 	// push API
 	assert.equal(Mark.parse('{div}').push("text"), 1, "push text into Mark object");
