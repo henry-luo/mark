@@ -188,7 +188,10 @@ var MARK = (function() {
 		// todo: another useful jQuery API?
 		
 		// query APIs
-		filter: Array.prototype.filter,				
+		//filter: Array.prototype.filter,
+		//map: Array.prototype.map,
+		//reduce: Array.prototype.reduce,			
+			
 		find: function(selector) { // similar to jQuery find(), diff from Array.prototype.find
 			// load helper on demand
 			if (!MARK.$select) { MARK.$select = require('./lib/mark.selector.js'); }

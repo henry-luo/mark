@@ -63,6 +63,11 @@ test('Mark Model', function(assert) {
 	assert.equal(JSON.stringify(div_contents), '["text"]', "Mark object div contents should be ['text']");
 	assert.equal(arrayEqual(div_contents, ["text"]), true, "Mark object div contents should be ['text']");
 	
+	// filter
+	//div = Mark.parse('{div "text" {br} "more" {b "bold"} {!-- comment --}}');
+	//div.length = 5;
+	//assert.equal(div.filter(function (n) { console.log('n', n); return typeof n === 'string'; }), ["text", "more"], "Mark filter API");
+	
 	// push API
 	assert.equal(Mark.parse('{div}').push("text"), 1, "push text into Mark object");
 	var div = Mark.parse('{div}');  
