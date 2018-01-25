@@ -17,7 +17,7 @@ function arrayEqual(array1, array2) {
 	});
 }
 
-test('Mark Model', function(assert) {
+test('Mark object model', function(assert) {
 	// Mark constructor
 	assert.equal(Mark('div').constructor.name, 'div', "div.constructor.name should be 'div'");
 	assert.equal(Mark('div').constructor(), undefined, "div.constructor returns nothing"); // for test coverage
@@ -141,4 +141,15 @@ test('Mark operation', function(assert) {
 	assert.equal(Mark.stringify(div), '{div {br}}', "Set Mark content");
 	assert.looseEqual(allInKeys(div), [], "Set Mark content");
 	assert.end();	
+});
+
+test('Mark pragma model', function(assert) {
+	var pragma = Mark.pragma("test");
+	assert.equal(typeof pragma, 'object', "typeof pragma is 'object'");
+	assert.equal(pragma.pragma(), 'test', "get pragma content");
+	assert.equal(pragma.pragma('content').pragma(), 'content', "set pragma content");
+	assert.equal(pragma.parent(), undefined, "get pragma parent");
+	assert.equal(pragma.valueOf() === pragma, true, "valueOf pragma should return itself");
+	assert.equal(pragma.toString(), "[object Pragma]", "pragma toString() should return [object Pragma]");
+	assert.end();
 });

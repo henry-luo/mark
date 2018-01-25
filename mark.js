@@ -104,24 +104,24 @@ var MARK = (function() {
 		prop: function(name, value) {
 			// accept only non-numeric key
 			if (typeof name === 'string' && isNaN(name*1)) { 
-				if (value !== undefined) this[name] = value; 
+				if (value !== undefined) { this[name] = value;  return this; } // returns this, so that the call can be chained
 				else return this[name];				
 			}
 			else { throw "Property name should not be numeric"; }
 		},
 		// to set or get parent
 		parent: function(pa) {
-			if (pa !== undefined) this[$parent] = pa;
+			if (pa !== undefined) { this[$parent] = pa;  return this; } // returns this, so that the call can be chained
 			else return this[$parent];
 		},
 		// to set or get pragma content
 		pragma: function(value) {
-			if (value !== undefined) this[$pragma] = value;
+			if (value !== undefined) { this[$pragma] = value;  return this; } // returns this, so that the call can be chained
 			else return this[$pragma];
 		},
 		
 		// should push be alias as 'append'?
-		push: function(item) {
+		push: function() {
 			// copy the arguments
 			var length = this[$length];
 			for (var i=0; i<arguments.length; i++) {
@@ -131,7 +131,7 @@ var MARK = (function() {
 			this[$length] = length;
 			return length;
 		},
-		pop: function(item) {
+		pop: function() {
 			var length = this[$length];
 			if (length > 0) {
 				var item = this[length-1];  delete this[length-1];
@@ -170,12 +170,11 @@ var MARK = (function() {
 			}
 			return length;
 		},
-		remove: function() {
+		remove: function(index) {
 			var deleted;
-			var length = this[$length];
 			if (arguments.length) {
 				// shift the items
-				var index = arguments[0];
+				var length = this[$length];
 				if (index >=0 && index < length) {
 					deleted = this[index];
 					for (var i = index; i < length - 1; i++) { this[i] = this[i+1]; }
@@ -186,7 +185,6 @@ var MARK = (function() {
 			return deleted;
 		},
 		// todo: another useful jQuery API?
-		
 
 		// filter: like Array.prototype.filter
 		filter: function(func, thisArg) {
@@ -302,7 +300,7 @@ var MARK = (function() {
 			Object.defineProperty(con, 'pragma', {value:api.pragma});
 			Object.defineProperty(con, 'parent', {value:api.parent});
 			Object.defineProperty(con, 'valueOf', {value:Object.valueOf});
-			Object.defineProperty(con, 'toString', {value:Object.toString});
+			Object.defineProperty(con, 'toString', {value:function() { return '[object Pragma]'; }});
 			// any other API?
 			constructors['!pragma'] = con;
 		}

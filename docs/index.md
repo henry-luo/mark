@@ -97,7 +97,7 @@ var obj = Mark.parse(`{div {span 'Hello World!' }}`);  // using ES6 backtick
 console.log("Greeting from Mark: " + Mark.stringify(obj));
 ```
 
-To use the library in browser, you can include the `mark.js` under `/dist` directory, into your html page, e.g.:
+To use the library in browser, you can include the `mark.js` under `/dist` directory into your html page. *(Note: comparing to mark.js under the root directory, /dist/mark.js has bundled mark.convert.js and mark.selector.js and all dependencies with it, and is meant to run in browser.)*
 
 ```
 <script src='mark.js'></script>
@@ -110,5 +110,6 @@ console.log("Greeting from Mark: " + Mark.stringify(obj));
 ## Documentation
 
 - Detailed [syntax specification](mark-syntax.md);
-- Detailed data model specification; *(being developed)*
-- Library APIs documentation; *(being developed)*
+- Detailed [data model and API specification](mark-model.md); 
+- Mark CLI; *(being developed)*
+
