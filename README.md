@@ -1,13 +1,9 @@
 <h1 style='font-family:Helvetica,Arial,sans-serif'>{mark}</h1>
 <img src='https://api.travis-ci.org/henry-luo/mark.svg?branch=master'>
 
-*Objective Markup Notation*, abbreviated as **Mark** or **{mark}**, is a new unified notation for both object and markup data. The notation is a superset of what can be represented by JSON and HTML, but overcomes many limitations these two popular data formats, yet still having a very clean syntax and simple data model.
+*Objective Markup Notation*, abbreviated as **Mark** or **{mark}**, is a new unified notation for both object and markup data. The notation is a superset of what can be represented by JSON, HTML and XML, but overcomes many limitations these popular data formats, yet still having a very clean syntax and simple data model.
 
-The core data structure in Mark is an compound object, which have the following 3 facets of data:
-
-- **Type name**;
-- **Properties**: which is a collect of named values, like JSON;
-- **Contents**: which is a list of text object, comment object or nested Mark object;
+## Mark Sample
 
 Below is a sample Mark object, representing a simple registration form:
 
@@ -30,9 +26,23 @@ Below is a sample Mark object, representing a simple registration form:
 }
 ```
 
+## Mark Data Model
+
+Mark object has a very clean and simple data model. Each Mark object has 3 facets of data:
+
+- **Type name**, which is mapped to `object.constructor.name` under JavaScript.
+- **Properties**, which is a collection of key-value pairs, stored as normal JavaScript *named properties*.
+- **Contents**, which is a list of content objects, stored as *indexed properties* inside the same JavaScript object.
+
+Mark utilizes a novel feature in JavaScript that an plain JS object is actually *array-like*, it can contain both named properties and indexed properties.
+
+So each Mark object is mapped to just one plain JavaScript object, which is very compact and efficient comparing to other DOM models. *(Many JS virtual-dom implementations need to represent one DOM element with at least 3 objects: the main object, one JSON object for the properties, and one array object for the contents.)*
+
 ## Mark vs. JSON
 
-Mark is a superset of JSON. It extends JSON notation with a type-name, and a list of content objects. Comparing to JSON, Mark has the following advantages:
+Mark is a superset of JSON. It extends JSON notation with a type-name, and a list of content objects.
+
+Comparing to JSON, Mark has the following advantages:
 
 - It has a type-name, which is important in identifying what the data represents; whereas JSON is actually an anonymous object, missing the type name.
 - It can have nested content objects, which is common in all markup formats, and thus allows Mark to convenient represent document-oriented data, which is awkward for JSON.
@@ -61,18 +71,6 @@ Comparing to XML, Mark has the following advantages:
 - Mark properties can have complex object as value; whereas XML attribute values always need to be quoted and cannot have complex object as value, which is not flexible in syntax and data model.
 - Mark syntax is much cleaner than XML. It does not have all the legacy things like DTD, and it does not have whitespace ambiguity.
 - The data model produced by Mark is fully typed, like JSON; whereas XML is only semi-typed without schema.
-
-## Mark Data Model
-
-Mark object has a very clean and simple data model. Each Mark object has 3 facets of data:
-
-- **Type name**, which is mapped to `object.constructor.name` under JavaScript.
-- **Properties**, which are normal JavaScript *named properties*.
-- **Contents**, which are stored as *indexed properties* inside the same JavaScript object.
-
-Mark utilizes a novel feature in JavaScript that an plain JS object is actually *array-like*, it can contain both named properties and indexed properties.
-
-So each Mark object is mapped to just one plain JavaScript object, which is very compact and efficient comparing to other DOM models *(Many JS virtual-dom implementations needs to represent one DOM element with at least 3 objects: the main object, one JSON object for the properties, and one array object for the contents.)*.
 
 ## mark.js
 
@@ -108,7 +106,7 @@ console.log("Greeting from Mark: " + Mark.stringify(obj));
 </script>
 ```
 
-*(Note: comparing to mark.js under the root directory, /dist/mark.js has bundled mark.convert.js and mark.selector.js and all dependencies with it, and is meant to run in browser.)*
+*(Note: comparing to mark.js under the root directory, /dist/mark.js has bundled mark.convert.js and mark.selector.js and all dependencies with it, and is meant to run in browser. The entire script is about 12K after gzip.)*
 
 ## Documentation
 
