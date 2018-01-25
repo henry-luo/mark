@@ -1,10 +1,10 @@
 # Mark Syntax
 
-Mark syntax is a superset of JSON. The primary extension that Mark makes to JSON is the introduction of a new object notation to support markup data, commonly seen in HTML, XML, etc.
+Mark syntax is a superset of JSON. The primary extension that Mark makes to JSON is the introduction of a new object notation to support markup data, commonly seen in HTML and XML.
 
-## Mark Object
+## 1. Mark Object
 
-Below is the key grammar rules for the new Mark object in BNF notation:
+Below are the key grammar rules for the new Mark object in BNF notation:
 
 ```BNF
 Mark ::= ws value ws
@@ -31,7 +31,7 @@ Comparing to a JSON object, a Mark object has two extensions:
 - A **type name**: which corresponds to class name or type name of an object. In JavaScript, that is `obj.constructor.name`. In HTML and XML, that's the element name.
 - Optional list of **content** values following the properties: the content values corresponds to child nodes in markup data.
 
-### Properties
+### 1.1 Properties
 
 ```BNF
 identifier ::= begin_identifier continue_identifier*
@@ -47,7 +47,7 @@ continue_identifier ::= begin_identifier | digit | '-' | '.'
 - Property keys **must not be a number**, as they are reserved for indexed Mark contents.
 - Last property can have trailing comma.
 
-## Mark Pragma
+## 2. Mark Pragma
 
 Another syntax extension to JSON is Mark pragma, it is a sequence of characters enclosed in '{' and '}'. It can contain any character except '{' and '}', which need to be escaped using backslash '\'.
 
@@ -57,33 +57,33 @@ mark_pragma ::= '{' pchar_no_brace+ '}'
 
 It is designed to support markup content like HTML comment and XML processing instruction.
 
-## Other Syntax Extensions to JSON
+## 3. Other Syntax Extensions to JSON
 
 Other syntax extensions made to JSON are pretty much just syntax sugars. Most of them are inherited from [JSON5](http://json5.org/).
 
-### Arrays
+### 3.1 Arrays
 
 - Arrays can have trailing comma.
 
-### Strings
+### 3.2 Strings
 
 - Strings can be single, double quoted.
 - Strings can be split across multiple lines.
 - String can also be triple-quoted with single or double quote character, similar to Python or Scala.
   - The quoted sequence of characters is arbitrary, except that it may contain three or more consecutive quote characters only at the very end. Escape sequences are not interpreted.
 
-### Numbers
+### 3.3 Numbers
 
 - Numbers can begin or end with a (leading or trailing) decimal point.
 - Numbers can include `Infinity`, `-Infinity`,  `NaN`, and `-NaN`.
 - Numbers can begin with an explicit plus sign.
 - *Note: Mark does not support hexadecimal integer. This is the only feature that Mark omits from JSON5.*
 
-### Comments
+### 3.4 Comments
 
 - Both inline (single-line) and block (multi-line) comments are allowed, similar to those in JS.
 
-## Full Grammar Specification
+## 4. Full Grammar Specification
 
 The formal grammar specification in BNF is [here](mark.bnf).
 

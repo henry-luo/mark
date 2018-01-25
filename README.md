@@ -1,5 +1,6 @@
-# {mark}
+<h1 style='font-family:Helvetica,Arial,sans-serif'>{mark}</h1>
 <img src='https://api.travis-ci.org/henry-luo/mark.svg?branch=master'>
+
 *Objective Markup Notation*, abbreviated as **Mark** or **{mark}**, is a new unified notation for both object and markup data. The notation is a superset of what can be represented by JSON and HTML, but overcomes many limitations these two popular data formats, yet still having a very clean syntax and simple data model.
 
 The core data structure in Mark is an compound object, which have the following 3 facets of data:
@@ -71,7 +72,7 @@ Mark object has a very clean and simple data model. Each Mark object has 3 facet
 
 Mark utilizes a novel feature in JavaScript that an plain JS object is actually *array-like*, it can contain both named properties and indexed properties.
 
-So each Mark object is mapped to just one plain JavaScript object, which is very compact and efficient comparing to other DOM models *(Many JS virtual-dom implementations needs to represent one DOM element with at least 3 objects: the main object, one JSON object for the properties, and one array object for the contents. Browser DOM will be even heavier.)*.
+So each Mark object is mapped to just one plain JavaScript object, which is very compact and efficient comparing to other DOM models *(Many JS virtual-dom implementations needs to represent one DOM element with at least 3 objects: the main object, one JSON object for the properties, and one array object for the contents.)*.
 
 ## mark.js
 
@@ -93,11 +94,11 @@ Then in your node script, use it as:
 
 ```
 const Mark = require('mark-js');
-var obj = Mark.parse(`{div {span 'Hello World!' }}`);  // using ES6 backtick
+var obj = Mark.parse(`{div {span 'Hello World!' }}`);
 console.log("Greeting from Mark: " + Mark.stringify(obj));
 ```
 
-To use the library in browser, you can include the `mark.js` under `/dist` directory into your html page. *(Note: comparing to mark.js under the root directory, /dist/mark.js has bundled mark.convert.js and mark.selector.js and all dependencies with it, and is meant to run in browser.)*
+To use the library in browser, you can include the `mark.js` under `/dist` directory into your html page, like:
 
 ```
 <script src='mark.js'></script>
@@ -106,6 +107,8 @@ var obj = Mark.parse(`{div {span 'Hello World!' }}`);  // using ES6 backtick
 console.log("Greeting from Mark: " + Mark.stringify(obj));
 </script>
 ```
+
+*(Note: comparing to mark.js under the root directory, /dist/mark.js has bundled mark.convert.js and mark.selector.js and all dependencies with it, and is meant to run in browser.)*
 
 ## Documentation
 
