@@ -1,9 +1,23 @@
 ﻿const test = require('tape');
-const fs = require('fs');
+
 const Mark = require('./../mark.js');
 
+function loadXml() {
+	if (typeof document !== 'undefined') { // in browser environment
+		// make sync AJAX call
+		var xhReq = new XMLHttpRequest();
+		xhReq.open("GET", "base/test/data/book.xml", false);
+		xhReq.send(null);
+		var xml = xhReq.responseText;  console.log('xml:', xml);
+		return xml;
+	} else {
+		const fs = require('fs');
+		return fs.readFileSync('./test/data/book.xml').toString(); 
+	}
+}
+
 test('Parse XML', function(assert) {
-	var src = fs.readFileSync('./test/data/book.xml').toString(); 
+	var src = loadXml(); 
 	var obj = Mark.parse(src, {format:'xml'});
 	assert.equal(obj.constructor.name, 'catalog', 'Parse xml');
 	assert.equal(obj.length(), 12, 'Parse xml');
