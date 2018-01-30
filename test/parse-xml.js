@@ -8,7 +8,7 @@ function loadXml() {
 		var xhReq = new XMLHttpRequest();
 		xhReq.open("GET", "base/test/data/book.xml", false);
 		xhReq.send(null);
-		var xml = xhReq.responseText;  console.log('xml:', xml);
+		var xml = xhReq.responseText;  // console.log('xml:', xml);
 		return xml;
 	} else {
 		const fs = require('fs');
