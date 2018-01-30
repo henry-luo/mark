@@ -821,7 +821,9 @@ MARK.parse = (function() {
 								extended = true;  key = ident;
 								continue;
 							}
-							// else // JSON object
+							else { // JSON object
+								if (!obj.constructor.name) { obj.constructor.name = 'Object'; } // IE11 does not set constructor.name to 'Object'
+							}
 						}
 						key = ident;
 					}
@@ -902,9 +904,8 @@ MARK.parse = (function() {
         }
     };
 
-	// Return the json_parse function. It will have access to all of the above
-	// functions and variables.
-    return function(source, reviver) {	
+	// Return the enclosed parse function. It will have access to all of the above functions and variables.
+    return function(source, options) {
 		// initialize the contextual variables
         at = 0;
         lineNumber = 1;
@@ -913,9 +914,10 @@ MARK.parse = (function() {
 		text = String(source);
 		
 		if (!source) { text = '';  error(UNEXPECT_END); }
-		if (source.match(/^\s*</)) { // parse as html
-			if (!MARK.$html) { MARK.$html = require('./lib/mark.convert.js')(MARK); }
-			return MARK.$html.parse(source);
+		if (typeof options === 'object' && options.format != 'mark') { // parse as other formats
+			// is it better to use a Symbol here?
+			if (!MARK.$convert) { MARK.$convert = require('./lib/mark.convert.js')(MARK); }
+			return MARK.$convert.parse(source, options);
 		} 
 		// else // parse as Mark
         
@@ -931,7 +933,7 @@ MARK.parse = (function() {
 		// passing each name/value pair to the reviver function for possible
 		// transformation, starting with a temporary root object that holds the result
 		// in an empty key. If there is not a reviver function, we simply return the result.
-        return typeof reviver === 'function' ? (function walk(holder, key) {
+        return typeof options === 'function' ? (function walk(holder, key) {
             var k, v, value = holder[key];
             if (value && typeof value === 'object') {
                 for (k in value) {
@@ -945,7 +947,7 @@ MARK.parse = (function() {
                     }
                 }
             }
-            return reviver.call(holder, key, value);
+            return options.call(holder, key, value);
         }({'': result}, '')) : result;
     };
 }());
@@ -1064,8 +1066,7 @@ MARK.stringify = function(obj, replacer, space) {
         var obj_part = getReplacedValueOrUndefined(holder, key, isTopLevel);
 
         if (obj_part && !isDate(obj_part)) {
-            // unbox objects
-            // don't unbox dates, since will turn it into number
+            // unbox objects, don't unbox dates, since will turn it into number
             obj_part = obj_part.valueOf();
         }
         switch (typeof obj_part) {
@@ -1084,7 +1085,8 @@ MARK.stringify = function(obj, replacer, space) {
             case "object":
                 if (obj_part === null) {
                     return "null";
-                } else if (isArray(obj_part)) {
+                } 
+				else if (isArray(obj_part)) {
                     checkForCircular(obj_part);  // console.log('print array', obj_part);
                     buffer = "[";
                     objStack.push(obj_part);

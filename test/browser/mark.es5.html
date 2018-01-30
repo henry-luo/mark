@@ -15,9 +15,10 @@
 	}
 	console.log('Mark object constructor.name: ', Mark.parse('{obj}').constructor.name);
 	// parse XML
-	var src = loadXml(); 
-	var obj = Mark.parse(src, {format:'xml'});
-	console.log('Parse xml obj.constructor.name: ', obj.constructor.name);	
+	var src = '<?xml version="1.0" encoding="UTF-8"?><book><p>text</p></book>'; // loadXml(); 
+	var obj = Mark.parse(src, {format:'xml', ignoreSpace:true});  console.log('parsed:', obj);
+	console.log('Parse xml obj.constructor.name: ', obj.constructor.name);
+	console.log('xml node length: ', obj.length());	
 	</script>
 </head>
 </html>
