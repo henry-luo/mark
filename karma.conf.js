@@ -16,7 +16,7 @@ module.exports = function(karma) {
     },
 
     browsers: ['Chrome'], // 'Chrome', 'Edge', 'IE'
-    browserConsoleLogOptions: {level: 'error', format: '%b %T: %m', terminal: false},	
+    //browserConsoleLogOptions: {level: 'error', format: '%b %T: %m', terminal: false},	
 
     //logLevel: 'LOG_DEBUG',
 

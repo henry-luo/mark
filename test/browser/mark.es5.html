@@ -5,7 +5,19 @@
 	<script>console.log('test'); </script>
 	<script src='../../dist/mark.es5.js'></script>
 	<script>
-		console.log('Mark object constructor.name: ', Mark.parse('{obj}').constructor.name);
+	function loadXml() {
+		// make sync AJAX call
+		var xhReq = new XMLHttpRequest();
+		xhReq.open("GET", "book.xml", false);
+		xhReq.send(null);
+		var xml = xhReq.responseText;  console.log('xml:', xml);
+		return xml;
+	}
+	console.log('Mark object constructor.name: ', Mark.parse('{obj}').constructor.name);
+	// parse XML
+	var src = loadXml(); 
+	var obj = Mark.parse(src, {format:'xml'});
+	console.log('Parse xml obj.constructor.name: ', obj.constructor.name);	
 	</script>
 </head>
 </html>
