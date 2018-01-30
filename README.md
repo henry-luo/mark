@@ -3,9 +3,26 @@
 
 *Objective Markup Notation*, abbreviated as **Mark** or **{mark}**, is a new unified notation for both object and markup data. The notation is a superset of what can be represented by JSON, HTML and XML, but overcomes many limitations these popular data formats, yet still having a very clean syntax and simple data model.
 
-## Mark Sample
+## Mark Example
 
-Below is a sample Mark object, representing a simple registration form:
+For example, a HTML registration form:
+
+```
+<form>
+  <!-- comment -->
+  <div class="form-group">
+    <label for="email">Email address:</label>
+    <input type="email" id="email">
+  </div>
+  <div class="form-group">
+    <label for="pwd">Password</label>
+    <input type="password" id:"pwd">
+  </div>
+  <button class='btn btn-info'>Submit</button>
+</form>
+```
+
+Represented in Mark would be:
 
 ```text
 {form                                   // object type-name 'form'
@@ -106,7 +123,7 @@ console.log("Greeting from Mark: " + Mark.stringify(obj));
 </script>
 ```
 
-*(Note: comparing to mark.js under the root directory, /dist/mark.js has bundled mark.convert.js and mark.selector.js and all dependencies with it, and is meant to run in browser. The entire script is about 12K after gzip.)*
+*(Note: comparing to mark.js under the root directory, /dist/mark.js has bundled mark.convert.js and mark.selector.js and all dependencies with it, and is meant to run in browser. The entire script is about 12K after gzip. And if you need to support legacy browsers, like IE11, without proper ES6 support, you can link to /dist/mark.es5.js)*
 
 ## Documentation
 

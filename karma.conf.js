@@ -15,8 +15,8 @@ module.exports = function(karma) {
       'test/*.js': ['browserify']
     },
 
-    browsers: ['IE'], // 'Chrome', 'Edge', 'IE', 'Firefox'
-    browserConsoleLogOptions: {level: 'error', format: '%b %T: %m', terminal: false},	
+    browsers: ['IE', 'Edge', 'Chrome', 'Firefox'],
+    //browserConsoleLogOptions: {level: 'error', format: '%b %T: %m', terminal: false},	
 
     //logLevel: 'LOG_DEBUG',
 

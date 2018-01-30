@@ -37,9 +37,9 @@ Mark object extends JSON object with a type name and a list of content objects. 
 
 A Mark object essentially contains 3 facets of data in its data model:
 
-- **type name**: a string that represent the type name of the Mark object, which is like element name in HTML/XML. It can be accessed as `markObj.constructor.name` under JS.
-- **properties**: a collection of name-value pairs, like properties of JSON objects, and attributes of HTML/XML elements. They can be accessed as `markObj.prop` under JS. One restriction, comparing to arbitrary JSON object is that the property name cannot be numeric, which is reserved for the content objects.
-- **contents**: an ordered list of content objects, which are like child nodes of elements in HTML/XML. They can be accessed as `markObj[index]` under JS. Mark utilizes a *novel* feature of JS that JS object can be array-like. It can store both named properties and indexed properties.
+- **type name**: a string that represent the type name of the Mark object, which is like element name in HTML/XML. 
+- **properties**: a collection of name-value pairs, like properties of JSON objects, and attributes of HTML/XML elements. One restriction, comparing to arbitrary JSON object is that the property name cannot be numeric, which is reserved for the content objects.
+- **contents**: an ordered list of content objects, which are like child nodes of elements in HTML/XML. Mark utilizes a *novel* feature of JS that JS object can be array-like. It can store both named properties and indexed properties.
 
 Mark has some restrictions on the objects that can be stored in the content:
 
@@ -54,8 +54,8 @@ These restrictions are defined so that Mark content model can align with that of
 Mark object constructor:
 
 - `Mark(type_name, properties, contents, parent)`: Mark object constructor takes 4 parameters, except `type_name`, the other 3 are optional.
-  - `type_name`: a string, which will be set as `constructor.name` on the object.
-  - `properties`: a JSON object containing name-value pairs. Numeric property keys are skipped.
+  - `type_name`: a string.
+  - `properties`: a JSON object containing name-value pairs. Numeric property keys are ignored.
   - `contents`: an array of content objects. Null values are skipped, primitive values are converted into strings, arrays will be flattened, and consecutive strings will be merged into one.
   - `parent`: for constructing a hierarchical DOM. If you intent to navigate the result data model using CSS selector, then you should supply this parameter.
 
@@ -77,9 +77,10 @@ Besides the POJO behaviors of the Mark object, there are some additional prototy
 - `some(callback, thisArg)`: similar to JS `Array.prototype.some` that iterates through the content items.
 - `push(item, ...)`: similar to JS `Array.prototype.push` that pushes item(s) at the end of the contents.
 - `pop(item)`: pop an item from the end of contents.
-- `shift(item)`: shift out an item from the beginning of the contents.
-- `unshift(item, ...)`: similar to JS `Array.prototype.unshift` that unshifts item(s) to the beginning of the contents.
+- `insert(item, index)`: inserts the given item(s) at the given `index`. If `index` is omitted, it defaults to 0.
 - `remove(index)`: removes the content item at the given `index`.
+
+When these API functions are overridden by properties of same name, you can still call them from the prototype, e.g.`Mark.prototype.length.call(markObj)`.
 
 ### 2.2 Static API
 
@@ -88,14 +89,12 @@ There are a few important API functions defined on the static Mark object:
 - `Mark.parse('string', reviver)`: similar to `JSON.parse` that parses a string into Mark object. It takes an optional parameter reviver function, which is provided for backward compatibility with JSON API.
 - `Mark.stringify(markObj, replacer, space)`: similar to `JSON.stringify` that serialize the Mark object back into string. `replacer` and `space` are optional parameters provided for backward compatibility with JSON API.
 
-Then all the Mark.prototype functions above are also linked static Mark object, so that when these prototype functions are overridden by properties of same name, they can still be conveniently invoked on the Mark object, i.e. instead of calling `markObj.__proto__.length.call(markObj)`, you can call `Mark.length.call(markObj)`.
-
 ### 2.3 Converter API
 
 These are additional prototype functions implemented in `mark.converter.js`, for mapping Mark into other formats:
 
-- `markObj.toHtml()`: serializes the Mark object into HTML.
-- `markObj.toXml()`: serializes the Mark object into XML.
+- `markObj.html()`: serializes the Mark object into HTML.
+- `markObj.xml()`: serializes the Mark object into XML.
 
 ### 2.4 Selector API
 

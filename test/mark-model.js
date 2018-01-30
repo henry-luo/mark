@@ -39,7 +39,7 @@ test('Mark object model', function(assert) {
 	// length and prop('length')
 	div = Mark.parse('{div length:12, width:20 "text"}');
 	assert.equal(div.length, 12, "length property of Mark object should be 12");
-	// assert.equal(Mark.length.call(div), 1, "length of Mark object should be 1");
+	assert.equal(Mark.prototype.length.call(div), 1, "length of Mark object should be 1");
 	assert.equal(div.contents().length, 1, "length of Mark object contents should be 1");
 	assert.equal(div.prop('length'), 12, "length property of Mark object should be 12");
 	assert.looseEqual(Object.keys(div), ['length','width'], "Mark object keys() should be ['length', 'width']");
@@ -62,7 +62,7 @@ test('Mark object model', function(assert) {
 	assert.equal(Array.isArray(div_contents), true, "Mark object div contents isArray() should be true");
 	assert.equal(JSON.stringify(div_contents), '["text"]', "Mark object div contents should be ['text']");
 	assert.equal(arrayEqual(div_contents, ["text"]), true, "Mark object div contents should be ['text']");
-	
+		
 	// filter
 	div = Mark.parse('{div "text" {br} "more" {b "bold"} {!-- comment --}}');
 	assert.deepEqual(div.filter(n => typeof n === 'string'), ["text", "more"], "Mark filter API");
@@ -76,6 +76,12 @@ test('Mark object model', function(assert) {
 	// some
 	assert.equal(div.some(n => n.constructor && n.constructor.name == 'b'), true, "Mark some API");
 	assert.equal(div.some(n => n.constructor && n.constructor.name == 'div'), false, "Mark some API");
+	
+	// direct content assignment
+	var div = Mark.parse('{div "text"}');
+	div[0] = Mark('br');
+	assert.equal(Mark.stringify(div), '{div {br}}', "Set Mark content");
+	assert.looseEqual(allInKeys(div), [], "Set Mark content");
 	
 	// push API
 	assert.equal(Mark.parse('{div}').push("text"), 1, "push text into Mark object");
@@ -99,11 +105,20 @@ test('Mark object model', function(assert) {
 	div.pop();  item = div.pop();
 	assert.equal(item, undefined, "undefiend after pop");
 	
+	// insert API
+	div = Mark.parse('{div {br} {p}}');
+	assert.equal(Mark.stringify(div.insert('test')), '{div "test" {br} {p}}', "Mark insert text");
+	assert.equal(Mark.stringify(div.insert(['test', Mark.parse('{br}')], 2)), '{div "test" {br} "test" {br} {p}}', "Mark insert items");
+	
 	// remove API
-	div = Mark.parse('{div "text" {br} {p}}');  var item = div.remove(1);
+	div = Mark.parse('{div "text" {br} {p}}');  div.remove(1);
 	assert.equal(Mark.stringify(div), '{div "text" {p}}', "Mark remove() test");
 	assert.equal(div.length(), 2, "div length after delete should be 2");
-	assert.equal(Mark.stringify(item), "{br}", "item deleted should be {br}");
+	
+	// source API
+	div = Mark.parse('{div width:10 "text"}');
+	assert.equal(div.source(), '{div width:10 "text"}', "Mark source()");
+	assert.equal(Mark.stringify(div.source('{div class:"bold" "text" {br} {p}}')), '{div class:"bold" "text" {br} {p}}', "Mark set source()");
 	
 	// isName
 	assert.equal(Mark.isName(123), false, "123 is not name");
@@ -112,35 +127,6 @@ test('Mark object model', function(assert) {
 	assert.equal(Mark.isName('$name_-.'), true, "$name_-. is valid name");
 	
 	assert.end();
-});
-
-test('Mark shift() API', function(assert) {
-	var div = Mark.parse('{div "text" {br}}');  var item = div.shift();
-	assert.equal(item, 'text', "shift from Mark object");
-	assert.equal(div.length(), 1, "length should be 1 after shift");
-	assert.equal(Mark.stringify(div), '{div {br}}', "shift from Mark object");
-	assert.deepEqual(Object.keys(div), [], "length should not be enumerable after shift");
-	div.shift();  item = div.shift();
-	assert.equal(item, undefined, "undefiend after shift");	
-	assert.end();
-});
-
-test('Mark unshift() API', function(assert) {
-	var div = Mark.parse('{div "text"}');  var len = div.unshift(Mark('br'), Mark('p'));
-	assert.equal(len, 3, "length after unshift should be 3");
-	assert.equal(Mark.stringify(div), '{div {br} {p} "text"}', "unshift to Mark object");
-	assert.deepEqual(Object.keys(div), [], "length should not be enumerable after unshift");
-	div.unshift();  // unshift push 
-	assert.equal(Mark.stringify(div), '{div {br} {p} "text"}', "unshift to Mark object");
-	assert.end();	
-});
-
-test('Mark operation', function(assert) {
-	var div = Mark.parse('{div "text"}');
-	div[0] = Mark('br');
-	assert.equal(Mark.stringify(div), '{div {br}}', "Set Mark content");
-	assert.looseEqual(allInKeys(div), [], "Set Mark content");
-	assert.end();	
 });
 
 test('Mark pragma model', function(assert) {

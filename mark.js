@@ -87,6 +87,22 @@ var MARK = (function() {
 		if (parent) { obj[$parent] = parent; }
 		return obj;
 	};
+	
+	// reset content of this object
+	function replaceWith(trg, obj) {
+		console.log('src obj:', obj);
+		// reset properties and contents
+		for (let p in trg) { if (typeof trg[p] !== 'function') delete trg[p]; }
+		for (let i=0, len=trg[$length]; i<len; i++) { delete trg[i]; }  console.log('obj afte reset:', trg);
+		// copy over new constructr, properties and contents
+		Object.setPrototypeOf(trg, Object.getPrototypeOf(obj));
+		for (let p in obj) { trg[p] = obj[p]; }
+		var length = obj[$length];
+		for (let i=0; i<length; i++) {
+			Object.defineProperty(trg, i, {value:obj[i], writable:true, configurable:true}); // make content item non-enumerable
+		}
+		trg[$length] = length;  console.log('obj afte copy:', trg);
+	}
 		
 	// Mark object API functions
 	var api = {
@@ -120,11 +136,11 @@ var MARK = (function() {
 			else return this[$pragma];
 		},
 		
-		// should push be alias as 'append'?
+		// todo: do content normalization
 		push: function() {
 			// copy the arguments
-			var length = this[$length];
-			for (var i=0; i<arguments.length; i++) {
+			let length = this[$length];
+			for (let i=0; i<arguments.length; i++) {
 				Object.defineProperty(this, length+i, {value:arguments[i], writable:true, configurable:true}); // make content item non-enumerable
 			}
 			length += arguments.length;
@@ -132,57 +148,49 @@ var MARK = (function() {
 			return length;
 		},
 		pop: function() {
-			var length = this[$length];
+			let length = this[$length];
 			if (length > 0) {
-				var item = this[length-1];  delete this[length-1];
+				let item = this[length-1];  delete this[length-1];
 				this[$length] = length - 1;
 				return item;
 			} else {
 				return undefined;
 			}
 		},
-		shift: function() {
-			var length = this[$length];
-			if (length > 0) {
-				var item = this[0];
-				for (var i=0; i<length-1; i++) {
-					Object.defineProperty(this, i, {value:this[i+1], writable:true, configurable:true});
+		// insert item(s) at the given index  // todo: do content normalization
+		insert: function(item, index) {
+			index = index || 0;
+			let length = this[$length];
+			if (index < 0 || index > length) { throw "Invalid index"; }
+			let offset = item instanceof Array ? item.length:1;
+			// shift items after index
+			for (let i=length-1; i>=index; i--) {
+				Object.defineProperty(this, i+offset, {value:this[i], writable:true, configurable:true});  // make content item non-enumerable
+			}
+			// insert items
+			if (offset > 1) {
+				for (let i=0; i<offset; i++) {
+					Object.defineProperty(this, index+i, {value:item[i], writable:true, configurable:true});  // make content item non-enumerable
 				}
-				this[$length] = length - 1;
-				return item;
 			} else {
-				return undefined;
+				Object.defineProperty(this, index, {value:item, writable:true, configurable:true});  // make content item non-enumerable
 			}
+			this[$length] = length + offset;
+			return this; // for call chaining
 		},
-		// should unshift be aliased as 'prepand'?
-		unshift: function() {
-			var args = arguments.length;  var length = this[$length];
-			if (args) {
-				// shift the items
-				for (var i = length+args-1; i > args-1; i--) {
-					Object.defineProperty(this, i, {value:this[i-args], writable:true, configurable:true});
-				}
-				// copy the arguments
-				for (var i=0; i<args; i++) {
-					Object.defineProperty(this, i, {value:arguments[i], writable:true, configurable:true});
-				}
-				this[$length] = length += args;
-			}
-			return length;
-		},
+		// can consider support 2nd param of cnt (for no. of items to remove)
+		// consider remove self
 		remove: function(index) {
-			var deleted;
 			if (arguments.length) {
 				// shift the items
 				var length = this[$length];
 				if (index >=0 && index < length) {
-					deleted = this[index];
 					for (var i = index; i < length - 1; i++) { this[i] = this[i+1]; }
 					this[$length] = length - 1;
 				}
 				// else invalid index
 			}
-			return deleted;
+			return this; // for call chaining
 		},
 		// todo: another useful jQuery API?
 
@@ -262,15 +270,35 @@ var MARK = (function() {
 		},
 		
 		// conversion APIs
-		toHtml: function() {
-			// load helper on demand
-			if (!MARK.$convert) { MARK.$convert = require('./lib/mark.convert.js')(Mark); }
-			return MARK.$convert.toHtml(this);
+		source: function() {
+			// get the source
+			if (!arguments.length) { return MARK.stringify(this); }
+			// set the source
+			replaceWith(this, MARK.parse(arguments[0]));
+			return this;  // for call chaining
 		},
-		toXml: function() {
-			// load helper on demand
-			if (!MARK.$convert) { MARK.$convert = require('./lib/mark.convert.js')(Mark); }
-			return MARK.$convert.toXml(this);
+		// json: function() {}
+		html: function() {
+			if (!arguments.length) { // get html source
+				// load helper on demand
+				if (!MARK.$convert) { MARK.$convert = require('./lib/mark.convert.js')(Mark); }
+				return MARK.$convert.toHtml(this);
+			} else { // set html source
+				let options = arguments[1] || {};  options.format = 'html';
+				replaceWith(this, MARK.parse(arguments[0], options));
+				return this;  // for call chaining
+			}
+		},
+		xml: function() {
+			if (!arguments.length) { // get xml source
+				// load helper on demand
+				if (!MARK.$convert) { MARK.$convert = require('./lib/mark.convert.js')(Mark); }
+				return MARK.$convert.toXml(this);
+			} else { // set html source
+				let options = arguments[1] || {};  options.format = 'xml';
+				replaceWith(this, MARK.parse(arguments[0], options));
+				return this;  // for call chaining
+			}
 		},		
 	}
 	// set the APIs
@@ -279,13 +307,15 @@ var MARK = (function() {
 		// Mark.prototype[a] = api[a];  // direct assignment will make the API functions enumerable
 		Object.defineProperty(Mark.prototype, a, func);  // make API functions non-enumerable
 		
-		// also set the APIs on static MARK object 
+		// no longer set the APIs on static MARK object, as 'length' cannot be overridden in IE11
 		// note: 'length' is non-writable in node, and non-configurable in IE
+		/*
 		try {
 			Object.defineProperty(Mark, a, func);
 		} catch (error) {
 			Mark[a] = api[a]; // 'length' is non-configurable in IE
 		}
+		*/
 	}
 	
 	// define additional APIs on Mark prototype
