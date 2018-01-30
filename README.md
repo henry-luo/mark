@@ -123,11 +123,12 @@ console.log("Greeting from Mark: " + Mark.stringify(obj));
 </script>
 ```
 
-*(Note: comparing to mark.js under the root directory, /dist/mark.js has bundled mark.convert.js and mark.selector.js and all dependencies with it, and is meant to run in browser. The entire script is about 12K after gzip. And if you need to support legacy browsers, like IE11, without proper ES6 support, you can link to /dist/mark.es5.js)*
+*(Note: /dist/mark.js has bundled mark.convert.js and mark.selector.js and all dependencies with it, and is meant to run in browser. The entire script is about 13K after gzip. And if you need to support legacy browsers, like IE11, which does not have proper ES6 support, you can link to /dist/mark.es5.js)*
 
 ## Documentation
 
 - Detailed [syntax specification](docs/mark-syntax.md);
 - Detailed [data model and API specification](docs/mark-model.md); 
 - Mark CLI; *(being developed)*
+
 
