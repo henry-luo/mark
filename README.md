@@ -132,3 +132,12 @@ console.log("Greeting from Mark: " + Mark.stringify(obj));
 - Mark CLI; *(being developed)*
 
 
+## Credits
+
+Credits to the following platforms that support the open source development of Mark:
+
+- NPM and GitHub;
+
+
+- [Travis CI](https://travis-ci.org/);
+- [BrowserStack](https://www.browserstack.com);
