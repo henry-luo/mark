@@ -1,6 +1,3 @@
-<style>
-pre.highlight { background-color:#fff; }
-</style>
 <h1 style='font-family:Helvetica,Arial,sans-serif'>{mark}</h1>
 <img src='https://api.travis-ci.org/henry-luo/mark.svg?branch=master'>
 
@@ -10,7 +7,7 @@ pre.highlight { background-color:#fff; }
 
 For example, a HTML registration form:
 
-```
+```html
 <form>
   <!-- comment -->
   <div class="form-group">
@@ -110,7 +107,7 @@ npm install mark-js --save
 
 Then in your node script, use it as:
 
-```
+```js
 const Mark = require('mark-js');
 var obj = Mark.parse(`{div {span 'Hello World!' }}`);
 console.log("Greeting from Mark: " + Mark.stringify(obj));
@@ -118,7 +115,7 @@ console.log("Greeting from Mark: " + Mark.stringify(obj));
 
 To use the library in browser, you can include the `mark.js` under `/dist` directory into your html page, like:
 
-```
+```html
 <script src='mark.js'></script>
 <script>
 var obj = Mark.parse(`{div {span 'Hello World!' }}`);  // using ES6 backtick
