@@ -24,7 +24,7 @@ For example, a HTML registration form:
 
 Represented in Mark would be:
 
-```text
+```json
 {form                                   // object type-name 'form'
   {!-- comment --}                      // Mark pragma, similar to HTML comment
   {div class:"form-group"               // nested Mark object
