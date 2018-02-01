@@ -1,3 +1,6 @@
+<style>
+pre.highlight { background-color:#fff; }
+</style>
 <h1 style='font-family:Helvetica,Arial,sans-serif'>{mark}</h1>
 <img src='https://api.travis-ci.org/henry-luo/mark.svg?branch=master'>
 
@@ -123,11 +126,28 @@ console.log("Greeting from Mark: " + Mark.stringify(obj));
 </script>
 ```
 
-*(Note: comparing to mark.js under the root directory, /dist/mark.js has bundled mark.convert.js and mark.selector.js and all dependencies with it, and is meant to run in browser. The entire script is about 12K after gzip. And if you need to support legacy browsers, like IE11, without proper ES6 support, you can link to /dist/mark.es5.js)*
+*(Note: /dist/mark.js has bundled mark.convert.js and mark.selector.js and all dependencies with it, and is meant to run in browser. The entire script is about 13K after gzip. And if you need to support legacy browsers, like IE11, which does not have proper ES6 support, you can link to /dist/mark.es5.js)*
 
 ## Documentation
 
-- Detailed [syntax specification](mark-syntax.md);
-- Detailed [data model and API specification](mark-model.md); 
+- [Syntax specification](mark-syntax.md)
+- [Data model and API specification](mark-model.md)
+- Examples:
+  - You can take look at all the [test scripts](https://github.com/henry-luo/mark/tree/master/test), which also serve as basic demonstration of API usage.
+  - [Mark HTML example](https://plnkr.co/edit/DCgNxf?p=preview)
+  - [Mark conversion example](https://plnkr.co/edit/cMSCW3?p=preview)
 - Mark CLI; *(being developed)*
 
+
+## Credits
+
+Credits to the following platforms or services that support the open source development of Mark:
+
+- NPM and GitHub;
+
+
+- [Travis CI](https://travis-ci.org/);
+- [BrowserStack](https://www.browserstack.com);
+- [jsDelivr](https://www.jsdelivr.com/);
+- [Plunker](https://plnkr.co/);
+- [JS.org](https://js.org/);
