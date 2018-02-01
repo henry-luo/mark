@@ -24,7 +24,7 @@ For example, a HTML registration form:
 
 Represented in Mark would be:
 
-```json
+```text
 {form                                   // object type-name 'form'
   {!-- comment --}                      // Mark pragma, similar to HTML comment
   {div class:"form-group"               // nested Mark object
@@ -141,8 +141,6 @@ console.log("Greeting from Mark: " + Mark.stringify(obj));
 Credits to the following platforms or services that support the open source development of Mark:
 
 - NPM and GitHub;
-
-
 - [Travis CI](https://travis-ci.org/);
 - [BrowserStack](https://www.browserstack.com);
 - [jsDelivr](https://www.jsdelivr.com/);
