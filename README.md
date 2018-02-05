@@ -113,7 +113,7 @@ Comparing to XML, Mark has the following advantages:
 
 S-expression from Lisp gave rise to novel ideas like high-order composition, self-hosting program. The clean and flexible syntax of Mark make it ideal for many such applications (e.g. [Mark Template](https://github.com/henry-luo/mark-template), a new JS template engine using Mark for its template syntax).
 
-The advantage of Mark over S-expressions is that it is more modern, and can directly run in browser and node.js environments.
+The advantage of Mark over S-expressions is that it takes a more modern, JS-first approach in its design, and can be more conveniently used in web and node.js environments.
 
 ## mark.js
 
