@@ -8,6 +8,15 @@
 - It has built-in **mixed content** support *(like HTML5 or even better)*
 - It supports **high-order** composition *(like S-expressions or even better)*
 
+|                        | Mark                | JSON     | HTML | XML     | S-expr  | YAML                             |
+| ---------------------- | ------------------- | -------- | ---- | ------- | ------- | -------------------------------- |
+| Clean syntax           | yes                 | yes      | no   | verbose | yes     | yes <sub>(for basic usage)</sub> |
+| Fully-typed            | yes                 | yes      | no   | no      | yes     | yes                              |
+| Generic                | yes                 | yes      | no   | yes     | -       | yes                              |
+| Mixed content support  | yes                 | hard     | yes  | yes     | -       | hard                             |
+| High-order composition | yes                 | possible | no   | verbose | yes     | ?                                |
+| Wide adoption          | not (at the moment) | yes      | yes  | yes     | limited | limited                          |
+
 ## Mark Syntax
 
 The major syntax extension Mark makes to JSON is the introduction of a Mark object. It is a JSON object extended with a type name and a list of content items, similar to element in HTML and XML.
@@ -50,7 +59,7 @@ Could be represented in Mark as:
 }
 ```
 
-You can refer to the [syntax spec](mark-syntax.md) for details.
+You can refer to the [syntax spec](https://mark.js.org/mark-syntax.html) for details.
 
 ## Mark Data Model
 
@@ -64,7 +73,7 @@ Mark utilizes a novel feature in JavaScript that an plain JS object is actually 
 
 So each Mark object is mapped to just **one** plain JavaScript object, which is more compact and efficient comparing to other JSON-based DOM models (e.g. [JsonML](http://www.jsonml.org/), [virtual-dom](https://github.com/Matt-Esch/virtual-dom)), and more intuitive to used in JS.
 
-You can refer to the [data model spec](mark-model.md) for details.
+You can refer to the [data model spec](https://mark.js.org/mark-model.html) for details.
 
 ## Mark vs. JSON
 
@@ -144,8 +153,8 @@ console.log("Greeting from Mark: " + Mark.stringify(obj));
 
 ## Documentation
 
-- [Syntax specification](mark-syntax.md)
-- [Data model and API specification](mark-model.md)
+- [Syntax specification](https://mark.js.org/mark-syntax.html)
+- [Data model and API specification](https://mark.js.org/mark-model.html)
 - Examples:
   - You can take a look at all the [test scripts](https://github.com/henry-luo/mark/tree/master/test), which also serve as basic demonstration of API usage.
   - [Mark HTML example](https://plnkr.co/edit/DCgNxf?p=preview)
