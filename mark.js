@@ -899,7 +899,7 @@ MARK.parse = (function() {
 						next();
 						return MARK.pragma(pragma, parent);
 					}				
-					else if (ch === '\\') { // as html, xml comment may contain '{' and '}'
+					else if (ch === '\\') { // escape '{' or '}', as html, xml comment may contain '{' and '}'
 						next();
 						if (ch !== '{' && ch !== '}') { pragma += '\\'; }
 					}

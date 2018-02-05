@@ -1,6 +1,6 @@
 # Mark Data Model and APIs
 
-Mark has a very simple data model. It is an extension to the JSON data model. Mark extends JSON data model with 2 new data types: **Mark pragma** and **Mark object**.
+Mark has a simple and fully-typed data model. It is an extension to the JSON data model. Mark extends JSON data model with 2 new data types: **Mark pragma** and **Mark object**.
 
 Mark's data model is designed so that a well-formed HTML or XML document can be converted into Mark document without any loss in data model.
 
@@ -8,9 +8,9 @@ Roughly speaking, JSON, HTML and XML data models are subset of Mark data model, 
 
 ## 1. Mark Pragma
 
-Mark pragma is just a special text string when data model is concerned. The interpretation of the text content stored in the pragma object is left up to the application. Mark pragma can be thought of like comment in HTML and processing instruction in XML.
+Mark pragma is just a simple object with string content when data model is concerned. The interpretation of the text content stored in the pragma object is left up to the application. Mark pragma can be thought of like comment in HTML and processing instruction in XML.
 
-### 1.1 vs. Mark comment
+### 1.1 Pragma vs. Comment
 
 Mark comment is only a lexical construct. All Mark comments are thrown away during parsing, and they do not appear in the parsed data model.
 
@@ -22,7 +22,7 @@ Mark pragma constructor:
 
 - `Mark.pragma(value, parent)`: constructs a pragma object with the given `value` string. `parent` is an optional parameter. If you want the result data model to be a hierarchical DOM (so that it can be queried with CSS-like selector), then you should supply this `parent` parameter. The parent should be a Mark object.
 
-The constructed pragma is a special JS object. It's does not have a constructor. `typeof pragmaObj === 'object'`, however `pragmaObj.constructor` is `undefined`. It has the following API functions:
+The constructed pragma is a special JS object. It's does not have a constructor, like other normal JS objects. `typeof pragmaObj === 'object'`, however `pragmaObj.constructor` is `undefined`. It has the following API functions:
 
 - `pragmaObj.pragma(value)`: when parameter `value` is not supplied, it returns the content string stored in the pragma; when the parameter `value` is supplied, it sets the content in the pragma, and returns the pragma itself.
 - `pragmaObj.parent(parent)`:  when parameter `parent` is not supplied, it returns the parent object of the pragma; when the parameter `parent` is supplied, it sets the parent object of the pragma, and returns the pragma itself.
@@ -47,7 +47,7 @@ Mark has some restrictions on the objects that can be stored in the content:
 - `Array`, `number`, `boolean` and `null` values are not allowed in Mark content.
 - Consecutive strings must be merged into one string.
 
-These restrictions are defined so that Mark content model can align with that of HTML and XML element content model.
+These restrictions are defined so that Mark content model can align with that of HTML and XML.
 
 ### 2.1 Core API
 
@@ -65,7 +65,7 @@ The constructed Mark object is just a simple POJO. So basically:
 - `properties`: can be accessed through `markObj.prop` or `markObj['prop']` when `prop` is not a proper JS identifier. You can also use JS `for ... in` loop to iterate through the properties. Unlike normal JS array, Mark object has been specially constructed so that Mark contents are not enumerable, thus do not appear in `for ... in` loop.
 - `contents`: can be accessed through `markObj[index]`. You can also use JS `for ... of` loop to iterate through the content items.
 
-Besides the POJO behaviors of the Mark object, there are some additional prototype functions defined to work with the data model:
+Besides the above POJO behaviors, there are some additional prototype functions defined to work with the data model:
 
 - `prop(name, value)`: without `value` parameter, it gets the value of the named property; with the `value` parameter, it sets the value of the named property, and returns current object. Comparing to setting property directly using `markObj.prop` or `markObj['prop']`, this is a safer method as it ensures that the key is not numeric.
 - `length()`: returns the number of content items stored in the Mark object.
@@ -80,7 +80,7 @@ Besides the POJO behaviors of the Mark object, there are some additional prototy
 - `insert(item, index)`: inserts the given item(s) at the given `index`. If `index` is omitted, it defaults to 0.
 - `remove(index)`: removes the content item at the given `index`.
 
-When these API functions are overridden by properties of same name, you can still call them from the prototype, e.g.`Mark.prototype.length.call(markObj)`.
+When these API functions are overridden by properties of same name, you can still call them from the `Mark.prototype`, e.g.`Mark.prototype.length.call(markObj)`.
 
 ### 2.2 Static API
 

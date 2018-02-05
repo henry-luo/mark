@@ -7,7 +7,7 @@ Mark syntax is a superset of JSON. The primary extension that Mark makes to JSON
 Below are the key grammar rules for the new Mark object in BNF notation:
 
 ```BNF
-Mark ::= ws value ws
+Mark ::= value     /* root */
 
 value ::= null | boolean | number | string | array | json_object | mark_object | mark_pragma
 
@@ -41,21 +41,21 @@ begin_identifier ::= [a-zA-Z] | '_' | '$'
 continue_identifier ::= begin_identifier | digit | '-' | '.'
 ```
 
-- Property keys can be unquoted if they’re valid identifiers. Yes, even reserved keywords (like `default`) are valid unquoted keys in Mark. However, it is recommended that you avoid using JS keywords, and JS and Mark object prototype method names as property keys, as they could cause confusion, inconvenience and even errors (as the underlying methods are overridden).
-- Comparing to JSON5 and JS identifiers, Mark identifier allows dash '-' and dot '.' in it. These two special characters are commonly used in markup data, like HTML, CSS, XML.
+- Property keys can be unquoted if they’re valid identifiers. Yes, even reserved keywords (like `default`) are valid unquoted keys in Mark. However, it is recommended that you avoid using JS keywords, and JS and Mark object prototype function names as property keys, as they could cause confusion, inconvenience and even errors (as the underlying functions are overridden).
+- Comparing to JSON5 and JS identifiers, Mark identifier allows dash '-' and dot '.' in it. These two special characters added as they are commonly used in markup formats, like HTML, CSS, XML.
 - Property keys can also be single or double quoted.
-- Property keys **must not be a number**, as they are reserved for indexed Mark contents.
+- Property keys **must not be a number**, which is reserved for Mark object contents.
 - Last property can have trailing comma.
 
 ## 2. Mark Pragma
 
-Another syntax extension to JSON is Mark pragma, it is a sequence of characters enclosed in '{' and '}'. It can contain any character except '{' and '}', which need to be escaped using backslash '\'.
+Mark pragma, it is a sequence of characters enclosed in '{' and '}', as long as it is not a valid JSON or Mark object. It can contain any character in it except '{' and '}', which need to be escaped using backslash '\'.
 
 ```BNF
 mark_pragma ::= '{' pchar_no_brace+ '}'
 ```
 
-It is designed to support markup content like HTML comment and XML processing instruction.
+It is designed to support markup content like comment in HTML and processing instruction in XML.
 
 ## 3. Other Syntax Extensions to JSON
 
@@ -77,7 +77,7 @@ Other syntax extensions made to JSON are pretty much just syntax sugars. Most of
 - Numbers can begin or end with a (leading or trailing) decimal point.
 - Numbers can include `Infinity`, `-Infinity`,  `NaN`, and `-NaN`.
 - Numbers can begin with an explicit plus sign.
-- *Note: Mark does not support hexadecimal integer. This is the only feature that Mark omits from JSON5.*
+- *(Mark does not support hexadecimal integer. This is a feature that Mark omits from JSON5.)*
 
 ### 3.4 Comments
 

@@ -3,14 +3,14 @@
 
 *Objective Markup Notation*, abbreviated as **Mark** or **{mark}**, is a new unified notation for both object and markup data. The notation is a superset of what can be represented by JSON, HTML and XML, but overcomes many limitations these popular data formats, yet still having a very clean syntax and simple data model.
 
-- It has **clean syntax** with **fully-type** data model (like JSON or even better)
-- It is **generic** and **extensible** (like XML or even better)
-- It has built-in **mixed content** support (like HTML5 or even better)
-- It supports **high-order** composition (like S-expressions or even better)
+- It has **clean syntax** with **fully-type** data model *(like JSON or even better)*
+- It is **generic** and **extensible** *(like XML or even better)*
+- It has built-in **mixed content** support *(like HTML5 or even better)*
+- It supports **high-order** composition *(like S-expressions or even better)*
 
 ## Mark Syntax
 
-The major syntax extension Mark makes to JSON is the introduction of a Mark object. It is a JSON object extended with a type name and a list of content items, like element in HTML and XML.
+The major syntax extension Mark makes to JSON is the introduction of a Mark object. It is a JSON object extended with a type name and a list of content items, similar to element in HTML and XML.
 
 For example, a HTML registration form:
 
@@ -62,7 +62,7 @@ Mark object has a very simple and fully-typed data model. Each Mark object has 3
 
 Mark utilizes a novel feature in JavaScript that an plain JS object is actually *array-like*, it can contain both named properties and indexed properties.
 
-So each Mark object is mapped to just **one** plain JavaScript object, which is more compact and efficient comparing to other JSON-based DOM models *(e.g. [JsonML](http://www.jsonml.org/), [virtual-dom](https://github.com/Matt-Esch/virtual-dom))*, and more intuitive to used in JS.
+So each Mark object is mapped to just **one** plain JavaScript object, which is more compact and efficient comparing to other JSON-based DOM models (e.g. [JsonML](http://www.jsonml.org/), [virtual-dom](https://github.com/Matt-Esch/virtual-dom)), and more intuitive to used in JS.
 
 You can refer to the [data model spec](docs/mark-model.md) for details.
 
@@ -102,9 +102,9 @@ Comparing to XML, Mark has the following advantages:
 
 ## Mark vs. S-expressions
 
-S-expression from Lisp gave rise to novel ideas like high-order composition, self-hosting program. The clean and flexible syntax of Mark mark it ideal for many such applications (e.g. [Mark Template](https://github.com/henry-luo/mark-template), a new JS template engine using Mark for its template syntax).
+S-expression from Lisp gave rise to novel ideas like high-order composition, self-hosting program. The clean and flexible syntax of Mark make it ideal for many such applications (e.g. [Mark Template](https://github.com/henry-luo/mark-template), a new JS template engine using Mark for its template syntax).
 
-The advantage of Mark over S-epxression is that it is more modern, and can directly run in browser and node.js environments.
+The advantage of Mark over S-expressions is that it is more modern, and can directly run in browser and node.js environments.
 
 ## mark.js
 
@@ -147,10 +147,9 @@ console.log("Greeting from Mark: " + Mark.stringify(obj));
 - [Syntax specification](docs/mark-syntax.md)
 - [Data model and API specification](docs/mark-model.md)
 - Examples:
-  - You can take look at all the [test scripts](https://github.com/henry-luo/mark/tree/master/test), which also serve as basic demonstration of API usage.
+  - You can take a look at all the [test scripts](https://github.com/henry-luo/mark/tree/master/test), which also serve as basic demonstration of API usage.
   - [Mark HTML example](https://plnkr.co/edit/DCgNxf?p=preview)
   - [Mark conversion example](https://plnkr.co/edit/cMSCW3?p=preview)
-- Mark CLI; *(being developed)*
 
 
 ## Applications of Mark
