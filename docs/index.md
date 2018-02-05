@@ -3,7 +3,14 @@
 
 *Objective Markup Notation*, abbreviated as **Mark** or **{mark}**, is a new unified notation for both object and markup data. The notation is a superset of what can be represented by JSON, HTML and XML, but overcomes many limitations these popular data formats, yet still having a very clean syntax and simple data model.
 
-## Mark Example
+- It has **clean syntax** with **fully-type** data model (like JSON or even better)
+- It is **generic** and **extensible** (like XML or even better)
+- It has built-in **mixed content** support (like HTML5 or even better)
+- It supports **high-order** composition (like S-expressions or even better)
+
+## Mark Syntax
+
+The major syntax extension Mark makes to JSON is the introduction of a Mark object. It is a JSON object extended with a type name and a list of content items, like element in HTML and XML.
 
 For example, a HTML registration form:
 
@@ -16,13 +23,13 @@ For example, a HTML registration form:
   </div>
   <div class="form-group">
     <label for="pwd">Password</label>
-    <input type="password" id:"pwd">
+    <input type="password" id="pwd">
   </div>
   <button class='btn btn-info'>Submit</button>
 </form>
 ```
 
-Represented in Mark would be:
+Could be represented in Mark as:
 
 ```text
 {form                                   // object type-name 'form'
@@ -43,9 +50,11 @@ Represented in Mark would be:
 }
 ```
 
+You can refer to the [syntax spec](mark-syntax.md) for details.
+
 ## Mark Data Model
 
-Mark object has a very clean and simple data model. Each Mark object has 3 facets of data:
+Mark object has a very simple and fully-typed data model. Each Mark object has 3 facets of data:
 
 - **Type name**, which is mapped to `object.constructor.name` under JavaScript.
 - **Properties**, which is a collection of key-value pairs, stored as normal JavaScript *named properties*.
@@ -53,7 +62,9 @@ Mark object has a very clean and simple data model. Each Mark object has 3 facet
 
 Mark utilizes a novel feature in JavaScript that an plain JS object is actually *array-like*, it can contain both named properties and indexed properties.
 
-So each Mark object is mapped to just one plain JavaScript object, which is very compact and efficient comparing to other DOM models. *(Many JS virtual-dom implementations need to represent one DOM element with at least 3 objects: the main object, one JSON object for the properties, and one array object for the contents.)*
+So each Mark object is mapped to just **one** plain JavaScript object, which is more compact and efficient comparing to other JSON-based DOM models *(e.g. [JsonML](http://www.jsonml.org/), [virtual-dom](https://github.com/Matt-Esch/virtual-dom))*, and more intuitive to used in JS.
+
+You can refer to the [data model spec](mark-model.md) for details.
 
 ## Mark vs. JSON
 
@@ -67,7 +78,7 @@ Comparing to JSON, Mark has the following advantages:
 
 Some disadvantages of Mark, comparing to JSON would be:
 
-- It is no longer a strict subset of JavaScript in syntax, although a Mark object is still a simple POJO.
+- It is no longer a subset of JavaScript in syntax, although a Mark object is still a simple POJO in data model.
 - It does not yet have wide support, like JSON, at the moment.
 
 ## Mark vs. HTML
@@ -76,9 +87,9 @@ Comparing to HTML, Mark has the following advantages:
 
 - Mark is a generic data format, whereas HTML is a specialized format for web content.
 - It does not have whitespace ambiguity, as the text objects need to be quoted explicitly. Thus Mark can be minified or prettified without worrying about changing the underlying content.
-- Its properties can have complex values, like JSON, not just quoted string values in HTML.
+- Its properties can have complex values, like JSON, not just quoted string values as in HTML.
 - It has a very clean syntax, whereas HTML5 parsing can be challenging even with HTML5 spec.
-- Its objects are always properly closed, like JSON and XHTML; whereas HTML self-closing tag rules are non-extensible and error-prone.
+- Its objects are always properly closed; whereas HTML self-closing tag syntax is non-extensible and error-prone.
 - The DOM produced under Mark model, is just a hierarchy of POJO objects, which can be easily processed using the built-in JS functions or 3rd party libraries, making Mark an ideal candidate for virtual DOM and other application usages.
 
 ## Mark vs. XML
@@ -86,8 +97,14 @@ Comparing to HTML, Mark has the following advantages:
 Comparing to XML, Mark has the following advantages:
 
 - Mark properties can have complex object as value; whereas XML attribute values always need to be quoted and cannot have complex object as value, which is not flexible in syntax and data model.
-- Mark syntax is much cleaner than XML. It does not have all the legacy things like DTD, and it does not have whitespace ambiguity.
+- Mark syntax is much cleaner than XML. It does not have whitespace ambiguity. It does not have all the legacy things like DTD.
 - The data model produced by Mark is fully typed, like JSON; whereas XML is only semi-typed without schema.
+
+## Mark vs. S-expressions
+
+S-expression from Lisp gave rise to novel ideas like high-order composition, self-hosting program. The clean and flexible syntax of Mark mark it ideal for many such applications (e.g. [Mark Template](https://github.com/henry-luo/mark-template), a new JS template engine using Mark for its template syntax).
+
+The advantage of Mark over S-epxression is that it is more modern, and can directly run in browser and node.js environments.
 
 ## mark.js
 
@@ -135,6 +152,10 @@ console.log("Greeting from Mark: " + Mark.stringify(obj));
   - [Mark conversion example](https://plnkr.co/edit/cMSCW3?p=preview)
 - Mark CLI; *(being developed)*
 
+
+## Applications of Mark
+
+- [Mark Template](https://github.com/henry-luo/mark-template): a JS template engine inspired by JSX and XSLT, using Mark for the template syntax.
 
 ## Credits
 

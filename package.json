@@ -1,6 +1,6 @@
 {
   "name": "mark-js",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "The core library for working with Mark, an unified notation for both object and markup data.",
   "main": "mark.js",
   "directories": {
@@ -45,7 +45,11 @@
     "json5",
     "parser",
     "stringify",
-    "xml"
+	"html",
+    "xml",
+	"jsonml",
+	"virtual-dom",
+	"s-expression"
   ],
   "author": "Henry Luo",
   "license": "MIT",
