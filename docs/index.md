@@ -8,14 +8,14 @@
 - It has built-in **mixed content** support *(like HTML5 or even better)*
 - It supports **high-order** composition *(like S-expressions or even better)*
 
-|                        | Mark                           | JSON     | HTML | XML                            | S-expr  | YAML                                  |
-| ---------------------- | ------------------------------ | -------- | ---- | ------------------------------ | ------- | ------------------------------------- |
-| Clean syntax           | yes                            | yes      | no   | verbose                        | yes     | yes <sub>(only for basic usage)</sub> |
-| Fully-typed            | yes                            | yes      | no   | no <sub>(when no schema)</sub> | yes     | yes                                   |
-| Generic                | yes                            | yes      | no   | yes                            | -       | yes                                   |
-| Mixed content support  | yes                            | hard     | yes  | yes                            | -       | hard                                  |
-| High-order composition | yes                            | possible | no   | verbose                        | yes     | ?                                     |
-| Wide adoption          | not <sub>(at the moment)</sub> | yes      | yes  | yes                            | limited | limited                               |
+|                        | Mark                           | JSON     | HTML | XML                            | S-expr                             | YAML                                  |
+| ---------------------- | ------------------------------ | -------- | ---- | ------------------------------ | ---------------------------------- | ------------------------------------- |
+| Clean syntax           | yes                            | yes      | no   | verbose                        | yes                                | yes <sub>(only for basic usage)</sub> |
+| Fully-typed            | yes                            | yes      | no   | no <sub>(when no schema)</sub> | yes                                | yes                                   |
+| Generic                | yes                            | yes      | no   | yes                            | yes                                | yes                                   |
+| Mixed content support  | yes                            | hard     | yes  | yes                            | hard <sub>(poor map support)</sub> | hard                                  |
+| High-order composition | yes                            | possible | no   | verbose                        | yes                                | ?                                     |
+| Wide adoption          | not <sub>(at the moment)</sub> | yes      | yes  | yes                            | limited                            | limited                               |
 
 ## Mark Syntax
 
