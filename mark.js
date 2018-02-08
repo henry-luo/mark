@@ -90,10 +90,10 @@ var MARK = (function() {
 	
 	// reset content of this object
 	function replaceWith(trg, obj) {
-		console.log('src obj:', obj);
+		// console.log('src obj:', obj);
 		// reset properties and contents
 		for (let p in trg) { if (typeof trg[p] !== 'function') delete trg[p]; }
-		for (let i=0, len=trg[$length]; i<len; i++) { delete trg[i]; }  console.log('obj afte reset:', trg);
+		for (let i=0, len=trg[$length]; i<len; i++) { delete trg[i]; }  // console.log('obj afte reset:', trg);
 		// copy over new constructr, properties and contents
 		Object.setPrototypeOf(trg, Object.getPrototypeOf(obj));
 		for (let p in obj) { trg[p] = obj[p]; }
@@ -101,7 +101,7 @@ var MARK = (function() {
 		for (let i=0; i<length; i++) {
 			Object.defineProperty(trg, i, {value:obj[i], writable:true, configurable:true}); // make content item non-enumerable
 		}
-		trg[$length] = length;  console.log('obj afte copy:', trg);
+		trg[$length] = length;  // console.log('obj afte copy:', trg);
 	}
 		
 	// Mark object API functions
@@ -741,20 +741,16 @@ MARK.parse = (function() {
 					next();
 					return array;   // Potentially empty array
 				}
-				// ES5 allows omitting elements in arrays, e.g. [,] and [,null]. We don't allow this in Mark.
+				// ES5 allows omitting elements in arrays, e.g. [,] and [,null]. JSON and Mark don't allow this.
 				if (ch === ',') {
 					error("Missing array element");
 				} else {
 					array.push(value());
 				}
 				white();
-				// If there's no comma after this value, this needs to be the end of the array.
-				if (ch !== ',') {
-					next(']');
-					return array;
-				}
-				next(',');
-				white();
+				
+				// comma is optional in Mark
+				if (ch === ',') { next();  white(); }
 			}
         },
 
@@ -867,10 +863,12 @@ MARK.parse = (function() {
 						}
 						obj[key] = val;
 						white();
+						// ',' is optional in Mark
 						if (ch === ',') {
 							next();  white();
 						} 
-						else if (ch === '}') { // end of the object
+						/*
+						if (ch === '}') { // end of the object
 							next();
 							if (extended) { obj[$length] = index; }
 							return obj;   // potentially empty object
@@ -881,6 +879,7 @@ MARK.parse = (function() {
 						} else {
 							error("Expect character ':'");						
 						}
+						*/
 					} else {
 						error("Bad object");
 					}

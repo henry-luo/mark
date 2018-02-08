@@ -2,13 +2,16 @@
 const Mark = require('./../mark.js');
 
 test('Parse Mark object', function(assert) {
+	// test array
+	assert.deepEqual(Mark.parse("[1 true 'text']"), [1, true, 'text'], "Comma is optional in Mark array");
+	assert.deepEqual(Mark.parse("[1 true, 'text']"), [1, true, 'text'], "Comma is optional in Mark array");
+	
+	// test name
 	assert.equal(Mark.parse('{obj}').constructor.name, 'obj', "Mark object constructor.name should be 'obj'");
 	assert.equal(Mark.parse('{HTML}').constructor.name, 'HTML', "Mark object constructor.name should be 'HTML'");
 	assert.equal(Mark.parse('{this.name}').constructor.name, 'this.name', "Mark object name can have '.'");
 	assert.equal(Mark.parse('{data-table}').constructor.name, 'data-table', "Mark object name can have '-'");
 	assert.equal(Mark.parse('{"obj":"value"}').constructor.name, "Object", "JSON object constructor should be 'Object'");
-	
-	// test name
 	assert.equal(Mark.parse('{$obj_name}').constructor.name, '$obj_name', "Mark object constructor.name should be '$obj_name'");
 	assert.equal(Mark.parse('{UPPER.CASE}').constructor.name, 'UPPER.CASE', "Mark object constructor.name should be 'UPPER'");
 	assert.equal(Mark.parse('{_dashed-name}').constructor.name, '_dashed-name', "Mark object constructor.name should be '_dashed-name'");
@@ -17,6 +20,7 @@ test('Parse Mark object', function(assert) {
 	assert.equal(Mark.parse('{"quoted name"}').constructor.name, 'quoted name', "Mark object constructor.name should be 'quoted name'");
 	
 	// test properties
+	assert.equal(Mark.parse("{div style:{color:'red' width:'100px' height:50}}").style.width, '100px', "comma between properties optional");
 	assert.equal(Mark.parse('{div margin:-10}').margin, -10, "Object margin should be -10");
 	assert.equal(Mark.parse('{div margin:+10}').margin, +10, "Object margin should be +10");
 	assert.equal(Mark.parse('{div style:{border-width:"10px"}}').style['border-width'], "10px", 'Object {div style:{width:"10px"}}.style["border-width"] should be "10px"');

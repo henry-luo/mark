@@ -15,7 +15,7 @@ mark_object ::= '{' type_name properties contents '}'
 
 type_name ::= key
 
-properties ::= (property (',' property)* ','?)?
+properties ::= (property ','?)*
 
 contents ::= (text | json_object | mark_object | mark_pragma)*
 
@@ -44,8 +44,8 @@ continue_identifier ::= begin_identifier | digit | '-' | '.'
 - Property keys can be unquoted if they’re valid identifiers. Yes, even reserved keywords (like `default`) are valid unquoted keys in Mark. However, it is recommended that you avoid using JS keywords, and JS and Mark object prototype function names as property keys, as they could cause confusion, inconvenience and even errors (as the underlying functions are overridden).
 - Comparing to JSON5 and JS identifiers, Mark identifier allows dash '-' and dot '.' in it. These two special characters added as they are commonly used in markup formats, like HTML, CSS, XML.
 - Property keys can also be single or double quoted.
-- Property keys **must not be a number**, which is reserved for Mark object contents.
-- Last property can have trailing comma.
+- Property keys **must not be a number**, which is reserved for Mark object contents. (This restriction does not apply to JSON properties.)
+- Comma between properties are optional, and last property can have trailing comma.
 
 ## 2. Mark Pragma
 
@@ -63,7 +63,7 @@ Other syntax extensions made to JSON are pretty much just syntax sugars. Most of
 
 ### 3.1 Arrays
 
-- Arrays can have trailing comma.
+- Comma between array items are optional, and array can have a trailing comma.
 
 ### 3.2 Strings
 

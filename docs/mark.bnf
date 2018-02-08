@@ -101,15 +101,13 @@ escape ::= '\'                 /* backslash */
 
 /*-- array ------------------------------------------------------*/
 
-array ::= begin_array (value (value_separator value)* value_sep_opt)? end_array
+array ::= begin_array (value value_separator?)* end_array
 
 begin_array     ::= ws '[' ws
 
 end_array       ::= ws ']' ws
 
 value_separator ::= ws ',' ws
-
-value_sep_opt   ::= (value_separator)?
 
 /*-- JSON object ------------------------------------------------------*/
 
@@ -119,7 +117,7 @@ begin_object ::= ws '{' ws
 
 end_object ::= ws '}' ws
 
-properties ::= (property (value_separator property)* value_sep_opt)?
+properties ::= (property value_separator?)*
 
 property ::= key separator value
 

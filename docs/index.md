@@ -47,13 +47,13 @@ Could be represented in Mark as:
     {label for:"email"                  // object with property 'for'
       "Email address:"                  // text needs to be quoted
     }
-    {input type:"email", id:"email"}    // object without any contents
+    {input type:"email" id:"email"}    // object without any contents
   }
   {div class:"form-group"
     {label for:"pwd" "Password"}
-    {input type:"password", id:"pwd"}
+    {input type:"password" id:"pwd"}
   }
-  {button class:['btn','btn-info']      // property with complex values
+  {button class:['btn' 'btn-info']      // property with complex values
     'Submit'                            // text quoted with single quote
   }
 }
