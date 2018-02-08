@@ -17,5 +17,7 @@ test('Stringify Mark object', function(assert) {
 	assert.equal(Mark.stringify(Mark.parse('{div {width:10}}')), '{div {width:10}}', "Stringify {div {width:10}}");
 	// stringify with identation
 	assert.equal(Mark.stringify(Mark.parse('{div width:10 "test"}'), null, '  '), '{div width:10 \n  "test"\n}', "Stringify with ident");
+	// stringify omit comma
+	assert.equal(Mark.stringify(Mark.parse('{div width:10 height:"15px" margin:[5 10 10 5]}'), {omitComma:true}), '{div width:10 height:"15px" margin:[5 10 10 5]}', "Stringify without comma");
 	assert.end() ;
 });

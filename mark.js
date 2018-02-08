@@ -983,10 +983,12 @@ MARK.parse = (function() {
 
 // stringify() is only defined on the static Mark API
 // Mark stringify will not quote keys where appropriate
-MARK.stringify = function(obj, replacer, space) {
+MARK.stringify = function(obj, options, space) {
 	"use strict";
-    if (replacer && (typeof(replacer) !== "function" && !isArray(replacer))) {
-        throw new Error('Replacer must be a function or an array');
+	var replacer = null;
+    if (options) {
+		if (typeof options === "function" || isArray(options)) { replacer = options; }
+		else if (typeof options !== "object") throw new Error('Option must be a function or an object');
     }
     var getReplacedValueOrUndefined = function(holder, key, isTopLevel) {
         var value = holder[key];
@@ -1058,6 +1060,7 @@ MARK.stringify = function(obj, replacer, space) {
             // ignore space parameter
         }
     }
+	var omitComma = options && options.omitComma;
 
     // Copied from Crokford's implementation of JSON
     // See https://github.com/douglascrockford/JSON-js/blob/e39db4b7e6249f04a195e7dd0840e610cc9e941e/json2.js#L195
@@ -1129,7 +1132,7 @@ MARK.stringify = function(obj, replacer, space) {
                             buffer += res;
                         }
                         if (i < obj_part.length-1) {
-                            buffer += ",";
+                            buffer += omitComma ? ' ':',';
                         } else if (indentStr) {
                             buffer += "\n";
                         }
@@ -1164,7 +1167,7 @@ MARK.stringify = function(obj, replacer, space) {
 						if (typeof value !== "undefined" && value !== null) {
 							// buffer += makeIndent(indentStr, objStack.length);                            
 							key = MARK.isName(prop) ? prop : escapeString(prop);
-							buffer += (hasAttr ? ', ':(nonEmpty ? ' ':''))+ key +":" + value;
+							buffer += (hasAttr ? (omitComma ? ' ':', '):(nonEmpty ? ' ':''))+ key +":"+ value;
 							hasAttr = true;  nonEmpty = true;
 						}
                     }
