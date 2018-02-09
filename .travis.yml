@@ -5,7 +5,8 @@ node_js:
   
 install:
   - npm install -g codecov
-  - npm install -g istanbul 
+  - npm install -g istanbul
+  - npm install boolbase
 script:
   - istanbul cover -x lib/css-select/** -x dev/** node_modules/tape/bin/tape ./test/*.js
   - codecov
