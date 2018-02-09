@@ -16,6 +16,7 @@
   },
   "scripts": {
     "test": "clear && tape test/*.js | tap-spec",
+	"test-dev": "clear && tape dev/test/*.js | tap-spec",
     "coverage": "istanbul cover -v --config .istanbul.yml node_modules/tape/bin/tape ./test/*.js",
     "karma": "clear && karma start",
     "buble": "buble mark.js > mark.es5.js",
