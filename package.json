@@ -16,7 +16,7 @@
   },
   "scripts": {
     "test": "clear && tape test/*.js | tap-spec",
-    "coverage": "istanbul cover -v -x lib/css-select/** -x dev/** node_modules/tape/bin/tape ./test/*.js",
+    "coverage": "istanbul cover -v --config .istanbul.yml node_modules/tape/bin/tape ./test/*.js",
     "karma": "clear && karma start",
     "buble": "buble mark.js > mark.es5.js",
     "build": "npm-run-all --parallel build-core build-convert build-selector && npm run build-mark",

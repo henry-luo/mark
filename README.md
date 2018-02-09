@@ -174,6 +174,7 @@ Credits to the following platforms or services that support the open source deve
 
 - NPM and GitHub;
 - [Travis CI](https://travis-ci.org/);
+- [Codecov](https://codecov.io/);
 - [BrowserStack](https://www.browserstack.com);
 - [jsDelivr](https://www.jsdelivr.com/);
 - [Plunker](https://plnkr.co/);
