@@ -16,8 +16,8 @@
   },
   "scripts": {
     "test": "clear && tape test/*.js | tap-spec",
-    "test-coverage": "istanbul cover -x lib/css-select/** -x dev/** node_modules/tape/bin/tape ./test/*.js",
-    "test-karma": "clear && karma start",
+    "coverage": "istanbul cover -x lib/css-select/** -x dev/** node_modules/tape/bin/tape ./test/*.js",
+    "karma": "clear && karma start",
     "buble": "buble mark.js > mark.es5.js",
     "build": "npm-run-all --parallel build-core build-convert build-selector && npm run build-mark",
     "build-core": "browserify -x ./lib/mark.convert.js -x ./lib/mark.selector.js -x htmlparser2 --standalone Mark mark.js | uglifyjs > dist/mark.core.js",
