@@ -19,22 +19,24 @@ function loadXml() {
 
 test('Parse XML under JSDOM', function(assert) {
 	var src = loadXml();
-	
-	// setup 
-	global.window = (new JSDOM(``)).window;
-	global.document = window.document;
-	global.DOMParser = window.DOMParser;
+	if (typeof window === 'undefined') { 
+		// setup 
+		global.window = (new JSDOM(``)).window;
+		global.document = window.document;
+		global.DOMParser = window.DOMParser;
 
-	var obj = Mark.parse(src, {format:'xml', ignoreSpace:true});  // console.log('parsed xml', Mark.stringify(obj));
-	assert.equal(obj.constructor.name, 'catalog', 'Parse xml');
-	assert.equal(obj.length(), 12, 'Parse xml');
-	assert.equal(obj[0].constructor.name, 'book', 'Parse xml');
-	var xml = obj.xml();
-	assert.equal(xml.replace(/ |\r|\n/g, ''), src.replace(/ |\r|\n/g, ''), 'Mark to xml');
-	
-	assert.equal(obj.xml('<?xml version="1.0" encoding="UTF-8"?><div><p>text</p></div>').source(), '{div {p "text"}}', "Test set xml()");
-	
-	// tear down
-	global.window = global.document = global.DOMParser = undefined;	
+		var obj = Mark.parse(src, {format:'xml', ignoreSpace:true});  // console.log('parsed xml', Mark.stringify(obj));
+		assert.equal(obj.constructor.name, 'catalog', 'Parse xml');
+		assert.equal(obj.length(), 12, 'Parse xml');
+		assert.equal(obj[0].constructor.name, 'book', 'Parse xml');
+		var xml = obj.xml();
+		assert.equal(xml.replace(/ |\r|\n/g, ''), src.replace(/ |\r|\n/g, ''), 'Mark to xml');
+		
+		assert.equal(obj.xml('<?xml version="1.0" encoding="UTF-8"?><div><p>text</p></div>').source(), '{div {p "text"}}', "Test set xml()");
+		
+		// tear down
+		global.window = global.document = global.DOMParser = undefined;	
+	}
+	// else skip test under browser
 	assert.end() ;
 });
