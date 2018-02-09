@@ -3,3 +3,8 @@ language: node_js
 node_js:
   - stable
   
+install:
+  - npm install -g codecov
+script:
+  - istanbul cover -x lib/css-select/** -x dev/** node_modules/tape/bin/tape ./test/*.js
+  - codecov

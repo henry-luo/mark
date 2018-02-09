@@ -1,0 +1,3 @@
+ignore:
+  - "lib/css-select/**"
+  - "dev/**"

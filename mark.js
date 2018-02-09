@@ -1154,10 +1154,10 @@ MARK.stringify = function(obj, options, space) {
 						return obj_part[$pragma] ? '{' + obj_part[$pragma] + '}':
 							'null' /* unknown object */;
 					}
-					if (obj_part.constructor.name != 'Object') { 
+					if (obj_part.constructor.name !== 'Object' || obj_part instanceof MARK) { 
 						buffer += obj_part.constructor.name;  nonEmpty = true;
 					} 
-					// else // JSON 
+					// else JSON
 
 					// print object attributes
 					var hasAttr = false;

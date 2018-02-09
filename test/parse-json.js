@@ -17,5 +17,6 @@ test('Parse JSON object', function(assert) {
     });
 	assert.deepEqual(book, {"title":"JavaScript: The Definitive Guide", "author":"David Flanagan"}, 'Parse with reviver');	
 	
+	assert.deepEqual(Mark.stringify(Mark.parse('{Object}')), "{Object}", '{Object} is not JSON');
 	assert.end() ;
 });
