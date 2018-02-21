@@ -383,7 +383,7 @@ MARK.parse = (function() {
 		text,			// The text being parsed
 		
         escapee = {
-            "'":  "'",
+            "'":  "'",		// this is needed as we allows single quote
             '"':  '"',
             '\\': '\\',
             '/':  '/',

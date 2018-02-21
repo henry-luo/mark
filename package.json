@@ -34,7 +34,7 @@
     "list-mark": "browserify --full-paths -x htmlparser2 mark.js | discify --open",
     "dev": "watchify mark.js --standalone Mark -o dist/mark.js -v",
     "benchmark": "node test/perf/benchmark.js",
-    "gen-mark-diagram": "cp-cli dev/viewer.html node_modules/grammkit/template/viewer.html && grammkit docs/mark.bnf -o docs/mark-grammar.html"
+    "gen-grammar-diagram": "cp-cli dev/viewer.html node_modules/grammkit/template/viewer.html && grammkit docs/mark.bnf -o docs/mark-grammar.html"
   },
   "repository": {
     "type": "git",

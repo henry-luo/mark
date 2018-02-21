@@ -53,7 +53,9 @@ continue_identifier ::= begin_identifier | digit | '-' | '.'
 Mark pragma, it is a sequence of characters enclosed in '{' and '}', as long as it is not a valid JSON or Mark object. It can contain any character in it except '{', '}', ':' and ';', which need to be escaped using backslash '\'.
 
 ```BNF
-mark_pragma ::= '{' pchar_no_brace_colon+ '}'
+mark_pragma ::= '{' pragma_escape | pchar_no_brace_colon+ '}'
+
+pragma_escape ::= '\' ('{' | '}' | ':' | ';')
 ```
 
 It is designed to support markup content like comment in HTML and processing instruction in XML.
@@ -64,7 +66,7 @@ Other syntax extensions made to JSON are pretty much just syntax sugars. Most of
 
 ### 3.1 Arrays
 
-- Comma between array items are optional, and array can have a trailing comma.
+- Comma between array items are optional, and last item in array can have a trailing comma.
 
 ### 3.2 Strings
 

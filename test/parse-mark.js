@@ -62,6 +62,7 @@ test('Parse Mark object', function(assert) {
 	assert.equal(pragma.pragma(), "div '100%' 'text'!", "Mark pragma parsing that needs backtracking");
 	pragma = Mark.parse("{field name:'test', required:{this.context.user.hasRole('admin')}}");
 	assert.equal(pragma.required.pragma(), "this.context.user.hasRole('admin')", "Mark pragma parsing that needs backtracking");
+	assert.equal(Mark.parse(`{var t = "\r\n"}`).pragma(), `var t = "\r\n"`, "Mark pragma should preserve JS escape");
 	
 	// test multiline text
 	assert.equal(Mark.parse('{div "string"\n" 2nd line"\n\t\t" and 3rd"}')[0], "string 2nd line and 3rd", "Mark multiline text");

@@ -81,23 +81,22 @@ char ::= unescaped | escaped
 
 unescaped ::= [#x20-#x21] | [#x23-#x26] | [#x28-#x5B] | [#x5D-#x7E] | [#x80-#x10FFFF]
    
-escaped ::= escape (
-   [#x30] |             /* 0    nul             U+0000 */
-   [#x62] |             /* b    backspace       U+0008 */
-   [#x66] |             /* f    form feed       U+000C */
-   [#x6E] |             /* n    line feed       U+000A */
-   [#x72] |             /* r    carriage return U+000D */
-   [#x74] |             /* t    tab             U+0009 */
-   unicode|				/* uXXXX                U+XXXX */
-   [#x76] |             /* v    vtab            U+000B */
-   eol              	/* end-of-line -> empty string */
+escaped ::= '\' (
+   "'" |			/* this is needed as we allows single quote string */
+   '"' |
+   '\' |
+   '/' |
+   'b' |            /* b    backspace       U+0008 */
+   'f' |            /* f    form feed       U+000C */
+   'n' |            /* n    line feed       U+000A */
+   'r' |            /* r    carriage return U+000D */
+   't' |         	/* t    tab             U+0009 */
+   unicode			/* uXXXX                U+XXXX */
    )
 
 unicode ::= 'u' hexdig hexdig hexdig hexdig	
 
 hexdig ::= [0-9a-fA-F]
-
-escape ::= '\'                 /* backslash */
 
 /*-- array ------------------------------------------------------*/
 
@@ -142,7 +141,9 @@ contents ::= (text | json_object | mark_object | mark_pragma | ws)*
 
 text ::= (string ws)+   /* Mark text can be multiple consecutive strings */
 
-mark_pragma ::= '{' pchar_no_brace_colon+ '}'
+mark_pragma ::= '{' (pragma_escape | pchar_no_brace_colon)+ '}'
+
+pragma_escape ::= '\' ('{' | '}' | ':' | ';')
 
 pchar_no_brace_colon ::= [#x20-#x39] | [#x3C-#x7A] | '|' | [#x7E-#x10FFFF] /* Printable characters except {, }, :, ; */
 
