@@ -1,10 +1,10 @@
-<h1 style='font-family:Helvetica,Arial,sans-serif'>{mark}</h1>
+<h1 style='font-family:Helvetica,Arial,sans-serif'>Mark Notation</h1>
 
 [![npm version](https://badge.fury.io/js/mark-js.svg)](https://badge.fury.io/js/mark-js)
 [![Build Status](https://travis-ci.org/henry-luo/mark.svg?branch=master)](https://travis-ci.org/henry-luo/mark)
 [![codecov](https://codecov.io/gh/henry-luo/mark/branch/master/graph/badge.svg)](https://codecov.io/gh/henry-luo/mark)
 
-*Objective Markup Notation*, abbreviated as **Mark** or **{mark}**, is a new unified notation for both object and markup data. The notation is a superset of what can be represented by JSON, HTML and XML, but overcomes many limitations these popular data formats, yet still having a very clean syntax and simple data model.
+*Objective Markup Notation*, abbreviated as Mark Notation or, just **Mark**, is a new unified notation for both object and markup data. The notation is a superset of what can be represented by JSON, HTML and XML, but overcomes many limitations these popular data formats, yet still having a very clean syntax and simple data model.
 
 - It has **clean syntax** with **fully-type** data model *(like JSON or even better)*
 - It is **generic** and **extensible** *(like XML or even better)*
@@ -17,7 +17,7 @@
 | Fully-typed            | yes                            | yes      | no   | no <sub>(when no schema)</sub> | yes                                | yes                                   |
 | Generic                | yes                            | yes      | no   | yes                            | yes                                | yes                                   |
 | Mixed content support  | yes                            | hard     | yes  | yes                            | hard <sub>(poor map support)</sub> | hard                                  |
-| High-order composition | yes                            | possible | no   | verbose                        | yes                                | ?                                     |
+| High-order composition | yes                            | possible | no   | verbose                        | yes                                | possible                              |
 | Wide adoption          | not <sub>(at the moment)</sub> | yes      | yes  | yes                            | limited                            | limited                               |
 
 ## Mark Syntax
@@ -152,7 +152,9 @@ console.log("Greeting from Mark: " + Mark.stringify(obj));
 </script>
 ```
 
-*(Note: /dist/mark.js has bundled mark.convert.js and mark.selector.js and all dependencies with it, and is meant to run in browser. The entire script is about 13K after gzip. /dist/mark.js supports latest browsers, including Chrome, Safari, Firefox, Edge. If you need to support legacy browsers, like IE11, which does not have proper ES6 support, you need to use /dist/mark.es5.js. IE < 11 are not supported.)*
+*Note: /dist/mark.js has bundled mark.convert.js and mark.selector.js and all dependencies with it, and is meant to run in browser. The entire script is about 13K after gzip. /dist/mark.js supports latest browsers, including Chrome, Safari, Firefox, Edge.*
+
+*If you need to support legacy browsers, like IE11, which does not have proper ES6 support, you need to use /dist/mark.es5.js. IE < 11 are not supported.*
 
 ## Documentation
 
@@ -164,7 +166,7 @@ console.log("Greeting from Mark: " + Mark.stringify(obj));
   - [Mark conversion example](https://plnkr.co/edit/cMSCW3?p=preview)
 
 
-## Applications of Mark
+## Extensions and Applications of Mark
 
 - [Mark Template](https://github.com/henry-luo/mark-template): a JS template engine inspired by JSX and XSLT, using Mark for the template syntax.
 

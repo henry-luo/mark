@@ -46,13 +46,14 @@ continue_identifier ::= begin_identifier | digit | '-' | '.'
 - Property keys can also be single or double quoted.
 - Property keys **must not be a number**, which is reserved for Mark object contents. (This restriction does not apply to JSON properties.)
 - Comma between properties are optional, and last property can have trailing comma.
+- Property keys are **case-sensitive**.
 
 ## 2. Mark Pragma
 
-Mark pragma, it is a sequence of characters enclosed in '{' and '}', as long as it is not a valid JSON or Mark object. It can contain any character in it except '{' and '}', which need to be escaped using backslash '\'.
+Mark pragma, it is a sequence of characters enclosed in '{' and '}', as long as it is not a valid JSON or Mark object. It can contain any character in it except '{', '}', ':' and ';', which need to be escaped using backslash '\'.
 
 ```BNF
-mark_pragma ::= '{' pchar_no_brace+ '}'
+mark_pragma ::= '{' pchar_no_brace_colon+ '}'
 ```
 
 It is designed to support markup content like comment in HTML and processing instruction in XML.

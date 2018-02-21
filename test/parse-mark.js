@@ -58,8 +58,8 @@ test('Parse Mark object', function(assert) {
 	assert.equal(Mark.parse('{!-- comment with escape \\{\\} \\ --}').pragma(), "!-- comment with escape {} \\ --", "Mark pragma with escape");
 	assert.equal(Mark.parse('{div {!-- comment --} }')[0].pragma(), "!-- comment --", "Mark pragma as content");
 	assert.equal(Mark.parse("{'some text' + ' and more'}").pragma(), "'some text' + ' and more'", "Mark pragma parsing that needs backtracking");
-	let pragma = Mark.parse("{div width:'100%' 'text'!}");
-	assert.equal(pragma.pragma(), "div width:'100%' 'text'!", "Mark pragma parsing that needs backtracking");
+	let pragma = Mark.parse("{div '100%' 'text'!}");
+	assert.equal(pragma.pragma(), "div '100%' 'text'!", "Mark pragma parsing that needs backtracking");
 	pragma = Mark.parse("{field name:'test', required:{this.context.user.hasRole('admin')}}");
 	assert.equal(pragma.required.pragma(), "this.context.user.hasRole('admin')", "Mark pragma parsing that needs backtracking");
 	

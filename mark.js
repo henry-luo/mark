@@ -291,7 +291,7 @@ var MARK = (function() {
 				// load helper on demand
 				if (!MARK.$convert) { MARK.$convert = require('./lib/mark.convert.js')(Mark); }
 				return MARK.$convert.toXml(this);
-			} else { // set html source
+			} else { // set xml source
 				let options = arguments[1] || {};  options.format = 'xml';
 				replaceWith(this, MARK.parse(arguments[0], options));
 				return this;  // for call chaining
@@ -863,19 +863,6 @@ MARK.parse = (function() {
 						if (ch === ',') {
 							next();  white();
 						} 
-						/*
-						if (ch === '}') { // end of the object
-							next();
-							if (extended) { obj[$length] = index; }
-							return obj;   // potentially empty object
-						}
-						else if (extended && (ch === '"' || ch === "'" || ch === '{')) { 
-							parseContent();
-							return obj;
-						} else {
-							error("Expect character ':'");						
-						}
-						*/
 					} else {
 						error("Bad object");
 					}
@@ -894,12 +881,12 @@ MARK.parse = (function() {
 						next();
 						return MARK.pragma(pragma, parent);
 					}				
-					else if (ch === '\\') { // escape '{' or '}', as html, xml comment may contain '{' and '}'
+					else if (ch === '\\') { // escape '{', '}', ':', ';', as html, xml comment may contain these characters
 						next();
-						if (ch !== '{' && ch !== '}') { pragma += '\\'; }
+						if (ch !== '{' && ch !== '}' && ch !== ':' && ch !== ';') { pragma += '\\'; }
 					}
-					else if (ch === '{' || ch === '}') {
-						error("Brace character '"+ ch +"' should be escaped in Mark pragma");				
+					else if (ch === '{' || ch === '}' || ch === ':' || ch === ';') {
+						error("Character '"+ ch +"' should be escaped in Mark pragma");				
 					}
 					pragma += ch;
 					next();

@@ -142,9 +142,9 @@ contents ::= (text | json_object | mark_object | mark_pragma | ws)*
 
 text ::= (string ws)+   /* Mark text can be multiple consecutive strings */
 
-mark_pragma ::= '{' pchar_no_brace+ '}'
+mark_pragma ::= '{' pchar_no_brace_colon+ '}'
 
-pchar_no_brace ::= [#x20-#x7A] | '|' | [#x7E-#x10FFFF] /* Printable characters except {, } */
+pchar_no_brace_colon ::= [#x20-#x39] | [#x3C-#x7A] | '|' | [#x7E-#x10FFFF] /* Printable characters except {, }, :, ; */
 
 /*-- root ------------------------------------------------------*/
 
