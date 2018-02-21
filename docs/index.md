@@ -152,7 +152,7 @@ console.log("Greeting from Mark: " + Mark.stringify(obj));
 </script>
 ```
 
-*Note: /dist/mark.js has bundled mark.convert.js and mark.selector.js and all dependencies with it, and is meant to run in browser. The entire script is about 13K after gzip. /dist/mark.js supports latest browsers, including Chrome, Safari, Firefox, Edge.*
+*Note: /dist/mark.js has bundled mark.convert.js and mark.selector.js and all dependencies with it, and is meant to run in browser. The entire script is about 13K after gzip. It supports latest browsers, including Chrome, Safari, Firefox, Edge.*
 
 *If you need to support legacy browsers, like IE11, which does not have proper ES6 support, you need to use /dist/mark.es5.js. IE < 11 are not supported.*
 
