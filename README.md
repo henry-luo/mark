@@ -4,7 +4,7 @@
 [![Build Status](https://travis-ci.org/henry-luo/mark.svg?branch=master)](https://travis-ci.org/henry-luo/mark)
 [![codecov](https://codecov.io/gh/henry-luo/mark/branch/master/graph/badge.svg)](https://codecov.io/gh/henry-luo/mark)
 
-*Objective Markup Notation*, abbreviated as Mark Notation or, just **Mark**, is a new unified notation for both object and markup data. The notation is a superset of what can be represented by JSON, HTML and XML, but overcomes many limitations these popular data formats, yet still having a very clean syntax and simple data model.
+*Objective Markup Notation*, abbreviated as Mark Notation or just **Mark**, is a new unified notation for both object and markup data. The notation is a superset of what can be represented by JSON, HTML and XML, but overcomes many limitations these popular data formats, yet still having a very clean syntax and simple data model.
 
 - It has **clean syntax** with **fully-type** data model *(like JSON or even better)*
 - It is **generic** and **extensible** *(like XML or even better)*
@@ -154,7 +154,7 @@ console.log("Greeting from Mark: " + Mark.stringify(obj));
 
 *Note: /dist/mark.js has bundled mark.convert.js and mark.selector.js and all dependencies with it, and is meant to run in browser. The entire script is about 13K after gzip. It supports latest browsers, including Chrome, Safari, Firefox, Edge.*
 
-*If you need to support legacy browsers, like IE11, which does not have proper ES6 support, you need to use /dist/mark.es5.js. IE < 11 are not supported.*
+*If you need to support legacy browsers, like IE11, which do not have proper ES6 support, you need to use /dist/mark.es5.js. IE < 11 are not supported.*
 
 ## Documentation
 
@@ -172,12 +172,4 @@ console.log("Greeting from Mark: " + Mark.stringify(obj));
 
 ## Credits
 
-Credits to the following platforms or services that support the open source development of Mark:
-
-- NPM and GitHub;
-- [Travis CI](https://travis-ci.org/);
-- [Codecov](https://codecov.io/);
-- [BrowserStack](https://www.browserstack.com);
-- [jsDelivr](https://www.jsdelivr.com/);
-- [Plunker](https://plnkr.co/);
-- [JS.org](https://js.org/);
+Thanks to the following platforms or services that support the open source development of Mark: NPM, GitHub, [Travis CI](https://travis-ci.org/), [Codecov](https://codecov.io/), [BrowserStack](https://www.browserstack.com), [jsDelivr](https://www.jsdelivr.com/), [Plunker](https://plnkr.co/), [JS.org](https://js.org/).
