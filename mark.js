@@ -30,7 +30,6 @@ var MARK = (function() {
 			Object.defineProperty(con, 'name', {value:typeName, configurable:true}); // non-writable, as we don't want the name to be changed
 
 			// con.prototype.__proto__ = Array.prototype; // Mark no longer extends Array; Mark is array like, but not array.
-			
 			// con is set to extend Mark, instead of copying all the API functions
 			// for (let a in api) { Object.defineProperty(con.prototype, a, {value:api[a], writable:true, configurable:true}); } // make API functions non-enumerable
 			Object.setPrototypeOf(con.prototype, Mark.prototype);
@@ -41,8 +40,7 @@ var MARK = (function() {
 		
 		// 3. copy properties, numeric keys are not allowed
 		if (props) { 
-			for (let p in props) { 
-				// propsTraps.set(obj, p, props[p]); 
+			for (let p in props) {
 				// accept only non-numeric key
 				if (isNaN(p*1)) { obj[p] = props[p]; }
 			}
@@ -192,7 +190,6 @@ var MARK = (function() {
 			}
 			return this; // for call chaining
 		},
-		// todo: another useful jQuery API?
 
 		// filter: like Array.prototype.filter
 		filter: function(func, thisArg) {
@@ -327,10 +324,9 @@ var MARK = (function() {
 	
 	// Mark pragma constructor
 	Mark.pragma = function(pragma, parent) {
-		let obj = {}; // pragma has no other property or content
 		let con = constructors['!pragma'];
 		if (!con) {
-			con = {};  Object.setPrototypeOf(con, null);
+			con = Object.create(null);
 			Object.defineProperty(con, 'pragma', {value:api.pragma});
 			Object.defineProperty(con, 'parent', {value:api.parent});
 			Object.defineProperty(con, 'valueOf', {value:Object.valueOf});
@@ -338,7 +334,7 @@ var MARK = (function() {
 			// any other API?
 			constructors['!pragma'] = con;
 		}
-		Object.setPrototypeOf(obj, con);
+		let obj = Object.create(con);
 		obj[$pragma] = pragma;  // pragma conent stored as Symbol
 		if (parent) { obj[$parent] = parent; }
 		return obj;

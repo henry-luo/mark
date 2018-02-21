@@ -19,7 +19,7 @@ module.exports = function(karma) {
 		'test/*.js': ['browserify']
     },
 
-    browsers: ['IE', 'Edge', 'Chrome', 'Firefox'],
+    browsers: ['Edge', 'Chrome', 'Firefox'], // 'IE', 
     browserConsoleLogOptions: {level: 'error', format: '%b %T: %m', terminal: false},	
 
     //logLevel: 'LOG_DEBUG',
@@ -30,7 +30,8 @@ module.exports = function(karma) {
     // browserify configuration
     browserify: {
 		// debug: true,
-		transform:[['babelify', {presets:['es2015'], plugins:['transform-runtime']}]]
+		transform:
+			process.env.BROWSER == 'ie' ? [['babelify', {presets:['es2015'], plugins:['transform-runtime']}]]:[]
     }
   });
 };
