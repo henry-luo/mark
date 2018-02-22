@@ -278,8 +278,7 @@ var MARK = (function() {
 		html: function() {
 			if (!arguments.length) { // get html source
 				// load helper on demand
-				if (!MARK.$convert) { MARK.$convert = require('./lib/mark.convert.js')(Mark); }
-				return MARK.$convert.toHtml(this);
+				return MARK.stringify(this, {format:'html'});
 			} else { // set html source
 				let options = arguments[1] || {};  options.format = 'html';
 				replaceWith(this, MARK.parse(arguments[0], options));
@@ -289,8 +288,7 @@ var MARK = (function() {
 		xml: function() {
 			if (!arguments.length) { // get xml source
 				// load helper on demand
-				if (!MARK.$convert) { MARK.$convert = require('./lib/mark.convert.js')(Mark); }
-				return MARK.$convert.toXml(this);
+				return MARK.stringify(this, {format:'xml'});
 			} else { // set xml source
 				let options = arguments[1] || {};  options.format = 'xml';
 				replaceWith(this, MARK.parse(arguments[0], options));
@@ -946,11 +944,12 @@ MARK.parse = (function() {
             error("Syntax error");
         }
 		
-		// Supporting the legacy JSON reviver function:
+		// Mark does not support the legacy JSON reviver function:
 		// If there is a reviver function, we recursively walk the new structure,
 		// passing each name/value pair to the reviver function for possible
 		// transformation, starting with a temporary root object that holds the result
 		// in an empty key. If there is not a reviver function, we simply return the result.
+		/*
         return typeof options === 'function' ? (function walk(holder, key) {
             var k, v, value = holder[key];
             if (value && typeof value === 'object') {
@@ -967,13 +966,45 @@ MARK.parse = (function() {
             }
             return options.call(holder, key, value);
         }({'': result}, '')) : result;
+		*/
+		return result;
     };
 }());
 
 // stringify() is only defined on the static Mark API
 // Mark stringify will not quote keys where appropriate
-MARK.stringify = function(obj, options, space) {
+MARK.stringify = function(obj, options) {
 	"use strict";
+	
+	var indentStr, space, omitComma;
+	if (options)  {
+		if (options.format !== 'mark') {
+			// load helper on demand
+			if (!MARK.$convert) { MARK.$convert = require('./lib/mark.convert.js')(Mark); }
+			if (options.format === 'xml') return MARK.$convert.toXml(obj, options);
+			if (options.format === 'html') return MARK.$convert.toHtml(obj, options);
+		}
+		
+		// stringify as Mark
+		omitComma = options.omitComma;
+		space = options.space;
+		if (space) {
+			if (typeof space === "string") {
+				indentStr = space;
+			} else if (typeof space === "number" && space >= 0) {
+				indentStr = makeIndent(" ", space, true);
+			} else {
+				// ignore space parameter
+			}
+			// indentation step no more than 10 chars
+			if (indentStr && indentStr.length > 10) {
+				indentStr = indentStr.substring(0, 10);
+			}
+		}
+	}
+	
+	// Mark no longer supports replacer
+	/*
 	var replacer = null;
     if (options) {
 		if (typeof options === "function" || isArray(options)) { replacer = options; }
@@ -981,12 +1012,13 @@ MARK.stringify = function(obj, options, space) {
     }
     var getReplacedValueOrUndefined = function(holder, key, isTopLevel) {
         var value = holder[key];
-
-        // Replace the value with its toJSON value first, if possible
-        // if (value && value.toJSON && typeof value.toJSON === "function") {
+		
+		// toJSON call might not be secure, so we don't call it
+        // Replace the value with its toJSON value first, if possible 
+        // if (value && typeof value.toJSON === "function") {
         //    value = value.toJSON();
         // }
-
+		
         // If the user-supplied replacer if a function, call it. If it's an array, check objects' string keys for
         // presence in the array (removing the key/value pair from the resulting JSON if the key is missing).
         if (typeof(replacer) === "function") {
@@ -1001,6 +1033,7 @@ MARK.stringify = function(obj, options, space) {
             return value;
         }
     };
+	*/
 
     // polyfills
     function isArray(obj) {
@@ -1025,31 +1058,12 @@ MARK.stringify = function(obj, options, space) {
     }
 
     function makeIndent(str, num, noNewLine) {
-        if (!str) {
-            return "";
-        }
-        // indentation no more than 10 chars
-        if (str.length > 10) {
-            str = str.substring(0, 10);
-        }
         var indent = noNewLine ? "" : "\n";
         for (var i = 0; i < num; i++) {
             indent += str;
         }
         return indent;
     }
-
-    var indentStr;
-    if (space) {
-        if (typeof space === "string") {
-            indentStr = space;
-        } else if (typeof space === "number" && space >= 0) {
-            indentStr = makeIndent(" ", space, true);
-        } else {
-            // ignore space parameter
-        }
-    }
-	var omitComma = options && options.omitComma;
 
     // Copied from Crokford's implementation of JSON
     // See https://github.com/douglascrockford/JSON-js/blob/e39db4b7e6249f04a195e7dd0840e610cc9e941e/json2.js#L195
@@ -1073,18 +1087,16 @@ MARK.stringify = function(obj, options, space) {
         escapable.lastIndex = 0;
         return escapable.test(string) ? '"' + string.replace(escapable, function (a) {
             var c = meta[a];
-            return typeof c === 'string' ?
-                c :
-                '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
+            return typeof c === 'string' ? c : '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
         }) + '"' : '"' + string + '"';
     }
     // End
 
-    function internalStringify(holder, key, isTopLevel) {
+    function internalStringify(obj_part) {
         var buffer, res;
 
         // Replace the value, if necessary
-        var obj_part = getReplacedValueOrUndefined(holder, key, isTopLevel);
+        // var obj_part = holder[key]; // getReplacedValueOrUndefined(holder, key, isTopLevel);
 
         if (obj_part && !isDate(obj_part)) {
             // unbox objects, don't unbox dates, since will turn it into number
@@ -1104,16 +1116,16 @@ MARK.stringify = function(obj, options, space) {
                 return escapeString(obj_part.toString());
 
             case "object":
-                if (obj_part === null) {
+                if (obj_part === null) { // null value
                     return "null";
                 } 
-				else if (isArray(obj_part)) {
+				else if (isArray(obj_part)) { // Array
                     checkForCircular(obj_part);  // console.log('print array', obj_part);
                     buffer = "[";
                     objStack.push(obj_part);
 
                     for (var i = 0; i < obj_part.length; i++) {
-                        res = internalStringify(obj_part, i, false);
+                        res = internalStringify(obj_part[i]);
                         if (indentStr) buffer += makeIndent(indentStr, objStack.length);
                         if (res === null || typeof res === "undefined") {
                             buffer += "null";
@@ -1132,17 +1144,17 @@ MARK.stringify = function(obj, options, space) {
                     }
                     buffer += "]";
                 }
-				else {
+				else { // pragma or object
                     checkForCircular(obj_part);  // console.log('print obj', obj_part);
                     buffer = "{";
                     var nonEmpty = false;
-                    objStack.push(obj_part);
-					// print object type-name, if any
 					if (!obj_part.constructor) { // assume Mark pragma
 						// todo: should escape '{','}' in $pragma
-						return obj_part[$pragma] ? '{' + obj_part[$pragma] + '}':
-							'null' /* unknown object */;
+						return obj_part[$pragma] ? '{' + obj_part[$pragma] + '}' : 'null'/* unknown object */;
 					}
+					// Mark or JSON object
+					objStack.push(obj_part);
+					// print object type-name, if any
 					if (obj_part.constructor.name !== 'Object' || obj_part instanceof MARK) { 
 						buffer += obj_part.constructor.name;  nonEmpty = true;
 					} 
@@ -1151,11 +1163,10 @@ MARK.stringify = function(obj, options, space) {
 					// print object attributes
 					var hasAttr = false;
                     for (var prop in obj_part) {
-						var value = internalStringify(obj_part, prop, false);
-						isTopLevel = false;
-						if (typeof value !== "undefined" && value !== null) {
+						var value = internalStringify(obj_part[prop]);
+						if (typeof value !== "undefined") {
 							// buffer += makeIndent(indentStr, objStack.length);                            
-							key = MARK.isName(prop) ? prop : escapeString(prop);
+							var key = MARK.isName(prop) ? prop : escapeString(prop);
 							buffer += (hasAttr ? (omitComma ? ' ':', '):(nonEmpty ? ' ':''))+ key +":"+ value;
 							hasAttr = true;  nonEmpty = true;
 						}
@@ -1172,7 +1183,7 @@ MARK.stringify = function(obj, options, space) {
 							}
 							else if (typeof item === "object") {
 								if (indentStr) buffer += makeIndent(indentStr, objStack.length);
-								buffer += internalStringify({"":item}, '', false);
+								buffer += internalStringify(item);
 							}
 							else { console.log("unknown object", item); }
 						}
@@ -1193,14 +1204,10 @@ MARK.stringify = function(obj, options, space) {
         }
     }
 
-    // special case...when undefined is used inside of
-    // a compound object/array, return null.
+    // special case...when undefined is used inside of a compound object/array, return null.
     // but when top-level, return undefined
-    var topLevelHolder = {"":obj};
-    if (obj === undefined) {
-        return getReplacedValueOrUndefined(topLevelHolder, '', true);
-    }
-    return internalStringify(topLevelHolder, '', true);
+    if (obj === undefined) { return undefined; }
+    return internalStringify(obj);
 };
 
 // export the Mark interface

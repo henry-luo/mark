@@ -88,10 +88,12 @@ When these API functions are overridden by properties of same name, you can stil
 
 There are a few important API functions defined on the static Mark object:
 
-- `Mark.parse('string', reviver)`: similar to `JSON.parse` that parses a string into Mark object. It takes an optional parameter reviver function, which is provided for backward compatibility with JSON API.
-- `Mark.stringify(markObj, options, space)`: similar to `JSON.stringify` that serialize the Mark object back into string.
+- `Mark.parse('string', options)`: parses a string into Mark object. It takes an optional parameter `options`.
+- `Mark.stringify(markObj, options)`: serialize the Mark object back into string. It takes an optional parameter `options`.
   - `options.omitComma`: tells whether comma between properties and array items should be omitted in the output. Default: `false`.
-  - if `options` is a function, then it is a replacer. `replacer` and `space` are optional parameters provided for backward compatibility with JSON API.
+  - `options.space`: may be used to control spacing in the final string. If it is a number, successive levels in the stringification will each be indented by this many space characters (up to 10). If it is a string, successive levels will be indented by this string (or the first 10 characters of it).
+
+Mark does not support `reviver` function defined in `JSON.parse()`, and `replacer` function defined in `JSON.stringify()`. They are not structured nor secure way to serialize and deserialize custom data types.
 
 ### 2.3 Converter API
 

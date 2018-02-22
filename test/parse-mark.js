@@ -83,13 +83,5 @@ test('Parse Mark object', function(assert) {
 	assert.equal(Mark.parse('{div //comment\n}').constructor.name, "div", "Mark with line comment");
 	assert.equal(Mark.parse('{div /*comment*/}').constructor.name, "div", "Mark with block comment");
 	
-	// test JSON reviver
-	var book = Mark.parse('{book "title":"JavaScript: The Definitive Guide", "author":"David Flanagan", "edition":6}', function(name, value) {
-        if (name === 'edition') { return undefined; }
-        // otherwise return value
-        return value; 
-    });
-	assert.deepEqual(Mark.stringify(book), '{book title:"JavaScript: The Definitive Guide", author:"David Flanagan"}', 'Parse with reviver');	
-	
 	assert.end();
 });
