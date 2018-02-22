@@ -41,7 +41,7 @@ var MARK = (function() {
 		// 3. copy properties, numeric keys are not allowed
 		if (props) { 
 			for (let p in props) {
-				// accept only non-numeric key
+				// accept only non-numeric key; key should have no duplicate here
 				if (isNaN(p*1)) { obj[p] = props[p]; }
 			}
 		}
@@ -857,6 +857,9 @@ MARK.parse = (function() {
 						if (extended && !isNaN(key*1)) { // any numeric key is rejected for Mark object
 							error("Numeric key not allowed as Mark property name");
 						}
+						if (obj[key] && typeof obj[key] !== 'function') {
+							error("Duplicate key not allowed: " + key);
+						}
 						obj[key] = val;
 						white();
 						// ',' is optional in Mark
@@ -885,8 +888,11 @@ MARK.parse = (function() {
 						next();
 						if (ch !== '{' && ch !== '}' && ch !== ':' && ch !== ';') { pragma += '\\'; }
 					}
-					else if (ch === '{' || ch === '}' || ch === ':' || ch === ';') {
-						error("Character '"+ ch +"' should be escaped in Mark pragma");				
+					else if (ch === '{' || ch === '}' || ch === ':') {
+						throw e; // rethrow the error, assuming user wants to write JSON or Mark object
+					}
+					else if (ch === ';') {
+						error("Character ';' should be escaped in Mark pragma");
 					}
 					pragma += ch;
 					next();
