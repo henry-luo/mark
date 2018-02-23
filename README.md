@@ -76,9 +76,9 @@ Mark utilizes a novel feature in JavaScript that an plain JS object is actually 
 
 So each Mark object is mapped to just **one** plain JavaScript object, which is more compact and efficient comparing to other JSON-based DOM models (e.g. [JsonML](http://www.jsonml.org/), [virtual-dom](https://github.com/Matt-Esch/virtual-dom)), and more intuitive to used in JS.
 
-Roughly speaking, data model of JSON, XML/HTML are subset of Mark, and Mark data model is a subset of JS data model.
+Roughly speaking, data model of JSON, XML/HTML are subsets of Mark, and Mark data model is a subset of JS data model.
 
-![data-model](https://mark.js.org/docs/data-model.png)
+![data-model](https://mark.js.org/data-model.png)
 
 You can refer to the [data model spec](https://mark.js.org/mark-model.html) for details.
 
