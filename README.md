@@ -50,11 +50,11 @@ Could be represented in Mark as:
     {label for:"email"                  // object with property 'for'
       "Email address:"                  // text needs to be quoted
     }
-    {input type:"email" id:"email"}    // object without any contents
+    {input type:"email" id:"email"}     // object without any contents
   }
   {div class:"form-group"
     {label for:"pwd" "Password"}
-    {input type:"password" id:"pwd"}
+    {input type:"password" id:"pwd"}    // comma between properties is optional
   }
   {button class:['btn' 'btn-info']      // property with complex values
     'Submit'                            // text quoted with single quote
@@ -75,6 +75,10 @@ Mark object has a very simple and fully-typed data model. Each Mark object has 3
 Mark utilizes a novel feature in JavaScript that an plain JS object is actually *array-like*, it can contain both named properties and indexed properties.
 
 So each Mark object is mapped to just **one** plain JavaScript object, which is more compact and efficient comparing to other JSON-based DOM models (e.g. [JsonML](http://www.jsonml.org/), [virtual-dom](https://github.com/Matt-Esch/virtual-dom)), and more intuitive to used in JS.
+
+Roughly speaking, data model of JSON, XML/HTML are subset of Mark, and Mark data model is a subset of JS data model.
+
+![data-model](https://mark.js.org/docs/data-model.png)
 
 You can refer to the [data model spec](https://mark.js.org/mark-model.html) for details.
 
@@ -138,7 +142,7 @@ Then in your node script, use it as:
 
 ```js
 const Mark = require('mark-js');
-var obj = Mark.parse(`{div {span 'Hello World!' }}`);
+var obj = Mark.parse(`{div {span 'Hello World!'}}`);
 console.log("Greeting from Mark: " + Mark.stringify(obj));
 ```
 
@@ -147,7 +151,7 @@ To use the library in browser, you can include the `mark.js` under `/dist` direc
 ```html
 <script src='mark.js'></script>
 <script>
-var obj = Mark.parse(`{div {span 'Hello World!' }}`);  // using ES6 backtick
+var obj = Mark.parse(`{div {span 'Hello World!'}}`);
 console.log("Greeting from Mark: " + Mark.stringify(obj));
 </script>
 ```
