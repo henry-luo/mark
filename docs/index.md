@@ -78,7 +78,9 @@ So each Mark object is mapped to just **one** plain JavaScript object, which is 
 
 Roughly speaking, data model of JSON, XML/HTML are subsets of Mark, and Mark data model is a subset of JS data model.
 
-<img align='center' src='https://mark.js.org/data-model.png' width='300'>
+<div align="center">
+<img src='https://mark.js.org/data-model.png' width='300'>
+</div>
 
 You can refer to the [data model spec](https://mark.js.org/mark-model.html) for details.
 
@@ -164,6 +166,7 @@ console.log("Greeting from Mark: " + Mark.stringify(obj));
 
 - [Syntax specification](https://mark.js.org/mark-syntax.html)
 - [Data model and API specification](https://mark.js.org/mark-model.html)
+- Past discussion about Mark at [Hacker News](https://news.ycombinator.com/item?id=16308581)
 - Examples:
   - You can take a look at all the [test scripts](https://github.com/henry-luo/mark/tree/master/test), which also serve as basic demonstration of API usage.
   - [Mark HTML example](https://plnkr.co/edit/DCgNxf?p=preview)
