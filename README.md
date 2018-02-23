@@ -78,7 +78,7 @@ So each Mark object is mapped to just **one** plain JavaScript object, which is 
 
 Roughly speaking, data model of JSON, XML/HTML are subsets of Mark, and Mark data model is a subset of JS data model.
 
-![data-model](https://mark.js.org/data-model.png)
+<img align='center' src='https://mark.js.org/data-model.png' width='300'>
 
 You can refer to the [data model spec](https://mark.js.org/mark-model.html) for details.
 
