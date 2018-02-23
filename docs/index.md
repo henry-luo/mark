@@ -166,6 +166,7 @@ console.log("Greeting from Mark: " + Mark.stringify(obj));
 
 - [Syntax specification](https://mark.js.org/mark-syntax.html)
 - [Data model and API specification](https://mark.js.org/mark-model.html)
+- [FAQ](https://mark.js.org/faq.html)
 - Past discussion about Mark at [Hacker News](https://news.ycombinator.com/item?id=16308581)
 - Examples:
   - You can take a look at all the [test scripts](https://github.com/henry-luo/mark/tree/master/test), which also serve as basic demonstration of API usage.

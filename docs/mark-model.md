@@ -6,7 +6,9 @@ Mark's data model is designed so that a well-formed HTML or XML document can be 
 
 Roughly speaking, JSON, HTML and XML data models are subsets of Mark data model, and Mark data model is a subset of JS data model.
 
+<div align="center">
 <img align='center' src='https://mark.js.org/data-model.png' width='300'>
+</div>
 
 ## 1. Mark Pragma
 
