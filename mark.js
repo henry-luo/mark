@@ -930,7 +930,7 @@ MARK.parse = (function() {
 		text = String(source);
 		
 		if (!source) { text = '';  error(UNEXPECT_END); }
-		if (typeof options === 'object' && options.format != 'mark') { // parse as other formats
+		if (typeof options === 'object' && options.format && options.format != 'mark') { // parse as other formats
 			// is it better to use a Symbol here?
 			if (!MARK.$convert) { MARK.$convert = require('./lib/mark.convert.js')(MARK); }
 			return MARK.$convert.parse(source, options);
@@ -978,9 +978,9 @@ MARK.stringify = function(obj, options) {
 	
 	var indentStr, space, omitComma;
 	if (options)  {
-		if (options.format !== 'mark') {
+		if (options.format && options.format !== 'mark') {
 			// load helper on demand
-			if (!MARK.$convert) { MARK.$convert = require('./lib/mark.convert.js')(Mark); }
+			if (!MARK.$convert) { MARK.$convert = require('./lib/mark.convert.js')(MARK); }
 			if (options.format === 'xml') return MARK.$convert.toXml(obj, options);
 			if (options.format === 'html') return MARK.$convert.toHtml(obj, options);
 		}

@@ -1,4 +1,4 @@
-const test = require('tape') ;
+const test = require('tape');
 const Mark = require('./../mark.js');
 
 test('Stringify JSON object', function(assert) {
@@ -23,5 +23,5 @@ test('Stringify Mark object', function(assert) {
 	assert.equal(Mark.stringify(Mark.parse('{div width:10 {!--comment--} "test" {br}}'), {space:'  '}), '{div width:10 \n  {!--comment--} \n  "test" \n  {br}\n}', "Stringify with identation");
 	// stringify omit comma
 	assert.equal(Mark.stringify(Mark.parse('{div width:10 height:"15px" margin:[5 10 10 5]}'), {omitComma:true}), '{div width:10 height:"15px" margin:[5 10 10 5]}', "Stringify without comma");
-	assert.end() ;
+	assert.end();
 });
