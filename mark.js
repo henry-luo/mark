@@ -66,7 +66,11 @@ var MARK = (function() {
 						}
 						// else, assume Mark object
 					}
+					else if (t === 'undefined') {
+						continue;
+					}
 					else { // other primitive values
+						// val might be null
 						val = val.toString(); // convert to string, as Mark only accept text and Mark object as content
 						if (prev_type === 'string') {
 							len--;  val = obj[len] + val;  // merge text nodes
