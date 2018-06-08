@@ -12,7 +12,11 @@ test('Parse JSON5 object', function(assert) {
 	assert.equal(isNaN(Mark.parse("{a:NaN}").a), true, 'Parse object {a:NaN}');
 	assert.equal(isFinite(Mark.parse("{a:Infinity}").a), false, 'Parse object {a:Infinity}');
 	assert.equal(isNaN(Mark.parse("-NaN")), true, 'Parse value -NaN');
-	assert.equal(isFinite(Mark.parse("-Infinity")), false, 'Parse value -Infinity');	
+	assert.equal(isFinite(Mark.parse("-Infinity")), false, 'Parse value -Infinity');
+	
+	// check JSON model
+	var obj = Mark.parse('{obj:123}');
+	assert.deepEqual(obj.constructor.name, 'Object', 'JSON constructor.name');
 	
 	assert.end() ;
 });
