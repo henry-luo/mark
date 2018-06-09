@@ -27,7 +27,6 @@ test('Parse Mark object', function(assert) {
 	assert.equal(Mark.parse('{div style:{width:"10px"}}').style.width, "10px", 'Object {div style:{width:"10px"}}.style.width should be "10px"');
 	assert.equal(Mark.parse('{div "class":"large"}').class, "large", 'Object {div "class":"large"}.class should be "large"');
 	assert.equal(Mark.parse("{div 'class':'large'}").class, "large", 'Object {div "class":"large"}.class should be "large"');
-	assert.equal(Mark.parse("{obj length:100}").prop('length'), 100, "Object {obj length:100}.prop('length') should be 100");
 	assert.deepEqual(Object.keys(Mark.parse('{obj}')), [], 'Object {obj}.keys() should be empty');
 	assert.deepEqual(Object.keys(Mark.parse('{div class:"test", style:{color:"red"}}')), ['class','style'], 
 		'Object {div class:"test", style:{color:"red"}} keys should be ["class","style"]');

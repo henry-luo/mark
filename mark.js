@@ -123,81 +123,13 @@ var MARK = (function() {
 		length: function() {
 			return this[$length];
 		},
-		// to set or get a property
-		prop: function(name, value) {
-			// accept only non-numeric key
-			if (typeof name === 'string' && isNaN(name*1)) { 
-				if (value !== undefined) { this[name] = value;  return this; } // returns this, so that the call can be chained
-				else return this[name];				
-			}
-			else { throw "Property name should not be numeric"; }
-		},
-		// to set or get parent
+		// get parent
 		parent: function(pa) {
-			if (pa !== undefined) { this[$parent] = pa;  return this; } // returns this, so that the call can be chained
-			else return this[$parent];
+			return this[$parent];
 		},
-		// to set or get pragma content
+		// get pragma content
 		pragma: function(value) {
-			if (value !== undefined) { this[$pragma] = value;  return this; } // returns this, so that the call can be chained
-			else return this[$pragma];
-		},
-		
-		// todo: do content normalization
-		push: function() {
-			// copy the arguments
-			let length = this[$length];
-			for (let i=0; i<arguments.length; i++) {
-				Object.defineProperty(this, length+i, {value:arguments[i], writable:true, configurable:true}); // make content item non-enumerable
-			}
-			length += arguments.length;
-			this[$length] = length;
-			return length;
-		},
-		pop: function() {
-			let length = this[$length];
-			if (length > 0) {
-				let item = this[length-1];  delete this[length-1];
-				this[$length] = length - 1;
-				return item;
-			} else {
-				return undefined;
-			}
-		},
-		// insert item(s) at the given index  // todo: do content normalization
-		insert: function(item, index) {
-			index = index || 0;
-			let length = this[$length];
-			if (index < 0 || index > length) { throw "Invalid index"; }
-			let offset = item instanceof Array ? item.length:1;
-			// shift items after index
-			for (let i=length-1; i>=index; i--) {
-				Object.defineProperty(this, i+offset, {value:this[i], writable:true, configurable:true});  // make content item non-enumerable
-			}
-			// insert items
-			if (offset > 1) {
-				for (let i=0; i<offset; i++) {
-					Object.defineProperty(this, index+i, {value:item[i], writable:true, configurable:true});  // make content item non-enumerable
-				}
-			} else {
-				Object.defineProperty(this, index, {value:item, writable:true, configurable:true});  // make content item non-enumerable
-			}
-			this[$length] = length + offset;
-			return this; // for call chaining
-		},
-		// can consider support 2nd param of cnt (for no. of items to remove)
-		// consider remove self
-		remove: function(index) {
-			if (arguments.length) {
-				// shift the items
-				var length = this[$length];
-				if (index >=0 && index < length) {
-					for (var i = index; i < length - 1; i++) { this[i] = this[i+1]; }
-					this[$length] = length - 1;
-				}
-				// else invalid index
-			}
-			return this; // for call chaining
+			return this[$pragma];
 		},
 
 		// filter: like Array.prototype.filter
@@ -320,6 +252,14 @@ var MARK = (function() {
 			Mark[a] = api[a]; // 'length' is non-configurable in IE
 		}
 		*/
+	}
+	// load Mark.update APIs
+	try {
+		require('./lib/mark.update.js')(Mark, $length);
+	}
+	catch (e) {
+		// no Mark Update APIs
+		console.log("Failed to load update API", e.message);
 	}
 	
 	// define additional APIs on Mark prototype
@@ -988,31 +928,47 @@ MARK.parse = (function() {
 MARK.stringify = function(obj, options) {
 	"use strict";
 	
-	var indentStr, space, omitComma;
+	var indentStep, indentStrs, space, omitComma;
+	
+    function indent(num, noNewLine) {
+		if (num >= indentStrs.length) { // expand the cached indent strs
+			for (var i = indentStrs.length; i <= num; i++) {
+				indentStrs[i] = indentStrs[i-1] + indentStep;
+			}
+		}
+        return noNewLine ? indentStrs[num] : "\n" + indentStrs[num];
+    }	
+	
+	// option handling
 	if (options)  {
+		omitComma = options.omitComma;
+		space = options.space;
+		indentStrs = [''];
+		if (space) {
+			if (typeof space === "string") {
+				indentStep = space;
+			} else if (typeof space === "number" && space >= 0) {
+				indentStep = new Array(space + 1).join(" ");
+			} else {
+				// unknown type, ignore space parameter
+				indentStep = '';
+			}
+			// indentation step no more than 10 chars
+			if (indentStep && indentStep.length > 10) {
+				indentStep = indentStep.substring(0, 10);
+			}
+		}
+		
 		if (options.format && options.format !== 'mark') {
 			// load helper on demand
-			if (!MARK.$convert) { MARK.$convert = require('./lib/mark.convert.js')(MARK); }
+			if (!MARK.$convert) {
+				MARK.$convert = require('./lib/mark.convert.js')(MARK);
+			}
+			MARK.$convert.indent = indent;
 			if (options.format === 'xml') return MARK.$convert.toXml(obj, options);
 			if (options.format === 'html') return MARK.$convert.toHtml(obj, options);
 		}
-		
-		// stringify as Mark
-		omitComma = options.omitComma;
-		space = options.space;
-		if (space) {
-			if (typeof space === "string") {
-				indentStr = space;
-			} else if (typeof space === "number" && space >= 0) {
-				indentStr = makeIndent(" ", space, true);
-			} else {
-				// ignore space parameter
-			}
-			// indentation step no more than 10 chars
-			if (indentStr && indentStr.length > 10) {
-				indentStr = indentStr.substring(0, 10);
-			}
-		}
+		// else stringify as Mark	
 	}
 	
 	// Mark no longer supports replacer
@@ -1067,14 +1023,6 @@ MARK.stringify = function(obj, options) {
                 throw new TypeError("Converting circular structure to JSON");
             }
         }
-    }
-
-    function makeIndent(str, num, noNewLine) {
-        var indent = noNewLine ? "" : "\n";
-        for (var i = 0; i < num; i++) {
-            indent += str;
-        }
-        return indent;
     }
 
     // Copied from Crokford's implementation of JSON
@@ -1138,7 +1086,7 @@ MARK.stringify = function(obj, options) {
 
                     for (var i = 0; i < obj_part.length; i++) {
                         res = internalStringify(obj_part[i]);
-                        if (indentStr) buffer += makeIndent(indentStr, objStack.length);
+                        if (indentStep) buffer += indent(objStack.length);
                         if (res === null || typeof res === "undefined") {
                             buffer += "null";
                         } else {
@@ -1146,13 +1094,13 @@ MARK.stringify = function(obj, options) {
                         }
                         if (i < obj_part.length-1) {
                             buffer += omitComma ? ' ':',';
-                        } else if (indentStr) {
+                        } else if (indentStep) {
                             buffer += "\n";
                         }
                     }
                     objStack.pop();
-                    if (obj_part.length && indentStr) {
-                        buffer += makeIndent(indentStr, objStack.length, true);
+                    if (obj_part.length && indentStep) {
+                        buffer += indent(objStack.length, true);
                     }
                     buffer += "]";
                 }
@@ -1177,7 +1125,7 @@ MARK.stringify = function(obj, options) {
                     for (var prop in obj_part) {
 						var value = internalStringify(obj_part[prop]);
 						if (typeof value !== "undefined") {
-							// buffer += makeIndent(indentStr, objStack.length);                            
+							// buffer += indent(objStack.length);                            
 							var key = MARK.isName(prop) ? prop : escapeString(prop);
 							buffer += (hasAttr ? (omitComma ? ' ':', '):(nonEmpty ? ' ':''))+ key +":"+ value;
 							hasAttr = true;  nonEmpty = true;
@@ -1190,11 +1138,11 @@ MARK.stringify = function(obj, options) {
 							buffer += ' ';
 							var item = obj_part[i];
 							if (typeof item === "string") {
-								if (indentStr) buffer += makeIndent(indentStr, objStack.length);
+								if (indentStep) buffer += indent(objStack.length);
 								buffer += escapeString(item.toString());
 							}
 							else if (typeof item === "object") {
-								if (indentStr) buffer += makeIndent(indentStr, objStack.length);
+								if (indentStep) buffer += indent(objStack.length);
 								buffer += internalStringify(item);
 							}
 							else { console.log("unknown object", item); }
@@ -1202,8 +1150,8 @@ MARK.stringify = function(obj, options) {
 					}
                     objStack.pop();
                     if (nonEmpty ) {
-                        // buffer = buffer.substring(0, buffer.length-1) + makeIndent(indentStr, objStack.length) + "}";
-						if (length && indentStr) { buffer += makeIndent(indentStr, objStack.length); }
+                        // buffer = buffer.substring(0, buffer.length-1) + indent(objStack.length) + "}";
+						if (length && indentStep) { buffer += indent(objStack.length); }
 						buffer += "}";
                     } else {
                         buffer = '{}';

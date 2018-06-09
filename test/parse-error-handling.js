@@ -15,6 +15,7 @@ test('Mark parse error handling ', function(assert) {
 	assert.throws(function () { Mark.parse('{a;2}'); }, /Character ';' should be escaped in Mark pragma/, "Character ';' should be escaped in pragma");
 	assert.throws(function () { Mark.parse('{obj prop:{a;2}}'); }, /Character ';' should be escaped in Mark pragma/, "Character ';' should be escaped in pragma");
 	assert.throws(function () { Mark.parse("{a > b ? true:false}"); }, /Bad object/, "Character ':' should be escaped in pragma");
+	assert.throws(function () { Mark.parse("{div 'text' 'text'?}"); }, /Unexpected character/, "This is not a valid pragma");
 	
 	assert.throws(function () { Mark.parse('[1,,2]'); }, /Missing array element/, "Missing array element");
 	

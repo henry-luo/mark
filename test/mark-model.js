@@ -36,12 +36,11 @@ test('Mark object model', function(assert) {
 	assert.deepEqual(Object.keys(Mark.parse('{div}')), [], "Mark object {div} keys should be empty");
 	assert.deepEqual(Object.keys(Mark.parse('{div class:"test"}')), ['class'], "Mark object {div class:'test'} keys should be ['class']");
 	
-	// length and prop('length')
+	// length prop and length API
 	div = Mark.parse('{div length:12, width:20 "text"}');
 	assert.equal(div.length, 12, "length property of Mark object should be 12");
 	assert.equal(Mark.prototype.length.call(div), 1, "length of Mark object should be 1");
 	assert.equal(div.contents().length, 1, "length of Mark object contents should be 1");
-	assert.equal(div.prop('length'), 12, "length property of Mark object should be 12");
 	assert.looseEqual(Object.keys(div), ['length','width'], "Mark object keys() should be ['length', 'width']");
 	
 	// contents API
@@ -77,11 +76,15 @@ test('Mark object model', function(assert) {
 	assert.equal(div.some(n => n.constructor && n.constructor.name == 'b'), true, "Mark some API");
 	assert.equal(div.some(n => n.constructor && n.constructor.name == 'div'), false, "Mark some API");
 	
-	// direct content assignment
+	// direct content assignment - not advisable
 	var div = Mark.parse('{div "text"}');
 	div[0] = Mark('br');
 	assert.equal(Mark.stringify(div), '{div {br}}', "Set Mark content");
 	assert.looseEqual(allInKeys(div), [], "Set Mark content");
+	
+	// set property
+	div.set('width', '10px');
+	assert.equal(div.width, '10px', "Set width to 10px");
 	
 	// push API
 	assert.equal(Mark.parse('{div}').push("text"), 1, "push text into Mark object");
@@ -133,7 +136,6 @@ test('Mark pragma model', function(assert) {
 	var pragma = Mark.pragma("test");
 	assert.equal(typeof pragma, 'object', "typeof pragma is 'object'");
 	assert.equal(pragma.pragma(), 'test', "get pragma content");
-	assert.equal(pragma.pragma('content').pragma(), 'content', "set pragma content");
 	assert.equal(pragma.parent(), undefined, "get pragma parent");
 	assert.equal(pragma.valueOf() === pragma, true, "valueOf pragma should return itself");
 	assert.equal(pragma.toString(), "[object Pragma]", "pragma toString() should return [object Pragma]");
