@@ -32,7 +32,7 @@ test('Parse XML under JSDOM', function(assert) {
 		var xml = obj.xml();
 		assert.equal(xml.replace(/ |\r|\n/g, ''), src.replace(/ |\r|\n/g, ''), 'Mark to xml');
 		
-		assert.equal(obj.xml('<?xml version="1.0" encoding="UTF-8"?><div><p>text</p></div>').source(), '{div {p "text"}}', "Test set xml()");
+		// assert.equal(obj.xml('<?xml version="1.0" encoding="UTF-8"?><div><p>text</p></div>').source(), '{div {p "text"}}', "Test set xml()");
 		
 		// tear down
 		global.window = global.document = global.DOMParser = undefined;	

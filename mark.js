@@ -94,22 +94,6 @@ var MARK = (function() {
 		if (parent) { obj[$parent] = parent; }
 		return obj;
 	};
-	
-	// reset content of this object
-	function replaceWith(trg, obj) {
-		// console.log('src obj:', obj);
-		// reset properties and contents
-		for (let p in trg) { if (typeof trg[p] !== 'function') delete trg[p]; }
-		for (let i=0, len=trg[$length]; i<len; i++) { delete trg[i]; }  // console.log('obj afte reset:', trg);
-		// copy over new constructr, properties and contents
-		Object.setPrototypeOf(trg, Object.getPrototypeOf(obj));
-		for (let p in obj) { trg[p] = obj[p]; }
-		var length = obj[$length];
-		for (let i=0; i<length; i++) {
-			Object.defineProperty(trg, i, {value:obj[i], writable:true, configurable:true}); // make content item non-enumerable
-		}
-		trg[$length] = length;  // console.log('obj afte copy:', trg);
-	}
 		
 	// Mark object API functions
 	var api = {
@@ -208,33 +192,17 @@ var MARK = (function() {
 		},
 		
 		// conversion APIs
-		source: function() {
-			// get the source
-			if (!arguments.length) { return MARK.stringify(this); }
-			// set the source
-			replaceWith(this, MARK.parse(arguments[0]));
-			return this;  // for call chaining
+		source: function(options) {
+			return MARK.stringify(this, options);
 		},
 		// json: function() {}
-		html: function() {
-			if (!arguments.length) { // get html source
-				// load helper on demand
-				return MARK.stringify(this, {format:'html'});
-			} else { // set html source
-				let options = arguments[1] || {};  options.format = 'html';
-				replaceWith(this, MARK.parse(arguments[0], options));
-				return this;  // for call chaining
-			}
+		html: function(options) {
+			let opt = options || {};  opt.format = 'html';
+			return MARK.stringify(this, opt);
 		},
-		xml: function() {
-			if (!arguments.length) { // get xml source
-				// load helper on demand
-				return MARK.stringify(this, {format:'xml'});
-			} else { // set xml source
-				let options = arguments[1] || {};  options.format = 'xml';
-				replaceWith(this, MARK.parse(arguments[0], options));
-				return this;  // for call chaining
-			}
+		xml: function(options) {
+			let opt = options || {};  opt.format = 'xml';
+			return MARK.stringify(this, opt);
 		},		
 	}
 	// set the APIs
@@ -294,7 +262,8 @@ var MARK = (function() {
     function isNameStart(c) {
         return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || c === '_' || c === '$';
     }
-	// exported for convenience
+	
+	// check if a string is a Mark identifier, exported for convenience
     Mark.isName = function(key) {
         if (typeof key !== 'string') {
             return false;
@@ -396,14 +365,7 @@ MARK.parse = (function() {
 
 		// Parse an identifier.
         identifier = function () {
-			// Normally, reserved words are disallowed here, but we
-			// only use this for unquoted object keys, where reserved words are allowed,
-			// so we don't check for those here. References:
-			// - http://es5.github.com/#x7.6
-			// - https://developer.mozilla.org/en/Core_JavaScript_1.5_Guide/Core_Language_Features#Variables
-			// - http://docstore.mik.ua/orelly/webprog/jscript/ch02_07.htm
-
-			// TODO: identifiers can have Unicode "letters" in JS; add support for those.
+			// To keep it simple, Mark identifiers do not support Unicode "letters", as in JS; if needed, use quoted syntax
             var key = ch;
 
             // identifiers must start with a letter, _ or $.
