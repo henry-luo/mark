@@ -82,5 +82,8 @@ test('Parse Mark object', function(assert) {
 	assert.equal(Mark.parse('{div //comment\n}').constructor.name, "div", "Mark with line comment");
 	assert.equal(Mark.parse('{div /*comment*/}').constructor.name, "div", "Mark with block comment");
 	
+	// test shorthand
+	assert.equal(Mark('{div "text"}').constructor.name, "div", "Mark shorthand");
+	
 	assert.end();
 });

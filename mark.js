@@ -16,6 +16,10 @@ let $convert = null;  // Mark Convert API
 function isArray(obj) {
 	return Array.isArray ? Array.isArray(obj) : Object.prototype.toString.call(obj) === '[object Array]';
 }
+
+function isNameStart(c) {
+	return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || c === '_' || c === '$';
+}
 	
 // static Mark API
 var MARK = (function() {
@@ -31,6 +35,11 @@ var MARK = (function() {
 	// Mark object constructor
 	function Mark(typeName, props, contents) {
 		"use strict";
+		// handle special shorthand
+		if (arguments.length === 1 && typeName[0] === '{') { 
+			return MARK.parse(typeName); 
+		}
+		
 		// 1. prepare the constructor
 		let con = constructors[typeName];
 		if (!con) {
@@ -304,9 +313,6 @@ var MARK = (function() {
         return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || ('0' <= c && c <= '9') ||
             c === '_' || c === '$' || c === '.' || c === '-';
     }
-    function isNameStart(c) {
-        return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || c === '_' || c === '$';
-    }
 	
 	// check if a string is a Mark identifier, exported for convenience
     Mark.isName = function(key) {
@@ -339,7 +345,7 @@ MARK.parse = (function() {
 	
     let at,           	// The index of the current character
         lineNumber,   	// The current line number
-        columnNumber, 	// The current column number
+        columnStart, 	// The index of column start char
         ch,           	// The current character
 		text,			// The text being parsed
 		
@@ -373,6 +379,7 @@ MARK.parse = (function() {
         error = function(m) {
 			// Call error when something is wrong.
 			// todo: Still to read can scan to end of line
+			var columnNumber = at - columnStart;
 			var msg = m + " at line " + lineNumber + " column " + columnNumber + " of the Mark data. Still to read: " + JSON.stringify(text.substring(at - 1, at + 30) + "...");
             var error = new SyntaxError(msg);
             // beginning of message suffix to agree with that provided by Gecko - see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse
@@ -389,15 +396,11 @@ MARK.parse = (function() {
             if (c && c !== ch) {
                 error("Expected " + renderChar(c) + " instead of " + renderChar(ch));
             }
-
-			// Get the next character. When there are no more characters,
-			// return the empty string.
+			// Get the next character. When there are no more characters, return the empty string.
             ch = text.charAt(at);
             at++;
-            columnNumber++;
             if (ch === '\n' || ch === '\r' && peek() !== '\n') {
-                lineNumber++;
-                columnNumber = 0;
+                lineNumber++;  columnStart = at;
             }
             return ch;
         },
@@ -641,39 +644,30 @@ MARK.parse = (function() {
         word = function() {
             switch (ch) {
             case 't':
-                next('t');
-                next('r');
-                next('u');
-                next('e');
-                return true;
+				if (text[at] === 'r' && text[at+1] === 'u' && text[at+2] === 'e' && !isNameStart(text[at+3])) {
+					ch = text[at+3];  at += 4;  return true;
+				}
+				break;
             case 'f':
-                next('f');
-                next('a');
-                next('l');
-                next('s');
-                next('e');
-                return false;
+				if (text[at] === 'a' && text[at+1] === 'l' && text[at+2] === 's' && text[at+3] === 'e' && !isNameStart(text[at+4])) {
+					ch = text[at+4];  at += 5;  return false;
+				}				
+                break;
             case 'n':
-                next('n');
-                next('u');
-                next('l');
-                next('l');
-                return null;
+				if (text[at] === 'u' && text[at+1] === 'l' && text[at+2] === 'l' && !isNameStart(text[at+3])) {
+					ch = text[at+3];  at += 4;  return null;
+				}
+                break;
             case 'I':
-                next('I');
-                next('n');
-                next('f');
-                next('i');
-                next('n');
-                next('i');
-                next('t');
-                next('y');
-                return Infinity;
+				if (text[at] === 'n' && text[at+1] === 'f' && text[at+2] === 'i' && text[at+3] === 'n' && text[at+4] === 'i' 
+					&& text[at+5] === 't' && text[at+6] === 'y' && !isNameStart(text[at+7])) {
+					ch = text[at+7];  at += 8;  return Infinity;
+				}
+                break;
             case 'N':
-              next('N');
-              next('a');
-              next('N');
-              return NaN;
+				if (text[at] === 'a' && text[at+1] === 'N' && !isNameStart(text[at+2])) {
+					ch = text[at+2];  at += 3;  return NaN;
+				}
             }
             error("Unexpected character " + renderChar(ch));
         },
@@ -716,7 +710,7 @@ MARK.parse = (function() {
 
 			next();  // skip the starting '{'
 			// store the current source position, in case we need to backtrack later
-			let bkAt = at, bkLineNumber = lineNumber, bkColumnNumber = columnNumber;
+			let bkAt = at, bkLineNumber = lineNumber, bkColumnStart = columnStart;
 
 			let putText = function(text) {
 				// check preceding node
@@ -755,7 +749,7 @@ MARK.parse = (function() {
 			parsePragma = function() {
 				if (hasBrace || key) { error("Bad object"); } // cannot be parsed as Mark pragma, as brace needs to be escaped in Mark pragma
 				// restore parsing position, and try parse as Mark pragma
-				at = bkAt;  lineNumber = bkLineNumber;  columnNumber = bkColumnNumber;
+				at = bkAt;  lineNumber = bkLineNumber;  columnStart = bkColumnStart;
 				ch = text.charAt(at - 1);
 				
 				let pragma = '';
@@ -886,7 +880,7 @@ MARK.parse = (function() {
 		// initialize the contextual variables
         at = 0;
         lineNumber = 1;
-        columnNumber = 1;
+        columnStart = at;
         ch = ' ';
 		text = String(source);
 		
@@ -897,7 +891,7 @@ MARK.parse = (function() {
 		} 
 		// else // parse as Mark
         
-		// start parsing as a JSON value
+		// start parsing the root value
         var result = value();
         white();
         if (ch) {
