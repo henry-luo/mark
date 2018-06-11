@@ -12,6 +12,11 @@ const $parent = Symbol('Mark.parent');
 const $pragma = Symbol('Mark.pragma');
 let $convert = null;  // Mark Convert API
 
+// polyfills
+function isArray(obj) {
+	return Array.isArray ? Array.isArray(obj) : Object.prototype.toString.call(obj) === '[object Array]';
+}
+	
 // static Mark API
 var MARK = (function() {
 	"use strict";
@@ -24,10 +29,10 @@ var MARK = (function() {
 	}
 
 	// Mark object constructor
-	function Mark(typeName, props, contents, parent) {
+	function Mark(typeName, props, contents) {
 		"use strict";
 		// 1. prepare the constructor
-		var con = constructors[typeName];
+		let con = constructors[typeName];
 		if (!con) {
 			if (typeof typeName !== 'string') { throw "Type name should be a string"; }
 			con = constructors[typeName] = function(){};
@@ -42,12 +47,12 @@ var MARK = (function() {
 		}
 		
 		// 2. create object
-		var obj = Object.create(con.prototype);
+		let obj = Object.create(con.prototype);
 		
 		// 3. copy properties, numeric keys are not allowed
 		if (props) { 
 			for (let p in props) {
-				// accept only non-numeric key; key should have no duplicate here
+				// accept only non-numeric key; and we do no check key duplication here, last definition wins
 				if (isNaN(p*1)) { obj[p] = props[p]; }
 			}
 		}
@@ -55,13 +60,13 @@ var MARK = (function() {
 		// 4. copy contents if any
 		let len = 0;
 		if (contents) { 
-			let prev_type = null;
+			let prevType = null;
 			function addContents(items) {
 				for (let val of items) {
 					let t = typeof val;
 					if (t === 'string') {
 						if (!val.length) continue; // skip empty text '', ""
-						if (prev_type === 'string') { 
+						if (prevType === 'string') { 
 							len--;  val = obj[len] + val;  // merge text nodes
 						}
 					}
@@ -70,29 +75,28 @@ var MARK = (function() {
 						else if (val instanceof Array) { // expanded it inline
 							addContents(val);  continue;
 						}
-						// else, assume Mark object
+						// else, Mark object or pragma
+						val[$parent] = obj;  // set $parent
 					}
 					else if (t === 'undefined') {
 						continue;
 					}
-					else { // other primitive values
+					else { // other primitive values are converted to string
 						// val might be null
 						val = val.toString(); // convert to string, as Mark only accept text and Mark object as content
-						if (prev_type === 'string') {
+						if (prevType === 'string') {
 							len--;  val = obj[len] + val;  // merge text nodes
 						}
 					}
 					Object.defineProperty(obj, len, {value:val, writable:true, configurable:true}); // make content non-enumerable
-					prev_type = t;  len++;
+					prevType = t;  len++;
 				}
 			}
-			addContents(contents);
+			// contents can be an array or just single value
+			addContents(isArray(contents) ? contents : [contents]);
 		}
 		// set $length
 		obj[$length] = len;
-		
-		// set $parent
-		if (parent) { obj[$parent] = parent; }
 		return obj;
 	};
 		
@@ -179,6 +183,16 @@ var MARK = (function() {
 			return false;
 		},
 		
+		// each: like Array.prototype.forEach
+		each: function(func, thisArg) {
+			if (!(typeof func === 'function' && this)) throw new TypeError();
+			let i = 0, obj = Object(this);
+			for (const n of obj) {
+				func.call(thisArg || obj, n, i, obj);
+				i++;
+			}
+		},
+		
 		// Mark selector APIs
 		/*
 		find: function(selector) { 
@@ -197,8 +211,37 @@ var MARK = (function() {
 		source: function(options) {
 			return MARK.stringify(this, options);
 		},
-		// text()
-		// json: function() {}
+		text : function() {
+			let txt = [];
+			let _text = function(obj) {
+				for (let n of obj) {
+					if (typeof n === 'string') { txt.push(n); }
+					else if (n.constructor) { _text(n); }
+				}
+			}
+			_text(this);
+			return txt.join('');
+		},
+		/*
+		json: function() {
+			let _json = function(obj) {
+				let jn = {};  jn[0] = obj.constructor.name;
+				for (let p in obj) { jn[p] = obj[p]; }
+				for (let i = 0; i < obj.length(); i++) {
+					let n = obj[i];
+					if (typeof n === 'string') { jn[i+1] = n; }
+					else if (typeof n === 'object') {
+						if (!n.constructor) { // pragma
+							jn[i+1] = {'.':n.pragma()};
+						}
+						else { jn[i+1] = _json(n); }
+					}
+				}
+				return jn;
+			}
+			return _json(this);			
+		},
+		*/
 		html: function(options) {
 			let opt = options || {};  opt.format = 'html';
 			return MARK.stringify(this, opt);
@@ -242,20 +285,18 @@ var MARK = (function() {
 	}
 	
 	// Mark pragma constructor
-	Mark.pragma = function(pragma, parent) {
-		let con = constructors['!pragma'];
+	Mark.pragma = function(pragma) {
+		let con = constructors[$pragma];
 		if (!con) {
 			con = Object.create(null);
 			Object.defineProperty(con, 'pragma', {value:api.pragma});
 			Object.defineProperty(con, 'parent', {value:api.parent});
 			Object.defineProperty(con, 'valueOf', {value:Object.valueOf});
 			Object.defineProperty(con, 'toString', {value:function() { return '[object Pragma]'; }});
-			// any other API?
-			constructors['!pragma'] = con;
+			constructors[$pragma] = con;
 		}
 		let obj = Object.create(con);
 		obj[$pragma] = pragma;  // pragma conent stored as Symbol
-		if (parent) { obj[$parent] = parent; }
 		return obj;
 	}
 	
@@ -691,7 +732,8 @@ MARK.parse = (function() {
 				while (ch) {
 					if (ch === '{') { // child object
 						hasBrace = true;
-						Object.defineProperty(obj, index, {value:object(obj), writable:true, configurable:true}); // make content non-enumerable
+						let child = object(obj);  child[$parent] = obj;
+						Object.defineProperty(obj, index, {value:child, writable:true, configurable:true}); // make content non-enumerable
 						index++;  
 					}
 					else if (ch === '"' || ch === "'") { // text node
@@ -720,7 +762,8 @@ MARK.parse = (function() {
 				while (ch) {
 					if (ch === '}') { // end of pragma
 						next();
-						return MARK.pragma(pragma, parent);
+						let pgm = MARK.pragma(pragma);  pgm[$parent] = parent;
+						return pgm;
 					}				
 					else if (ch === '\\') { 
 						// escape seq for '{', '}', ':', ';', as html, xml comment may contain these characters
@@ -769,7 +812,7 @@ MARK.parse = (function() {
 						}
 						else if (!key) { // at the starting of the object
 							// create the object
-							obj = MARK(str, null, null, parent);
+							obj = MARK(str, null, null);
 							extended = true;  // key = str;
 							continue;							
 						}
@@ -786,7 +829,7 @@ MARK.parse = (function() {
 						key = ident;
 					} else {
 						if (!extended) { // start of Mark object
-							obj = MARK(ident, null, null, parent);
+							obj = MARK(ident, null, null);
 							extended = true;  // key = ident;
 							continue;
 						}
@@ -965,11 +1008,6 @@ MARK.stringify = function(obj, options) {
         }
     };
 	*/
-
-    // polyfills
-    function isArray(obj) {
-        return Array.isArray ? Array.isArray(obj) : Object.prototype.toString.call(obj) === '[object Array]';
-    }
 
     function isDate(obj) {
         return Object.prototype.toString.call(obj) === '[object Date]';

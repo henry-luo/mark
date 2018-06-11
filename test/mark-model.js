@@ -26,6 +26,8 @@ test('Mark object model', function(assert) {
 	assert.equal(Mark.stringify(Mark('div', null, ['text', '', 123, Mark('br'), ['nested'], null])), '{div "text123" {br} "nested"}', "div with nested contents");
 	assert.equal(Mark.stringify(Mark('div', null, [''])), '{div}', "div with empty text");
 	assert.equal(Mark.stringify(Mark('div', null, ['text', 'merged', ''])), '{div "textmerged"}', "merging text nodes");
+	assert.equal(Mark.stringify(Mark('div', null, 123)), '{div "123"}', "number as content");
+	assert.equal(Mark.stringify(Mark('div', null, {p:123})), '{div {p:123}}', "JSON as content");
 	
 	// type name
 	var div = Mark.parse('{div}');
@@ -75,6 +77,9 @@ test('Mark object model', function(assert) {
 	// some
 	assert.equal(div.some(n => n.constructor && n.constructor.name == 'b'), true, "Mark some API");
 	assert.equal(div.some(n => n.constructor && n.constructor.name == 'div'), false, "Mark some API");
+	// each
+	let types = [];  div.each(n => types.push(typeof n));
+	assert.deepEqual(types, ["string", "object", "string", "object", "object"], "Mark each API");
 	
 	// direct content assignment - not advisable
 	var div = Mark.parse('{div "text"}');
@@ -91,7 +96,7 @@ test('Mark object model', function(assert) {
 		'<?xml version="1.0" encoding="UTF-8"?><div><p>text</p></div>', "Mark replaceWith API");
 		
 	// push API
-	assert.equal(Mark.parse('{div}').push("text"), 1, "push text into Mark object");
+	assert.equal(Mark.parse('{div}').push("text").length(), 1, "push text into Mark object");
 	var div = Mark.parse('{div}');  
 	assert.equal(div.length(), 0, "length should be 0 before push");
 	div.push(Mark.parse('{br}'));
@@ -125,7 +130,13 @@ test('Mark object model', function(assert) {
 	// source API
 	div = Mark.parse('{div width:10 "text"}');
 	assert.equal(div.source(), '{div width:10 "text"}', "Mark source()");
-	// assert.equal(Mark.stringify(div.source('{div class:"bold" "text" {br} {p}}')), '{div class:"bold" "text" {br} {p}}', "Mark set source()");
+	
+	// text API
+	div = Mark.parse('{div width:10 "text " {span "more"} {!--comment--}}');
+	assert.equal(div.text(), "text more", "Mark text()");
+	
+	// JSON API
+	// assert.equal(JSON.stringify(div.json()), '{"0":"div","1":"text ","2":{"0":"span","1":"more"},"3":{".":"!--comment--"},"width":10}', "Mark json()");
 	
 	// isName
 	assert.equal(Mark.isName(123), false, "123 is not name");
