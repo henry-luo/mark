@@ -25,7 +25,7 @@ test('Parse XML', function(assert) {
 	var xml = obj.xml();
 	assert.equal(xml.replace(/ |\r|\n/g, ''), src.replace(/ |\r|\n/g, ''), 'Mark to xml');
 	// stringify with indentation
-	xml = obj.xml({space:'  '});  console.log(xml);
+	xml = obj.xml({space:'  '});  // console.log(xml);
 	assert.equal(xml.replace(/ |\r|\n/g, ''), src.replace(/ |\r|\n/g, ''), 'Mark to xml with indentation');
 	assert.end() ;
 });

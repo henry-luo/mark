@@ -10,6 +10,7 @@
 const $length = Symbol('Mark.length');
 const $parent = Symbol('Mark.parent');
 const $pragma = Symbol('Mark.pragma');
+let $convert = null;  // Mark Convert API
 
 // static Mark API
 var MARK = (function() {
@@ -179,7 +180,7 @@ var MARK = (function() {
 		},
 		
 		// Mark selector APIs
-		// find() is similar to jQuery find(), diff from Array.prototype.find()
+		/*
 		find: function(selector) { 
 			// load helper on demand
 			if (!MARK.$select) { MARK.$select = require('./lib/mark.selector.js'); }
@@ -190,11 +191,13 @@ var MARK = (function() {
 			if (!MARK.$select) { MARK.$select = require('./lib/mark.selector.js'); }
 			return MARK.$select(this).matches(selector);
 		},
+		*/
 		
 		// conversion APIs
 		source: function(options) {
 			return MARK.stringify(this, options);
 		},
+		// text()
 		// json: function() {}
 		html: function(options) {
 			let opt = options || {};  opt.format = 'html';
@@ -207,12 +210,9 @@ var MARK = (function() {
 	}
 	// set the APIs
 	for (let a in api) {
-		let func = {value:api[a], writable:true, configurable:true};
-		// Mark.prototype[a] = api[a];  // direct assignment will make the API functions enumerable
-		Object.defineProperty(Mark.prototype, a, func);  // make API functions non-enumerable
-		
-		// no longer set the APIs on static MARK object, as 'length' cannot be overridden in IE11
-		// note: 'length' is non-writable in node, and non-configurable in IE
+		// API functions are non-enumerable
+		Object.defineProperty(Mark.prototype, a, {value:api[a], writable:true, configurable:true});  
+		// no longer set the APIs on static MARK object, as 'length' is non-writable in node, and non-configurable in IE11
 		/*
 		try {
 			Object.defineProperty(Mark, a, func);
@@ -221,13 +221,17 @@ var MARK = (function() {
 		}
 		*/
 	}
-	// load Mark.update APIs
+	// load mark.selector APIs
 	try {
-		require('./lib/mark.update.js')(Mark, $length);
-	}
-	catch (e) {
-		// no Mark Update APIs
-		console.log("Failed to load update API", e.message);
+		require('./lib/mark.selector.js')(Mark);
+	} catch (e) {
+		console.trace("No Mark Selector API", e.message);
+	}	
+	// load mark.mutate APIs
+	try {
+		require('./lib/mark.mutate.js')(Mark, $length);
+	} catch (e) {
+		console.trace("No Mark Mutate API", e.message);
 	}
 	
 	// define additional APIs on Mark prototype
@@ -845,9 +849,8 @@ MARK.parse = (function() {
 		
 		if (!source) { text = '';  error(UNEXPECT_END); }
 		if (typeof options === 'object' && options.format && options.format != 'mark') { // parse as other formats
-			// is it better to use a Symbol here?
-			if (!MARK.$convert) { MARK.$convert = require('./lib/mark.convert.js')(MARK); }
-			return MARK.$convert.parse(source, options);
+			if (!$convert) { $convert = require('./lib/mark.convert.js')(MARK); }
+			return $convert.parse(source, options);
 		} 
 		// else // parse as Mark
         
@@ -923,17 +926,15 @@ MARK.stringify = function(obj, options) {
 		
 		if (options.format && options.format !== 'mark') {
 			// load helper on demand
-			if (!MARK.$convert) {
-				MARK.$convert = require('./lib/mark.convert.js')(MARK);
-			}
-			MARK.$convert.indent = indent;
-			if (options.format === 'xml') return MARK.$convert.toXml(obj, options);
-			if (options.format === 'html') return MARK.$convert.toHtml(obj, options);
+			if (!$convert) { $convert = require('./lib/mark.convert.js')(MARK); }
+			$convert.indent = indent;
+			if (options.format === 'xml') return $convert.toXml(obj, options);
+			if (options.format === 'html') return $convert.toHtml(obj, options);
 		}
 		// else stringify as Mark	
 	}
 	
-	// Mark no longer supports replacer
+	// Mark no longer supports JSON replacer
 	/*
 	var replacer = null;
     if (options) {
@@ -967,11 +968,7 @@ MARK.stringify = function(obj, options) {
 
     // polyfills
     function isArray(obj) {
-        if (Array.isArray) {
-            return Array.isArray(obj);
-        } else {
-            return Object.prototype.toString.call(obj) === '[object Array]';
-        }
+        return Array.isArray ? Array.isArray(obj) : Object.prototype.toString.call(obj) === '[object Array]';
     }
 
     function isDate(obj) {
