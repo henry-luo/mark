@@ -3,9 +3,9 @@ const Mark = require('./../mark.js');
 
 test('Mark parse error handling ', function(assert) {
 	// Mark parser
-	assert.throws(function () { Mark.parse(null); }, /Unexpected end of input/, "Mark should throw error with empty source, following JSON.parse");
-	assert.throws(function () { Mark.parse(''); }, /Unexpected end of input/, "Mark should throw error with empty source, following JSON.parse");
-	assert.throws(function () { Mark.parse('  '); }, /Unexpected character EOF/, "Mark should throw error with empty source, following JSON.parse");
+	assert.throws(function () { Mark.parse(null); }, /Unexpected end of input/, "Mark throws error with empty source, following JSON.parse");
+	assert.throws(function () { Mark.parse(''); }, /Unexpected end of input/, "Mark throws error with empty source, following JSON.parse");
+	assert.throws(function () { Mark.parse('  '); }, /Unexpected character EOF/, "Mark throws error with empty source, following JSON.parse");
 	
 	assert.throws(function () { Mark.parse('{div'); }, /Unexpected end of input/, "Missing closing bracket");
 	assert.throws(function () { Mark.parse('{div "text"'); }, /Unexpected end of input/, "Missing closing bracket");

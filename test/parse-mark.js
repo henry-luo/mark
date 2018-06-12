@@ -83,7 +83,43 @@ test('Parse Mark object', function(assert) {
 	assert.equal(Mark.parse('{div /*comment*/}').constructor.name, "div", "Mark with block comment");
 	
 	// test shorthand
-	assert.equal(Mark('{div "text"}').constructor.name, "div", "Mark shorthand");
+	assert.equal(Mark('{div "text"}').constructor.name, "div", "Mark() shorthand");
+	
+	assert.end();
+});
+
+function stringArrayBuffer(str) {
+    var buffer = new ArrayBuffer(str.length);
+    var bytes = new Uint8Array(buffer);
+    str.split('').forEach(function(str, i) {
+      bytes[i] = str.charCodeAt(0);
+    });
+    return buffer;
+}
+
+function compareArrayBuffers(buffer1, buffer2) {
+    var len1 = buffer1.byteLength;
+    var len2 = buffer2.byteLength;
+    var view1 = new Uint8Array(buffer1);
+    var view2 = new Uint8Array(buffer2);
+
+    if (len1 !== len2) {
+      return false;
+    }
+
+    for (var i = 0; i < len1; i++) {
+      if (!view1[i] || view1[i] !== view2[i]) {
+        return false;
+      }
+    }
+    return true;
+}
+
+test('Parse Mark binary value', function(assert) {
+	// test binary
+	assert.equal(compareArrayBuffers(Mark.parse('{:TWFu}'), stringArrayBuffer("Man")), true, "Mark binary of 'Man'");
+	assert.equal(compareArrayBuffers(Mark.parse('{:SGVs bG8 gd29 ybGQ=}'), stringArrayBuffer("Hello world")), true, "Mark binary of 'Hello world'");
+	assert.equal(compareArrayBuffers(Mark.parse('{: SGVsb \t G8gd29 \r\n ybGRzIQ==}'), stringArrayBuffer("Hello worlds!")), true, "Mark binary of 'Hello worlds!'");
 	
 	assert.end();
 });

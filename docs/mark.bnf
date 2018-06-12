@@ -30,13 +30,9 @@ pchar_non_slash ::= [#x20-#x2E] | [#x30-#x7E] | [#x80-#x10FFFF] /* Printable cha
 /*--------------------------------------------------------*/
 
 ws ::= (SP |                /* Space */
-        ows |               /* Other space-like characters */
+        HTAB |             /* Horizontal tab */
         eol |               /* Line ending */
 		comment)*           /* Comment */
-
-ows ::= HTAB |              /* Horizontal tab */
-      [#xA0] |              /* NBSP */
-      [#xFEFF]              /* BOM */
 
 /*--------------------------------------------------------*/
 

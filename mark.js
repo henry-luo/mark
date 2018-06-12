@@ -349,510 +349,559 @@ MARK.parse = (function() {
         ch,           	// The current character
 		text,			// The text being parsed
 		
-        escapee = {
-            "'":  "'",		// this is needed as we allows single quote
-            '"':  '"',
-            '\\': '\\',
-            '/':  '/',
-            '\n': '',       // Replace escaped newlines in strings w/ empty string
-            b:    '\b',
-            f:    '\f',
-            n:    '\n',
-            r:    '\r',
-            t:    '\t'
-        },
-        ws = [
-            ' ',
-            '\t',
-            '\r',
-            '\n',
-            '\v',
-            '\f',
-            '\xA0',
-            '\uFEFF'
-        ],
+	escapee = {
+		"'":  "'",		// this is needed as we allows single quote
+		'"':  '"',
+		'\\': '\\',
+		'/':  '/',
+		'\n': '',       // Replace escaped newlines in strings w/ empty string
+		b:    '\b',
+		f:    '\f',
+		n:    '\n',
+		r:    '\r',
+		t:    '\t'
+	},
+	ws = [' ', '\t', '\r', '\n'],
         
-        renderChar = function(chr) {
-            return chr === '' ? 'EOF' : "'" + chr + "'";
-        },
+    renderChar = function(chr) {
+		return chr === '' ? 'EOF' : "'" + chr + "'";
+	},
 
-        error = function(m) {
-			// Call error when something is wrong.
-			// todo: Still to read can scan to end of line
-			var columnNumber = at - columnStart;
-			var msg = m + " at line " + lineNumber + " column " + columnNumber + " of the Mark data. Still to read: " + JSON.stringify(text.substring(at - 1, at + 30) + "...");
-            var error = new SyntaxError(msg);
-            // beginning of message suffix to agree with that provided by Gecko - see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse
-            error.at = at;
-            // These two property names have been chosen to agree with the ones in Gecko, the only popular
-            // environment which seems to supply this info on JSON.parse
-            error.lineNumber = lineNumber;
-            error.columnNumber = columnNumber;
-            throw error;
-        },
+	error = function(m) {
+		// Call error when something is wrong.
+		// todo: Still to read can scan to end of line
+		var columnNumber = at - columnStart;
+		var msg = m + " at line " + lineNumber + " column " + columnNumber + " of the Mark data. Still to read: " + JSON.stringify(text.substring(at - 1, at + 30) + "...");
+		var error = new SyntaxError(msg);
+		// beginning of message suffix to agree with that provided by Gecko - see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse
+		error.at = at;
+		// These two property names have been chosen to agree with the ones in Gecko, the only popular
+		// environment which seems to supply this info on JSON.parse
+		error.lineNumber = lineNumber;
+		error.columnNumber = columnNumber;
+		throw error;
+	},
 
-        next = function (c) {
-			// If a c parameter is provided, verify that it matches the current character.
-            if (c && c !== ch) {
-                error("Expected " + renderChar(c) + " instead of " + renderChar(ch));
-            }
-			// Get the next character. When there are no more characters, return the empty string.
-            ch = text.charAt(at);
-            at++;
-            if (ch === '\n' || ch === '\r' && peek() !== '\n') {
-                lineNumber++;  columnStart = at;
-            }
-            return ch;
-        },
+	next = function (c) {
+		// If a c parameter is provided, verify that it matches the current character.
+		if (c && c !== ch) {
+			error("Expected " + renderChar(c) + " instead of " + renderChar(ch));
+		}
+		// Get the next character. When there are no more characters, return the empty string.
+		ch = text.charAt(at);
+		at++;
+		if (ch === '\n' || ch === '\r' && peek() !== '\n') {
+			lineNumber++;  columnStart = at;
+		}
+		return ch;
+	},
 
-        peek = function () {
-			// Get the next character without consuming it or
-			// assigning it to the ch varaible.
-            return text.charAt(at);
-        },
+	peek = function () {
+		// Get the next character without consuming it or
+		// assigning it to the ch varaible.
+		return text.charAt(at);
+	},
 
-		// Parse an identifier.
-        identifier = function () {
-			// To keep it simple, Mark identifiers do not support Unicode "letters", as in JS; if needed, use quoted syntax
-            var key = ch;
+	// Parse an identifier.
+	identifier = function () {
+		// To keep it simple, Mark identifiers do not support Unicode "letters", as in JS; if needed, use quoted syntax
+		var key = ch;
 
-            // identifiers must start with a letter, _ or $.
-            if ((ch !== '_' && ch !== '$') && (ch < 'a' || ch > 'z') && (ch < 'A' || ch > 'Z')) {
-                error("Bad identifier as unquoted key");
-            }
+		// identifiers must start with a letter, _ or $.
+		if ((ch !== '_' && ch !== '$') && (ch < 'a' || ch > 'z') && (ch < 'A' || ch > 'Z')) {
+			error("Bad identifier as unquoted key");
+		}
 
-            // subsequent characters can contain digits.
-            while (next() && (
-				('a' <= ch && ch <= 'z') ||
-				('A' <= ch && ch <= 'Z') ||
-				('0' <= ch && ch <= '9') ||
-				ch === '_' || ch === '$' ||
-				ch === '.' || ch === '-'  // add 2 special chars commonly used in html and xml names, which are not valid JS name chars
-				)) {
-                key += ch;
-            }
+		// subsequent characters can contain digits.
+		while (next() && (
+			('a' <= ch && ch <= 'z') ||
+			('A' <= ch && ch <= 'Z') ||
+			('0' <= ch && ch <= '9') ||
+			ch === '_' || ch === '$' ||
+			ch === '.' || ch === '-'  // add 2 special chars commonly used in html and xml names, which are not valid JS name chars
+			)) {
+			key += ch;
+		}
 
-            return key;
-        },
+		return key;
+	},
 
-		// Parse a number value.
-        number = function () {
-            let number, sign = '', string = '', base = 10;
+	// Parse a number value.
+	number = function () {
+		let number, sign = '', string = '', base = 10;
 
-            if (ch === '-' || ch === '+') {
-                sign = ch;  next(ch);
-            }
+		if (ch === '-' || ch === '+') {
+			sign = ch;  next(ch);
+		}
 
-            // support for Infinity (could tweak to allow other words):
-            if (ch === 'I') {
-                number = word();
-                if (typeof number !== 'number' || isNaN(number)) {
-                    error('Unexpected word for number');
-                }
-                return (sign === '-') ? -number : number;
-            }
-
-            // support for NaN
-            if (ch === 'N' ) {
-              number = word();
-              if (!isNaN(number)) {
-                error('expected word to be NaN');
-              }
-              // ignore sign as -NaN also is NaN
-              return number;
-            }
-
-            if (ch === '0') {
-                string += ch;  next();
-			} else {
-                while (ch >= '0' && ch <= '9' ) {
-                    string += ch;
-                    next();
-                }
-                if (ch === '.') {
-                    string += '.';
-                    while (next() && ch >= '0' && ch <= '9') {
-                        string += ch;
-                    }
-                }
-                if (ch === 'e' || ch === 'E') {
-                    string += ch;
-                    next();
-                    if (ch === '-' || ch === '+') {
-                        string += ch;
-                        next();
-                    }
-                    while (ch >= '0' && ch <= '9') {
-                        string += ch;
-                        next();
-                    }
-                }			
+		// support for Infinity (could tweak to allow other words):
+		if (ch === 'I') {
+			number = word();
+			if (typeof number !== 'number' || isNaN(number)) {
+				error('Unexpected word for number');
 			}
+			return (sign === '-') ? -number : number;
+		}
 
-            if (sign === '-') {
-                number = -string;
-            } else {
-                number = +string;
-            }
+		// support for NaN
+		if (ch === 'N' ) {
+			number = word();
+			if (!isNaN(number)) {
+			error('expected word to be NaN');
+			}
+			// ignore sign as -NaN also is NaN
+			return number;
+		}
 
-            if (!isFinite(number)) {
-                error("Bad number");
-            } else {
-                return number;
-            }
-        },
-
-		// Parse a string value.
-        string = function() {			
-            var hex, i, string = '', triple = false,
-                delim,      // double quote or single quote
-                uffff;
-
-			// when parsing for string values, we must look for ' or " and \ characters.
-            if (ch === '"' || ch === "'") {
-                delim = ch;
-				if (peek() === delim && text.charAt(at+1) === delim) { // got tripple quote
-					triple = true;  next();  next();
+		if (ch === '0') {
+			string += ch;  next();
+		} else {
+			while (ch >= '0' && ch <= '9' ) {
+				string += ch;
+				next();
+			}
+			if (ch === '.') {
+				string += '.';
+				while (next() && ch >= '0' && ch <= '9') {
+					string += ch;
 				}
-                while (next()) {
-                    if (ch === delim) {
-                        next();
-						if (!triple) { // end of string
-							return string;
-						}
-						else if (ch === delim && peek() === delim) { // end of tripple quoted text
-							next();  next();  return string;
-						}
-						else {
-							string += delim;
-						}
-						// continue
-                    }
-					if (ch === '\\') { // escape sequence
-						if (triple) { string += '\\'; } // treated as normal char
-						else { // escape sequence
-							next();
-							if (ch === 'u') { // unicode escape sequence
-								uffff = 0;
-								for (i = 0; i < 4; i += 1) {
-									hex = parseInt(next(), 16);
-									if (!isFinite(hex)) {
-										break;
-									}
-									uffff = uffff * 16 + hex;
-								}
-								string += String.fromCharCode(uffff);
-							} 
-							else if (ch === '\r') { // ignore the line-end, as defined in ES5
-								if (peek() === '\n') {
-									next();
-								}
-							} else if (typeof escapee[ch] === 'string') {
-								string += escapee[ch];
-							} else { 
-								break;  // bad escape
-							}
-						}
-                    } 
-					// else if (ch === '\n') {
-                        // unescaped newlines are invalid in JSON, but valid in Mark; 
-                        // see: https://github.com/json5/json5/issues/24
-                        // break;
-                    // } 
-					else { // normal char
-                        string += ch;
-                    }
-                }
-            }
-            error("Bad string");
-        },
-
-		// Parse an inline comment
-        inlineComment = function () {
-			// Skip an inline comment, assuming this is one. The current character should
-			// be the second / character in the // pair that begins this inline comment.
-			// To finish the inline comment, we look for a newline or the end of the text.
-            if (ch !== '/') {
-                error("Not an inline comment");
-            }
-            do {
-                next();
-                if (ch === '\n' || ch === '\r') {
-                    next();
-                    return;
-                }
-            } while (ch);
-        },
-
-		// Parse a block comment
-        blockComment = function () {
-			// Skip a block comment, assuming this is one. The current character should be
-			// the * character in the /* pair that begins this block comment.
-			// To finish the block comment, we look for an ending */ pair of characters,
-			// but we also watch for the end of text before the comment is terminated.
-            if (ch !== '*') {
-                error("Not a block comment");
-            }
-            do {
-                next();
-                while (ch === '*') {
-                    next('*');
-                    if (ch === '/') {
-                        next('/');
-                        return;
-                    }
-                }
-            } while (ch);
-
-            error("Unterminated block comment");
-        },
-
-		// Parse a comment
-        comment = function () {
-			// Skip a comment, whether inline or block-level, assuming this is one.
-			// Comments always begin with a / character.
-            if (ch !== '/') {
-                error("Not a comment");
-            }
-            next('/');
-            if (ch === '/') {
-                inlineComment();
-            } else if (ch === '*') {
-                blockComment();
-            } else {
-                error("Unrecognized comment");
-            }
-        },
-
-		// Parse whitespace and comments.
-        white = function() {
-			// Note that we're detecting comments by only a single / character.
-			// This works since regular expressions are not valid JSON(5), but this will
-			// break if there are other valid values that begin with a / character!
-            while (ch) {
-                if (ch === '/') {
-                    comment();
-                } else if (ws.indexOf(ch) >= 0) {
-                    next();
-                } else {
-                    return;
-                }
-            }
-        },
-
-		// Parse true, false, or null.
-        word = function() {
-            switch (ch) {
-            case 't':
-				if (text[at] === 'r' && text[at+1] === 'u' && text[at+2] === 'e' && !isNameStart(text[at+3])) {
-					ch = text[at+3];  at += 4;  return true;
-				}
-				break;
-            case 'f':
-				if (text[at] === 'a' && text[at+1] === 'l' && text[at+2] === 's' && text[at+3] === 'e' && !isNameStart(text[at+4])) {
-					ch = text[at+4];  at += 5;  return false;
-				}				
-                break;
-            case 'n':
-				if (text[at] === 'u' && text[at+1] === 'l' && text[at+2] === 'l' && !isNameStart(text[at+3])) {
-					ch = text[at+3];  at += 4;  return null;
-				}
-                break;
-            case 'I':
-				if (text[at] === 'n' && text[at+1] === 'f' && text[at+2] === 'i' && text[at+3] === 'n' && text[at+4] === 'i' 
-					&& text[at+5] === 't' && text[at+6] === 'y' && !isNameStart(text[at+7])) {
-					ch = text[at+7];  at += 8;  return Infinity;
-				}
-                break;
-            case 'N':
-				if (text[at] === 'a' && text[at+1] === 'N' && !isNameStart(text[at+2])) {
-					ch = text[at+2];  at += 3;  return NaN;
-				}
-            }
-            error("Unexpected character " + renderChar(ch));
-        },
-
-        value,  // Place holder for the value function.
-
-		// Parse an array
-        array = function() {
-            var array = [];
-			
-			next();  // skip the starting '['
-			white();
-			while (ch) {
-				if (ch === ']') {
+			}
+			if (ch === 'e' || ch === 'E') {
+				string += ch;
+				next();
+				if (ch === '-' || ch === '+') {
+					string += ch;
 					next();
-					return array;   // Potentially empty array
 				}
-				// ES5 allows omitted elements in arrays, e.g. [,] and [,null]. JSON and Mark don't allow this.
-				if (ch === ',') {
-					error("Missing array element");
-				} else {
-					array.push(value());
+				while (ch >= '0' && ch <= '9') {
+					string += ch;
+					next();
 				}
-				white();
-				
-				// comma is optional in Mark
-				if (ch === ',') { next();  white(); }
+			}			
+		}
+
+		if (sign === '-') {
+			number = -string;
+		} else {
+			number = +string;
+		}
+
+		if (!isFinite(number)) {
+			error("Bad number");
+		} else {
+			return number;
+		}
+	},
+
+	// Parse a string value.
+	string = function() {			
+		var hex, i, string = '', triple = false,
+			delim,      // double quote or single quote
+			uffff;
+
+		// when parsing for string values, we must look for ' or " and \ characters.
+		if (ch === '"' || ch === "'") {
+			delim = ch;
+			if (peek() === delim && text.charAt(at+1) === delim) { // got tripple quote
+				triple = true;  next();  next();
 			}
-		}, 
-
-		// Parse an object or pragma
-        object = function(parent) {
-			let obj = {}, 
-				key = null, 		// property key
-				extended = false, 	// whether the is extended Mark object or legacy JSON object
-				hasBrace = false, 	// whether the object has any unescaped brace
-				index = 0;  	
-			// all 3 types: Mark object, JSON object, Mark pragma store reference to parent 
-			if (parent) { obj[$parent] = parent; } 
-
-			next();  // skip the starting '{'
-			// store the current source position, in case we need to backtrack later
-			let bkAt = at, bkLineNumber = lineNumber, bkColumnStart = columnStart;
-
-			let putText = function(text) {
-				// check preceding node
-				if (index > 0 && typeof obj[index-1] === 'string') {
-					// merge with previous text
-					obj[index-1] += text;
-				} else {
-					Object.defineProperty(obj, index, {value:text, writable:true, configurable:true}); // make content non-enumerable
-					index++;
-				}
-			},
-			parseContent = function() {
-				while (ch) {
-					if (ch === '{') { // child object
-						hasBrace = true;
-						let child = object(obj);  child[$parent] = obj;
-						Object.defineProperty(obj, index, {value:child, writable:true, configurable:true}); // make content non-enumerable
-						index++;  
+			while (next()) {
+				if (ch === delim) {
+					next();
+					if (!triple) { // end of string
+						return string;
 					}
-					else if (ch === '"' || ch === "'") { // text node
-						let str = string();
-						// only output non empty text
-						if (str) putText(str);
-					}
-					else if (ch === '}') { 
-						next();  obj[$length] = index;
-						return;
+					else if (ch === delim && peek() === delim) { // end of tripple quoted text
+						next();  next();  return string;
 					}
 					else {
-						error("Unexpected character " + renderChar(ch));
+						string += delim;
 					}
-					white();
+					// continue
 				}
-				error(UNEXPECT_END);		
-			},
-			parsePragma = function() {
-				if (hasBrace || key) { error("Bad object"); } // cannot be parsed as Mark pragma, as brace needs to be escaped in Mark pragma
-				// restore parsing position, and try parse as Mark pragma
-				at = bkAt;  lineNumber = bkLineNumber;  columnStart = bkColumnStart;
-				ch = text.charAt(at - 1);
-				
-				let pragma = '';
-				while (ch) {
-					if (ch === '}') { // end of pragma
+				if (ch === '\\') { // escape sequence
+					if (triple) { string += '\\'; } // treated as normal char
+					else { // escape sequence
 						next();
-						let pgm = MARK.pragma(pragma);  pgm[$parent] = parent;
-						return pgm;
-					}				
-					else if (ch === '\\') { 
-						// escape seq for '{', '}', ':', ';', as html, xml comment may contain these characters
-						next();
-						if (ch !== '{' && ch !== '}' && ch !== ':' && ch !== ';') { pragma += '\\'; }
-						// else treated as normal character
-					}
-					else if (ch === '{' || ch === '}' || ch === ':') {
-						error("Bad object"); // throw error 'Bad object', assuming user wants to write JSON or Mark object, not pragma
-					}
-					else if (ch === ';') {
-						error("Character ';' should be escaped in Mark pragma");
-					}
-					pragma += ch;
-					next();
-				}
-				error(UNEXPECT_END);
-			};
-			
-			white();
-			while (ch) {
-				if (ch === '}') { // end of the object
-					next();  
-					if (extended) { obj[$length] = index; }
-					return obj;   // could be empty object
-				}
-				// scan the key
-				if (ch === '{') { // child object
-					if (extended) {
-						hasBrace = true;  parseContent();  return obj;
-					}
-					error("Unexpected character '{'");
-				}
-				if (ch === '"' || ch === "'") { // quoted key
-					var str = string();  white();
-					if (ch === ':') { // property or JSON object
-						key = str;
-					} else {
-						if (extended) { // already got type name
-							// only output non-empty text
-							if (str) putText(str);
-							if (ch === '}' || ch === '{' || ch === '"' || ch === "'") { 
-								parseContent();  return obj;
+						if (ch === 'u') { // unicode escape sequence
+							uffff = 0;
+							for (i = 0; i < 4; i += 1) {
+								hex = parseInt(next(), 16);
+								if (!isFinite(hex)) {
+									break;
+								}
+								uffff = uffff * 16 + hex;
 							}
-							else { return parsePragma(); }
-						}
-						else if (!key) { // at the starting of the object
-							// create the object
-							obj = MARK(str, null, null);
-							extended = true;  // key = str;
-							continue;							
-						}
-						else { 
-							return parsePragma();
+							string += String.fromCharCode(uffff);
+						} 
+						else if (ch === '\r') { // ignore the line-end, as defined in ES5
+							if (peek() === '\n') {
+								next();
+							}
+						} else if (typeof escapee[ch] === 'string') {
+							string += escapee[ch];
+						} else { 
+							break;  // bad escape
 						}
 					}
+				} 
+				// else if (ch === '\n') {
+					// unescaped newlines are invalid in JSON, but valid in Mark; 
+					// see: https://github.com/json5/json5/issues/24
+					// break;
+				// } 
+				else { // normal char
+					string += ch;
 				}
-				// Mark key or binary literal
-				else if (ch==='_' || ch==='$' || 'a'<=ch && ch<='z' || 'A'<=ch && ch<='Z') {
-					// Mark unquoted key, which needs to be valid JS identifier.
-					var ident = identifier();  white();
-					if (ch == ':') { // property value
-						key = ident;
-					} else {
-						if (!extended) { // start of Mark object
-							obj = MARK(ident, null, null);
-							extended = true;  // key = ident;
-							continue;
+			}
+		}
+		error("Bad string");
+	},
+
+	// Parse an inline comment
+	inlineComment = function () {
+		// Skip an inline comment, assuming this is one. The current character should
+		// be the second / character in the // pair that begins this inline comment.
+		// To finish the inline comment, we look for a newline or the end of the text.
+		if (ch !== '/') {
+			error("Not an inline comment");
+		}
+		do {
+			next();
+			if (ch === '\n' || ch === '\r') {
+				next();
+				return;
+			}
+		} while (ch);
+	},
+
+	// Parse a block comment
+	blockComment = function () {
+		// Skip a block comment, assuming this is one. The current character should be
+		// the * character in the /* pair that begins this block comment.
+		// To finish the block comment, we look for an ending */ pair of characters,
+		// but we also watch for the end of text before the comment is terminated.
+		if (ch !== '*') {
+			error("Not a block comment");
+		}
+		do {
+			next();
+			while (ch === '*') {
+				next('*');
+				if (ch === '/') {
+					next('/');
+					return;
+				}
+			}
+		} while (ch);
+
+		error("Unterminated block comment");
+	},
+
+	// Parse a comment
+	comment = function () {
+		// Skip a comment, whether inline or block-level, assuming this is one.
+		// Comments always begin with a / character.
+		if (ch !== '/') {
+			error("Not a comment");
+		}
+		next('/');
+		if (ch === '/') {
+			inlineComment();
+		} else if (ch === '*') {
+			blockComment();
+		} else {
+			error("Unrecognized comment");
+		}
+	},
+
+	// Parse whitespace and comments.
+	white = function() {
+		// Note that we're detecting comments by only a single / character.
+		// This works since regular expressions are not valid JSON(5), but this will
+		// break if there are other valid values that begin with a / character!
+		while (ch) {
+			if (ch === '/') {
+				comment();
+			} else if (ws.indexOf(ch) >= 0) {
+				next();
+			} else {
+				return;
+			}
+		}
+	},
+
+	// Parse true, false, null, Infinity, NaN
+	word = function() {
+		switch (ch) {
+		case 't':
+			if (text[at] === 'r' && text[at+1] === 'u' && text[at+2] === 'e' && !isNameStart(text[at+3])) {
+				ch = text[at+3];  at += 4;  return true;
+			}
+			break;
+		case 'f':
+			if (text[at] === 'a' && text[at+1] === 'l' && text[at+2] === 's' && text[at+3] === 'e' && !isNameStart(text[at+4])) {
+				ch = text[at+4];  at += 5;  return false;
+			}				
+			break;
+		case 'n':
+			if (text[at] === 'u' && text[at+1] === 'l' && text[at+2] === 'l' && !isNameStart(text[at+3])) {
+				ch = text[at+3];  at += 4;  return null;
+			}
+			break;
+		case 'I':
+			if (text[at] === 'n' && text[at+1] === 'f' && text[at+2] === 'i' && text[at+3] === 'n' && text[at+4] === 'i' 
+				&& text[at+5] === 't' && text[at+6] === 'y' && !isNameStart(text[at+7])) {
+				ch = text[at+7];  at += 8;  return Infinity;
+			}
+			break;
+		case 'N':
+			if (text[at] === 'a' && text[at+1] === 'N' && !isNameStart(text[at+2])) {
+				ch = text[at+2];  at += 3;  return NaN;
+			}
+		}
+		error("Unexpected character " + renderChar(ch));
+	},
+
+	value,  // Place holder for the value function.
+
+	// Parse an array
+	array = function() {
+		var array = [];
+		
+		next();  // skip the starting '['
+		white();
+		while (ch) {
+			if (ch === ']') {
+				next();
+				return array;   // Potentially empty array
+			}
+			// ES5 allows omitted elements in arrays, e.g. [,] and [,null]. JSON and Mark don't allow this.
+			if (ch === ',') {
+				error("Missing array element");
+			} else {
+				array.push(value());
+			}
+			white();
+			
+			// comma is optional in Mark
+			if (ch === ',') { next();  white(); }
+		}
+	};
+
+	// Parse binary
+	let base64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/",
+	// Use a lookup table to find the index.
+	lookup = new Uint8Array(256);
+	lookup.fill(65); // denote invalid value
+	for (var i = 0; i < 64; i++) {
+		lookup[base64.charCodeAt(i)] = i;
+	}
+	// ' ', \t', '\r', '\n' spaces also allowed in base64 stream
+	lookup[32] = lookup[9] = lookup[13] = lookup[10] = 64;
+
+	let binary = function(parent) {
+		at++;  // skip the starting '{:'
+		if (text[at] === '~') { // base85
+		}
+		else { // base64
+			// code based on https://github.com/niklasvh/base64-arraybuffer
+			let end = text.indexOf('}', at), bufEnd = end;  // scan binary end
+			if (end < 0) { error("Missing base64 end delimiter"); }
+			// strip optional padding
+			if (text[bufEnd-1] === '=') { // 1st padding
+				bufEnd--;
+				if (text[bufEnd-1] === '=') { // 2nd padding
+					bufEnd--;
+				}
+			}
+			if (bufEnd <= at) { error("Invalid base64 encoding"); }
+			console.log('binary char length: ', bufEnd - at);
+
+			// first run decodes into base64 int values, and skip the spaces
+			let base = new Uint8Array(new ArrayBuffer(bufEnd - at)), p = 0;
+			while (at < bufEnd) {
+				let code = lookup[text.charCodeAt(at)];  console.log('bin: ', text[at], code);
+				if (code > 64) { error("Invalid base64 encoding"); }
+				if (code < 64) { base[p++] = code; }
+				// else skip spaces
+				at++;
+			}
+			at = end+1;  next();  // skip '}'
+
+			// second run decodes into actual binary data
+			let len = Math.floor(p * 0.75), code1, code2, code3, code4,
+				buffer = new ArrayBuffer(len), bytes = new Uint8Array(buffer);
+			console.log('binary length: ', len);
+			for (let i = 0, p = 0; p < len; i += 4) {
+				code1 = base[i];  code2 = base[i+1];
+				code3 = base[i+2];  code4 = base[i+3];
+				bytes[p++] = (code1 << 2) | (code2 >> 4);
+				// extra bytes will be ignored by JS arraybuffer
+				bytes[p++] = ((code2 & 15) << 4) | (code3 >> 2);
+				bytes[p++] = ((code3 & 3) << 6) | (code4 & 63);
+			}
+			console.log('binary decoded length:', p);
+			buffer[$parent] = parent;
+			return buffer;
+		}
+	},
+
+	// Parse an object, pragma or binary
+	object = function(parent) {
+		let obj = {}, 
+			key = null, 		// property key
+			extended = false, 	// whether the is extended Mark object or legacy JSON object
+			hasBrace = false, 	// whether the object has any unescaped brace
+			index = 0;  	
+		// all 3 types: Mark object, JSON object, Mark pragma store reference to parent 
+		if (parent) { obj[$parent] = parent; } 
+
+		next();  // skip the starting '{'
+		// store the current source position, in case we need to backtrack later
+		let bkAt = at, bkLineNumber = lineNumber, bkColumnStart = columnStart;
+
+		let putText = function(text) {
+			// check preceding node
+			if (index > 0 && typeof obj[index-1] === 'string') {
+				// merge with previous text
+				obj[index-1] += text;
+			} else {
+				Object.defineProperty(obj, index, {value:text, writable:true, configurable:true}); // make content non-enumerable
+				index++;
+			}
+		},
+		parseContent = function() {
+			while (ch) {
+				if (ch === '{') { // child object
+					hasBrace = true;
+					let child = (text[at] === ':') ? binary(obj) : object(obj);  child[$parent] = obj;
+					Object.defineProperty(obj, index, {value:child, writable:true, configurable:true}); // make content non-enumerable
+					index++;  
+				}
+				else if (ch === '"' || ch === "'") { // text node
+					let str = string();
+					// only output non empty text
+					if (str) putText(str);
+				}
+				else if (ch === '}') { 
+					next();  obj[$length] = index;
+					return;
+				}
+				else {
+					error("Unexpected character " + renderChar(ch));
+				}
+				white();
+			}
+			error(UNEXPECT_END);		
+		},
+		parsePragma = function() {
+			if (hasBrace || key) { error("Bad object"); } // cannot be parsed as Mark pragma, as brace needs to be escaped in Mark pragma
+			// restore parsing position, and try parse as Mark pragma
+			at = bkAt;  lineNumber = bkLineNumber;  columnStart = bkColumnStart;
+			ch = text.charAt(at - 1);
+			
+			let pragma = '';
+			while (ch) {
+				if (ch === '}') { // end of pragma
+					next();
+					let pgm = MARK.pragma(pragma);  pgm[$parent] = parent;
+					return pgm;
+				}				
+				else if (ch === '\\') { 
+					// escape seq for '{', '}', ':', ';', as html, xml comment may contain these characters
+					next();
+					if (ch !== '{' && ch !== '}' && ch !== ':' && ch !== ';') { pragma += '\\'; }
+					// else treated as normal character
+				}
+				else if (ch === '{' || ch === '}' || ch === ':') {
+					error("Bad object"); // throw error 'Bad object', assuming user wants to write JSON or Mark object, not pragma
+				}
+				else if (ch === ';') {
+					error("Character ';' should be escaped in Mark pragma");
+				}
+				pragma += ch;
+				next();
+			}
+			error(UNEXPECT_END);
+		};
+		
+		white();
+		while (ch) {
+			if (ch === '}') { // end of the object
+				next();  
+				if (extended) { obj[$length] = index; }
+				return obj;   // could be empty object
+			}
+			// scan the key
+			if (ch === '{') { // child object
+				if (extended) {
+					hasBrace = true;  parseContent();  return obj;
+				}
+				error("Unexpected character '{'");
+			}
+			if (ch === '"' || ch === "'") { // quoted key
+				var str = string();  white();
+				if (ch === ':') { // property or JSON object
+					key = str;
+				} else {
+					if (extended) { // already got type name
+						// only output non-empty text
+						if (str) putText(str);
+						if (ch === '}' || ch === '{' || ch === '"' || ch === "'") { 
+							parseContent();  return obj;
 						}
+						else { return parsePragma(); }
+					}
+					else if (!key) { // at the starting of the object
+						// create the object
+						obj = MARK(str, null, null);
+						extended = true;  // key = str;
+						continue;							
+					}
+					else { 
 						return parsePragma();
 					}
 				}
-				else { 
+			}
+			// Mark key or binary literal
+			else if (ch==='_' || ch==='$' || 'a'<=ch && ch<='z' || 'A'<=ch && ch<='Z') {
+				// Mark unquoted key, which needs to be valid JS identifier.
+				var ident = identifier();  white();
+				if (ch == ':') { // property value
+					key = ident;
+				} else {
+					if (!extended) { // start of Mark object
+						obj = MARK(ident, null, null);
+						extended = true;  // key = ident;
+						continue;
+					}
 					return parsePragma();
 				}
-				
-				// key-value pair
-				// assert(ch == ':');
-				next(); // skip ':'
-				if (ch === '{') { hasBrace = true; }
-				var val = value();
-				if (extended && !isNaN(key*1)) { // any numeric key is rejected for Mark object
-					error("Numeric key not allowed as Mark property name");
-				}
-				if (obj[key] && typeof obj[key] !== 'function') {
-					error("Duplicate key not allowed: " + key);
-				}
-				obj[key] = val;  white();
-				// ',' is optional in Mark
-				if (ch === ',') {
-					next();  white();
-				} 
 			}
-			error(UNEXPECT_END);
-        };
+			else { 
+				return parsePragma();
+			}
+			
+			// key-value pair
+			// assert(ch == ':');
+			next(); // skip ':'
+			if (ch === '{') { hasBrace = true; }
+			var val = value();
+			if (extended && !isNaN(key*1)) { // any numeric key is rejected for Mark object
+				error("Numeric key not allowed as Mark property name");
+			}
+			if (obj[key] && typeof obj[key] !== 'function') {
+				error("Duplicate key not allowed: " + key);
+			}
+			obj[key] = val;  white();
+			// ',' is optional in Mark
+			if (ch === ',') {
+				next();  white();
+			} 
+		}
+		error(UNEXPECT_END);
+	};
 
 	// Parse a JSON value. 
 	value = function() {
@@ -860,7 +909,7 @@ MARK.parse = (function() {
         white();
         switch (ch) {
         case '{':
-            return object();
+            return (text[at] === ':') ? binary() : object();
         case '[':
             return array();
         case '"':
@@ -878,10 +927,7 @@ MARK.parse = (function() {
 	// Return the enclosed parse function. It will have access to all of the above functions and variables.
     return function(source, options) {
 		// initialize the contextual variables
-        at = 0;
-        lineNumber = 1;
-        columnStart = at;
-        ch = ' ';
+        at = 0;  lineNumber = 1;  columnStart = at;  ch = ' ';
 		text = String(source);
 		
 		if (!source) { text = '';  error(UNEXPECT_END); }
@@ -894,33 +940,8 @@ MARK.parse = (function() {
 		// start parsing the root value
         var result = value();
         white();
-        if (ch) {
-            error("Syntax error");
-        }
-		
-		// Mark does not support the legacy JSON reviver function:
-		// If there is a reviver function, we recursively walk the new structure,
-		// passing each name/value pair to the reviver function for possible
-		// transformation, starting with a temporary root object that holds the result
-		// in an empty key. If there is not a reviver function, we simply return the result.
-		/*
-        return typeof options === 'function' ? (function walk(holder, key) {
-            var k, v, value = holder[key];
-            if (value && typeof value === 'object') {
-                for (k in value) {
-                    if (Object.prototype.hasOwnProperty.call(value, k)) {
-                        v = walk(value, k);
-                        if (v !== undefined) {
-                            value[k] = v;
-                        } else {
-                            delete value[k];
-                        }
-                    }
-                }
-            }
-            return options.call(holder, key, value);
-        }({'': result}, '')) : result;
-		*/
+        if (ch) { error("Expect end of input"); }
+		// Mark does not support the legacy JSON reviver function
 		return result;
     };
 }());
