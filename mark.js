@@ -965,8 +965,9 @@ MARK.stringify = function(obj, options) {
 			// load helper on demand
 			if (!$convert) { $convert = require('./lib/mark.convert.js')(MARK); }
 			$convert.indent = indent;
-			if (options.format === 'xml') return $convert.toXml(obj, options);
-			if (options.format === 'html') return $convert.toHtml(obj, options);
+			if (options.format === 'xml' || options.format === 'html') 
+				return $convert.toSgml(obj, options);
+			else return null;
 		}
 		// else stringify as Mark	
 	}

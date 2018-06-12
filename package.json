@@ -25,7 +25,7 @@
     "build-mark": "browserify -x htmlparser2 --standalone Mark mark.js | uglifyjs > dist/mark.js",
     "build-es5": "browserify -x htmlparser2 -t [ babelify --presets [ es2015 ] --plugins [ transform-runtime ] ] --standalone Mark mark.js | uglifyjs > dist/mark.es5.js",
     "build-find": "browserify --full-paths -x debug ./dev/mark.find.js | discify --open",
-    "list-core": "browserify --full-paths -x ./lib/mark.convert.js -x ./lib/mark.selector.js -x htmlparser2 mark.core.js | discify --open",
+    "list-core": "browserify --full-paths -x ./lib/mark.mutate.js -x ./lib/mark.convert.js -x ./lib/mark.selector.js -x htmlparser2 mark.js | discify --open",
     "list-convert": "browserify --full-paths -x htmlparser2 ./lib/mark.convert.js | discify --open",
     "list-selector": "browserify --full-paths ./lib/mark.selector.js | discify --open",
     "list-mark": "browserify --full-paths -x htmlparser2 mark.js | discify --open",
@@ -54,7 +54,6 @@
   "author": "Henry Luo",
   "license": "MIT",
   "dependencies": {
-    "boolbase": "~1.0.0",
     "commander": "~2.13.0",
     "css-select": "~1.3.0-rc0",
     "helmsman": "~1.0.3",
