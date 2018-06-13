@@ -12,6 +12,8 @@ const $parent = Symbol('Mark.parent');
 const $pragma = Symbol('Mark.pragma');
 let $convert = null;  // Mark Convert API
 
+let base64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
 // polyfills
 function isArray(obj) {
 	return Array.isArray ? Array.isArray(obj) : Object.prototype.toString.call(obj) === '[object Array]';
@@ -690,9 +692,8 @@ MARK.parse = (function() {
 	};
 
 	// Parse binary
-	let base64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/",
 	// Use a lookup table to find the index.
-	lookup = new Uint8Array(256);
+	let lookup = new Uint8Array(256);
 	lookup.fill(65); // denote invalid value
 	for (var i = 0; i < 64; i++) {
 		lookup[base64.charCodeAt(i)] = i;
@@ -716,12 +717,12 @@ MARK.parse = (function() {
 				}
 			}
 			if (bufEnd <= at) { error("Invalid base64 encoding"); }
-			console.log('binary char length: ', bufEnd - at);
+			// console.log('binary char length: ', bufEnd - at);
 
 			// first run decodes into base64 int values, and skip the spaces
 			let base = new Uint8Array(new ArrayBuffer(bufEnd - at)), p = 0;
 			while (at < bufEnd) {
-				let code = lookup[text.charCodeAt(at)];  console.log('bin: ', text[at], code);
+				let code = lookup[text.charCodeAt(at)];  // console.log('bin: ', text[at], code);
 				if (code > 64) { error("Invalid base64 encoding"); }
 				if (code < 64) { base[p++] = code; }
 				// else skip spaces
@@ -741,7 +742,7 @@ MARK.parse = (function() {
 				bytes[p++] = ((code2 & 15) << 4) | (code3 >> 2);
 				bytes[p++] = ((code3 & 3) << 6) | (code4 & 63);
 			}
-			console.log('binary decoded length:', p);
+			// console.log('binary decoded length:', p);
 			buffer[$parent] = parent;
 			return buffer;
 		}
@@ -993,38 +994,6 @@ MARK.stringify = function(obj, options) {
 		// else stringify as Mark	
 	}
 	
-	// Mark no longer supports JSON replacer
-	/*
-	var replacer = null;
-    if (options) {
-		if (typeof options === "function" || isArray(options)) { replacer = options; }
-		else if (typeof options !== "object") throw new Error('Option must be a function or an object');
-    }
-    var getReplacedValueOrUndefined = function(holder, key, isTopLevel) {
-        var value = holder[key];
-		
-		// toJSON call might not be secure, so we don't call it
-        // Replace the value with its toJSON value first, if possible 
-        // if (value && typeof value.toJSON === "function") {
-        //    value = value.toJSON();
-        // }
-		
-        // If the user-supplied replacer if a function, call it. If it's an array, check objects' string keys for
-        // presence in the array (removing the key/value pair from the resulting JSON if the key is missing).
-        if (typeof(replacer) === "function") {
-            return replacer.call(holder, key, value);
-        } else if(replacer) {
-            if (isTopLevel || isArray(holder) || replacer.indexOf(key) >= 0) {
-                return value;
-            } else {
-                return undefined;
-            }
-        } else {
-            return value;
-        }
-    };
-	*/
-
     function isDate(obj) {
         return Object.prototype.toString.call(obj) === '[object Date]';
     }
@@ -1065,98 +1034,115 @@ MARK.stringify = function(obj, options) {
     }
     // End
 
-    function internalStringify(obj_part) {
-        var buffer, res;
+    function _stringify(value) {
+        let buffer;
 
-        // Replace the value, if necessary
-        // var obj_part = holder[key]; // getReplacedValueOrUndefined(holder, key, isTopLevel);
-
-        if (obj_part && !isDate(obj_part)) {
+        // Mark no longer supports JSON replacer
+		
+        if (value && !isDate(value)) {
             // unbox objects, don't unbox dates, since will turn it into number
-            obj_part = obj_part.valueOf();
+            value = value.valueOf();
         }
-        switch (typeof obj_part) {
+        switch (typeof value) {
             case "boolean":
-                return obj_part.toString();
+                return value.toString();
 
             case "number":
-                if (isNaN(obj_part) || !isFinite(obj_part)) {
+                if (isNaN(value) || !isFinite(value)) {
                     return "null";
                 }
-                return obj_part.toString();
+                return value.toString();
 
             case "string":
-                return escapeString(obj_part.toString());
+                return escapeString(value.toString());
 
             case "object":
-                if (obj_part === null) { // null value
+                if (value === null) { // null value
                     return "null";
                 } 
-				else if (isArray(obj_part)) { // Array
-                    checkForCircular(obj_part);  // console.log('print array', obj_part);
+				else if (isArray(value)) { // Array
+                    checkForCircular(value);  // console.log('print array', value);
                     buffer = "[";
-                    objStack.push(obj_part);
+                    objStack.push(value);
 
-                    for (var i = 0; i < obj_part.length; i++) {
-                        res = internalStringify(obj_part[i]);
+                    for (var i = 0; i < value.length; i++) {
+                        let res = _stringify(value[i]);
                         if (indentStep) buffer += indent(objStack.length);
-                        if (res === null || typeof res === "undefined") {
+                        if (res === null || res === undefined) { 
+							// undefined is also converted to null, as Mark and JSON does not support 'undefined' value
                             buffer += "null";
                         } else {
                             buffer += res;
                         }
-                        if (i < obj_part.length-1) {
+                        if (i < value.length-1) {
                             buffer += omitComma ? ' ':',';
                         } else if (indentStep) {
                             buffer += "\n";
                         }
                     }
                     objStack.pop();
-                    if (obj_part.length && indentStep) {
+                    if (value.length && indentStep) {
                         buffer += indent(objStack.length, true);
                     }
                     buffer += "]";
                 }
+				else if (value instanceof ArrayBuffer) { // binary
+					var bytes = new Uint8Array(value), i, fullLen = bytes.length, len = fullLen - (fullLen % 3);
+					buffer = '{:';
+					// bulk encoding
+					for (i = 0; i < len; i+=3) {
+						buffer += base64[bytes[i] >> 2];
+						buffer += base64[((bytes[i] & 3) << 4) | (bytes[i + 1] >> 4)];
+						buffer += base64[((bytes[i + 1] & 15) << 2) | (bytes[i + 2] >> 6)];
+						buffer += base64[bytes[i + 2] & 63];
+					}
+					// trailing bytes and padding
+					if (fullLen % 3) {
+						buffer += base64[bytes[i] >> 2] + base64[((bytes[i] & 3) << 4) | (bytes[i + 1] >> 4)] +
+							(fullLen % 3 === 2 ? base64[(bytes[i + 1] & 15) << 2] : "=") + "=";
+					}
+					buffer += '}';
+				}
 				else { // pragma or object
-                    checkForCircular(obj_part);  // console.log('print obj', obj_part);
+                    checkForCircular(value);  // console.log('print obj', value);
                     buffer = "{";
                     var nonEmpty = false;
-					if (!obj_part.constructor) { // assume Mark pragma
+					if (!value.constructor) { // assume Mark pragma
 						// todo: should escape '{','}' in $pragma
-						return obj_part[$pragma] ? '{' + obj_part[$pragma] + '}' : 'null'/* unknown object */;
+						return value[$pragma] ? '{' + value[$pragma] + '}' : 'null'/* unknown object */;
 					}
 					// Mark or JSON object
-					objStack.push(obj_part);
+					objStack.push(value);
 					// print object type-name, if any
-					if (obj_part.constructor.name !== 'Object' || obj_part instanceof MARK) { 
-						buffer += obj_part.constructor.name;  nonEmpty = true;
+					if (value.constructor.name !== 'Object' || value instanceof MARK) { 
+						buffer += value.constructor.name;  nonEmpty = true;
 					} 
 					// else JSON
 
 					// print object attributes
-					var hasAttr = false;
-                    for (var prop in obj_part) {
-						var value = internalStringify(obj_part[prop]);
-						if (typeof value !== "undefined") {
-							// buffer += indent(objStack.length);                            
-							var key = MARK.isName(prop) ? prop : escapeString(prop);
-							buffer += (hasAttr ? (omitComma ? ' ':', '):(nonEmpty ? ' ':''))+ key +":"+ value;
+					let hasAttr = false;
+                    for (var prop in value) {
+						// prop of undefined value is omitted, as Mark and JSON does not support 'undefined' value
+						let res = _stringify(value[prop]);
+						if (res !== undefined) {                           
+							let key = MARK.isName(prop) ? prop : escapeString(prop);
+							buffer += (hasAttr ? (omitComma ? ' ':', '):(nonEmpty ? ' ':''))+ key +":"+ res;
 							hasAttr = true;  nonEmpty = true;
 						}
                     }
 					// print object content
-					var length = obj_part[$length];
+					let length = value[$length];
 					if (length) {
-						for (var i = 0; i<length; i++) {
+						for (let i = 0; i<length; i++) {
 							buffer += ' ';
-							var item = obj_part[i];
+							let item = value[i];
 							if (typeof item === "string") {
 								if (indentStep) buffer += indent(objStack.length);
 								buffer += escapeString(item.toString());
 							}
 							else if (typeof item === "object") {
 								if (indentStep) buffer += indent(objStack.length);
-								buffer += internalStringify(item);
+								buffer += _stringify(item);
 							}
 							else { console.log("unknown object", item); }
 						}
@@ -1180,7 +1166,7 @@ MARK.stringify = function(obj, options) {
     // special case...when undefined is used inside of a compound object/array, return null.
     // but when top-level, return undefined
     if (obj === undefined) { return undefined; }
-    return internalStringify(obj);
+    return _stringify(obj);
 };
 
 // export the Mark interface

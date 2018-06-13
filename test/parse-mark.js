@@ -117,9 +117,15 @@ function compareArrayBuffers(buffer1, buffer2) {
 
 test('Parse Mark binary value', function(assert) {
 	// test binary
-	assert.equal(compareArrayBuffers(Mark.parse('{:TWFu}'), stringArrayBuffer("Man")), true, "Mark binary of 'Man'");
+	var bin = Mark.parse('{:QXJ0}');
+	assert.equal(compareArrayBuffers(bin, stringArrayBuffer("Art")), true, "Mark binary of 'Art'");
+	assert.equal(bin instanceof ArrayBuffer, true, "Mark binary is instance of ArrayBuffer");
+	assert.equal(bin.byteLength, 3, "byteLength of 'Art' is 3");
 	assert.equal(compareArrayBuffers(Mark.parse('{:SGVs bG8 gd29 ybGQ=}'), stringArrayBuffer("Hello world")), true, "Mark binary of 'Hello world'");
 	assert.equal(compareArrayBuffers(Mark.parse('{: SGVsb \t G8gd29 \r\n ybGRzIQ==}'), stringArrayBuffer("Hello worlds!")), true, "Mark binary of 'Hello worlds!'");
+	
+	var doc = Mark("{doc mime:'text/html' data:{:PGgxPkhlbGxvLCBXb3JsZCE8L2gxPg==}}");
+	assert.equal(compareArrayBuffers(doc.data, stringArrayBuffer("<h1>Hello, World!</h1>")), true, "Mark binary of '<h1>Hello, World!</h1>'");
 	
 	assert.end();
 });
