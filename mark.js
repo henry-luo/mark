@@ -6,37 +6,25 @@
 // which is further based of Douglas Crockford's json_parse.js:
 // https://github.com/douglascrockford/JSON-js/blob/master/json_parse.js
 
+"use strict";
+
 // symbols used internally
-const $length = Symbol('Mark.length');
-const $parent = Symbol('Mark.parent');
-const $pragma = Symbol('Mark.pragma');
-let $convert = null;  // Mark Convert API
-
-let base64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-
-// polyfills
-function isArray(obj) {
-	return Array.isArray ? Array.isArray(obj) : Object.prototype.toString.call(obj) === '[object Array]';
-}
-
-function isNameStart(c) {
-	return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || c === '_' || c === '$';
-}
+const $length = Symbol('Mark.length'),
+	$parent = Symbol('Mark.parent'),
+	$pragma = Symbol('Mark.pragma');
 	
-// static Mark API
-var MARK = (function() {
-	"use strict";
-	// cached constructors for the Mark objects
-	let constructors = {};	
+let $convert = null,  // Mark Convert API
+	constructors = {};	// cached constructors for the Mark objects
 
+// MARK is the static Mark API, it is different from the Mark.prototype that Mark object extends
+var MARK = (function() {
 	// patch IE11
 	if (!constructors.constructor.name) { // IE11 does not set constructor.name to 'Object'
 		obj.constructor.name = 'Object';
 	}
-
-	// Mark object constructor
+	
+	// Mark.prototype and Mark object constructor
 	function Mark(typeName, props, contents) {
-		"use strict";
 		// handle special shorthand
 		if (arguments.length === 1 && typeName[0] === '{') { 
 			return MARK.parse(typeName); 
@@ -104,7 +92,7 @@ var MARK = (function() {
 				}
 			}
 			// contents can be an array or just single value
-			addContents(isArray(contents) ? contents : [contents]);
+			addContents(Array.isArray(contents) ? contents : [contents]);
 		}
 		// set $length
 		obj[$length] = len;
@@ -204,20 +192,6 @@ var MARK = (function() {
 			}
 		},
 		
-		// Mark selector APIs
-		/*
-		find: function(selector) { 
-			// load helper on demand
-			if (!MARK.$select) { MARK.$select = require('./lib/mark.selector.js'); }
-			return MARK.$select(this).find(selector);
-		},
-		matches: function(selector) {
-			// load helper on demand
-			if (!MARK.$select) { MARK.$select = require('./lib/mark.selector.js'); }
-			return MARK.$select(this).matches(selector);
-		},
-		*/
-		
 		// conversion APIs
 		source: function(options) {
 			return MARK.stringify(this, options);
@@ -233,26 +207,6 @@ var MARK = (function() {
 			_text(this);
 			return txt.join('');
 		},
-		/*
-		json: function() {
-			let _json = function(obj) {
-				let jn = {};  jn[0] = obj.constructor.name;
-				for (let p in obj) { jn[p] = obj[p]; }
-				for (let i = 0; i < obj.length(); i++) {
-					let n = obj[i];
-					if (typeof n === 'string') { jn[i+1] = n; }
-					else if (typeof n === 'object') {
-						if (!n.constructor) { // pragma
-							jn[i+1] = {'.':n.pragma()};
-						}
-						else { jn[i+1] = _json(n); }
-					}
-				}
-				return jn;
-			}
-			return _json(this);			
-		},
-		*/
 		html: function(options) {
 			let opt = options || {};  opt.format = 'html';
 			return MARK.stringify(this, opt);
@@ -267,13 +221,6 @@ var MARK = (function() {
 		// API functions are non-enumerable
 		Object.defineProperty(Mark.prototype, a, {value:api[a], writable:true, configurable:true});  
 		// no longer set the APIs on static MARK object, as 'length' is non-writable in node, and non-configurable in IE11
-		/*
-		try {
-			Object.defineProperty(Mark, a, func);
-		} catch (error) {
-			Mark[a] = api[a]; // 'length' is non-configurable in IE
-		}
-		*/
 	}
 	// load mark.selector APIs
 	try {
@@ -311,31 +258,35 @@ var MARK = (function() {
 		return obj;
 	}
 	
-    function isNameChar(c) {
-        return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || ('0' <= c && c <= '9') ||
-            c === '_' || c === '$' || c === '.' || c === '-';
-    }
-	
-	// check if a string is a Mark identifier, exported for convenience
-    Mark.isName = function(key) {
-        if (typeof key !== 'string') {
-            return false;
-        }
-        if (!isNameStart(key[0])) {
-            return false;
-        }
-        var i = 1, length = key.length;
-        while (i < length) {
-            if (!isNameChar(key[i])) {
-                return false;
-            }
-            i++;
-        }
-        return true;
-    }	
-	
 	return Mark;
 })();
+
+// check if a string is a Mark identifier, exported for convenience
+function isNameChar(c) {
+	return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || ('0' <= c && c <= '9') ||
+		c === '_' || c === '$' || c === '.' || c === '-';
+}
+function isNameStart(c) {
+	return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || c === '_' || c === '$';
+}
+MARK.isName = function(key) {
+	if (typeof key !== 'string') {
+		return false;
+	}
+	if (!isNameStart(key[0])) {
+		return false;
+	}
+	var i = 1, length = key.length;
+	while (i < length) {
+		if (!isNameChar(key[i])) {
+			return false;
+		}
+		i++;
+	}
+	return true;
+}
+	
+let base64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 // parse() is only defined on the static Mark API
 MARK.parse = (function() {
@@ -1036,7 +987,6 @@ MARK.stringify = function(obj, options) {
 
     function _stringify(value) {
         let buffer;
-
         // Mark no longer supports JSON replacer
 		
         if (value && !isDate(value)) {
@@ -1060,7 +1010,7 @@ MARK.stringify = function(obj, options) {
                 if (value === null) { // null value
                     return "null";
                 } 
-				else if (isArray(value)) { // Array
+				else if (Array.isArray(value)) { // Array
                     checkForCircular(value);  // console.log('print array', value);
                     buffer = "[";
                     objStack.push(value);
@@ -1170,5 +1120,4 @@ MARK.stringify = function(obj, options) {
 };
 
 // export the Mark interface
-if (typeof module === 'object')
 module.exports = MARK;
