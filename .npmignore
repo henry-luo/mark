@@ -1,3 +1,7 @@
 test/
 dev/
 docs/
+coverage/
+karma.conf.js
+.travis.yml
+.istanbul.yml

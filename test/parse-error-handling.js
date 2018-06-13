@@ -2,7 +2,6 @@ const test = require('tape') ;
 const Mark = require('./../mark.js');
 
 test('Mark parse error handling ', function(assert) {
-	// Mark parser
 	assert.throws(function () { Mark.parse(null); }, /Unexpected end of input/, "Mark throws error with empty source, following JSON.parse");
 	assert.throws(function () { Mark.parse(''); }, /Unexpected end of input/, "Mark throws error with empty source, following JSON.parse");
 	assert.throws(function () { Mark.parse('  '); }, /Unexpected character EOF/, "Mark throws error with empty source, following JSON.parse");
@@ -36,5 +35,15 @@ test('Mark parse error handling ', function(assert) {
 		assert.equal(e.columnNumber, 9, "Error column number");
 	}
 	
+	// Mark binary
+	assert.throws(function () { Mark.parse('{:abc'); }, /Missing base64 end delimiter/, "Based64 character error");
+	assert.throws(function () { Mark.parse('{:abc-}'); }, /Invalid base64 character/, "Based64 character error");
+	assert.throws(function () { Mark.parse('{:abcd=}'); }, /Invalid base64 stream length/, "Based64 length error");	
+	assert.throws(function () { Mark.parse('{:abcde}'); }, /Invalid base64 stream length/, "Based64 length error");	
+	
+	assert.throws(function () { Mark.parse('{:~abc}'); }, /Missing ascii85 end delimiter/, "Based64 character error");
+	assert.throws(function () { Mark.parse('{:~abcv~}'); }, /Invalid ascii85 character/, "Based64 character error");
+	assert.throws(function () { Mark.parse('{:~abcdef~}'); }, /Invalid ascii85 stream length/, "Based64 length error");	
+
 	assert.end();
 });

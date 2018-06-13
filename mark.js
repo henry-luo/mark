@@ -11,8 +11,7 @@
 // symbols used internally
 const $length = Symbol('Mark.length'), // for content length
 	$parent = Symbol('Mark.parent'), // for parent object
-	$pragma = Symbol('Mark.pragma'), // for pragma value
-	$encode = Symbol('Mark.encode');  // for binary encoding
+	$pragma = Symbol('Mark.pragma'); // for pragma value
 	
 let $convert = null,  // Mark Convert API
 	constructors = {};	// cached constructors for the Mark objects
@@ -615,8 +614,7 @@ MARK.parse = (function() {
 		}
 	};
 
-	// Parse binary
-	
+	// Parse binary value
 	// Use a lookup table to find the index.
 	let lookup64 = new Uint8Array(128);
 	lookup64.fill(65); // denote invalid value
@@ -636,34 +634,35 @@ MARK.parse = (function() {
 			at++;  // skip '~'
 			// code based on https://github.com/noseglid/base85/blob/master/lib/base85.js
 			let end = text.indexOf('~}', at);  // scan binary end
-			if (end < 0) { error("Missing base85 end delimiter"); }
+			if (end < 0) { error("Missing ascii85 end delimiter"); }
 			
 			// first run decodes into base85 int values, and skip the spaces
 			let p = 0, base = new Uint8Array(new ArrayBuffer(end - at + 3));  // 3 extra bytes of padding
 			while (at < end) {
 				let code = lookup85[text.charCodeAt(at)];  // console.log('bin: ', text[at], code);
-				if (code > 85) { error("Invalid base85 encoding"); }
+				if (code > 85) { error("Invalid ascii85 character"); }
 				if (code < 85) { base[p++] = code; }
 				// else skip spaces
 				at++;
 			}
 			at = end+2;  next();  // skip '~}'			
+			// check length
+			if (p % 5 == 1) { error("Invalid ascii85 stream length"); }
 		
 			// second run decodes into actual binary data
 			let dataLength = p, padding = (dataLength % 5 === 0) ? 0 : 5 - dataLength % 5,
 				buffer = new ArrayBuffer(4 * Math.ceil(dataLength / 5) - padding), 
 				bytes = new DataView(buffer), trail = buffer.byteLength - 4;
 			base[p] = base[p+1] = base[p+2] = 84;  // 3 extra bytes of padding
-			console.log('base85 byte length: ', buffer.byteLength);
+			// console.log('base85 byte length: ', buffer.byteLength);
 			for (let i = 0, p = 0; i < dataLength; i += 5, p+=4) {
 				let num = (((base[i] * 85 + base[i+1]) * 85 + base[i+2]) * 85 + base[i+3]) * 85 + base[i+4];
-				console.log("set byte to val:", p, num, String.fromCodePoint(num >> 24), String.fromCodePoint((num >> 16) & 0xff),
-					String.fromCodePoint((num >> 8) & 0xff), String.fromCodePoint(num & 0xff));
+				// console.log("set byte to val:", p, num, String.fromCodePoint(num >> 24), String.fromCodePoint((num >> 16) & 0xff),
+				//	String.fromCodePoint((num >> 8) & 0xff), String.fromCodePoint(num & 0xff));
 				// write the uint32 value
 				if (p <= trail) { // bulk of bytes
 					bytes.setUint32(p, num); // big endian
 				} else { // trailing bytes
-					console.log("got padding bytes:", padding);
 					switch (padding) {
 					case 1:  bytes.setUint8(p+2, (num >> 8) & 0xff);  // fall through
 					case 2:  bytes.setUint16(p, num >> 16);  break;
@@ -671,33 +670,34 @@ MARK.parse = (function() {
 					}
 				}
 			}			
-			buffer[$parent] = parent;  buffer[$encode] = 85;
+			buffer[$parent] = parent;  buffer.encoding = 'a85';
 			return buffer;			
 		}
 		else { // base64
 			// code based on https://github.com/niklasvh/base64-arraybuffer
-			let end = text.indexOf('}', at), bufEnd = end;  // scan binary end
+			let end = text.indexOf('}', at), bufEnd = end, pad = 0;  // scan binary end
 			if (end < 0) { error("Missing base64 end delimiter"); }
 			// strip optional padding
 			if (text[bufEnd-1] === '=') { // 1st padding
-				bufEnd--;
+				bufEnd--;  pad = 1;
 				if (text[bufEnd-1] === '=') { // 2nd padding
-					bufEnd--;
+					bufEnd--;  pad = 2;
 				}
 			}
-			if (bufEnd <= at) { error("Invalid base64 encoding"); }
 			// console.log('binary char length: ', bufEnd - at);
 
 			// first run decodes into base64 int values, and skip the spaces
 			let base = new Uint8Array(new ArrayBuffer(bufEnd - at)), p = 0;
 			while (at < bufEnd) {
 				let code = lookup64[text.charCodeAt(at)];  // console.log('bin: ', text[at], code);
-				if (code > 64) { error("Invalid base64 encoding"); }
+				if (code > 64) { error("Invalid base64 character"); }
 				if (code < 64) { base[p++] = code; }
 				// else skip spaces
 				at++;
 			}
 			at = end+1;  next();  // skip '}'
+			// check length
+			if (pad && (p + pad) % 4 != 0 || !pad && p % 4 == 1) { error("Invalid base64 stream length"); }
 
 			// second run decodes into actual binary data
 			let len = Math.floor(p * 0.75), code1, code2, code3, code4,
@@ -712,7 +712,7 @@ MARK.parse = (function() {
 				bytes[p++] = ((code3 & 3) << 6) | (code4 & 63);
 			}
 			// console.log('binary decoded length:', p);
-			buffer[$parent] = parent;  buffer[$encode] = 64;
+			buffer[$parent] = parent;  buffer.encoding = 'b64';
 			return buffer;
 		}
 	};
@@ -971,7 +971,7 @@ MARK.stringify = function(obj, options) {
     function checkForCircular(obj) {
         for (var i = 0; i < objStack.length; i++) {
             if (objStack[i] === obj) {
-                throw new TypeError("Converting circular structure to JSON");
+                throw new TypeError("Got circular reference");
             }
         }
     }
@@ -1028,7 +1028,7 @@ MARK.stringify = function(obj, options) {
                 if (value === null) { // null value
                     return "null";
                 } 
-				else if (Array.isArray(value)) { // Array
+				else if (Array.isArray(value)) { // array
                     checkForCircular(value);  // console.log('print array', value);
                     buffer = "[";
                     objStack.push(value);
@@ -1055,7 +1055,7 @@ MARK.stringify = function(obj, options) {
                     buffer += "]";
                 }
 				else if (value instanceof ArrayBuffer) { // binary
-					if (value[$encode] === 85) { // base85
+					if (value.encoding === 'a85') { // base85
 						let bytes = new DataView(value), fullLen = value.byteLength, len = fullLen - (fullLen % 4), chars = new Array(5);
 						buffer = '{:~';
 						// bulk of encoding
@@ -1076,7 +1076,6 @@ MARK.stringify = function(obj, options) {
 						// trailing bytes and padding
 						let padding = 4 - fullLen % 4, num;
 						if (padding) {
-							console.log('got base85 padding', padding, i, bytes.getUint8(i));
 							switch (padding) {
 							case 1:  num = ((bytes.getUint16(i)<<8) + bytes.getUint8(i+2))<<8;  break;
 							case 2:  num = bytes.getUint16(i) << 16;  break;
@@ -1136,6 +1135,7 @@ MARK.stringify = function(obj, options) {
 							hasAttr = true;  nonEmpty = true;
 						}
                     }
+					
 					// print object content
 					let length = value[$length];
 					if (length) {
@@ -1153,6 +1153,7 @@ MARK.stringify = function(obj, options) {
 							else { console.log("unknown object", item); }
 						}
 					}
+					
                     objStack.pop();
                     if (nonEmpty ) {
                         // buffer = buffer.substring(0, buffer.length-1) + indent(objStack.length) + "}";

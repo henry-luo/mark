@@ -42,7 +42,8 @@ test('Stringify Mark object', function(assert) {
 	assert.equal(Mark.stringify(doc), '{doc mime:"text/html", data:{:PGgxPk1hcmsgYmluYXJ5ITwvaDE+}}', "Stringify nested binary data");
 	
 	// stringify base85 data
-	assert.equal(Mark.stringify(Mark("{:~BOu!rDZ~}")), "{:~BOu!rDZ~}", "Stringify base85");
+	var bin = stringArrayBuffer('hello');  bin.encoding = 'a85';
+	assert.equal(Mark.stringify(bin), "{:~BOu!rDZ~}", "Stringify base85");
 	assert.equal(Mark.stringify(Mark("{:~\n@p\ns7\ntD.3~}")), "{:~@ps7tD.3~}", "Stringify base85");
 	assert.equal(Mark.stringify(Mark("{:~ @<5pm \rBfIs ~}")), "{:~@<5pmBfIs~}", "Parse base85 of 'ascii85'");	
 	
