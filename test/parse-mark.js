@@ -116,16 +116,25 @@ function compareArrayBuffers(buffer1, buffer2) {
 }
 
 test('Parse Mark binary value', function(assert) {
-	// test binary
+	// test base64 parsing
 	var bin = Mark.parse('{:QXJ0}');
-	assert.equal(compareArrayBuffers(bin, stringArrayBuffer("Art")), true, "Mark binary of 'Art'");
-	assert.equal(bin instanceof ArrayBuffer, true, "Mark binary is instance of ArrayBuffer");
+	assert.equal(compareArrayBuffers(bin, stringArrayBuffer("Art")), true, "Parse base64 of 'Art'");
+	assert.equal(bin instanceof ArrayBuffer, true, "Mark base64 is instance of ArrayBuffer");
 	assert.equal(bin.byteLength, 3, "byteLength of 'Art' is 3");
-	assert.equal(compareArrayBuffers(Mark.parse('{:SGVs bG8 gd29 ybGQ=}'), stringArrayBuffer("Hello world")), true, "Mark binary of 'Hello world'");
-	assert.equal(compareArrayBuffers(Mark.parse('{: SGVsb \t G8gd29 \r\n ybGRzIQ==}'), stringArrayBuffer("Hello worlds!")), true, "Mark binary of 'Hello worlds!'");
+	assert.equal(compareArrayBuffers(Mark.parse('{:SGVs bG8 gd29 ybGQ=}'), stringArrayBuffer("Hello world")), true, "Parse base64 of 'Hello world'");
+	assert.equal(compareArrayBuffers(Mark.parse('{: SGVsb \t G8gd29 \r\n ybGRzIQ==}'), stringArrayBuffer("Hello worlds!")), true, "Parse base64 of 'Hello worlds!'");
 	
 	var doc = Mark("{doc mime:'text/html' data:{:PGgxPkhlbGxvLCBXb3JsZCE8L2gxPg==}}");
-	assert.equal(compareArrayBuffers(doc.data, stringArrayBuffer("<h1>Hello, World!</h1>")), true, "Mark binary of '<h1>Hello, World!</h1>'");
+	assert.equal(compareArrayBuffers(doc.data, stringArrayBuffer("<h1>Hello, World!</h1>")), true, "Parse base64 of '<h1>Hello, World!</h1>'");
+	
+	// test base85 parsing
+	var bin = Mark("{:~@ps7tD.7's~}");
+	assert.equal(compareArrayBuffers(bin, stringArrayBuffer("canumber")), true, "Parse base85 of 'canumber'");
+	assert.equal(bin instanceof ArrayBuffer, true, "Mark base85 is instance of ArrayBuffer");
+	assert.equal(bin.byteLength, 8, "byteLength of 'canumber' is 8");
+	assert.equal(compareArrayBuffers(Mark("{:~BOu! \t \n rDZ~}"), stringArrayBuffer("hello")), true, "Parse base85 of 'hello'");
+	assert.equal(compareArrayBuffers(Mark("{:~\n@p\ns7\ntD.3~}"), stringArrayBuffer("canumb")), true, "Parse base85 of 'canumb'");
+	assert.equal(compareArrayBuffers(Mark("{:~ @<5pm \rBfIs ~}"), stringArrayBuffer("ascii85")), true, "Parse base85 of 'ascii85'");
 	
 	assert.end();
 });

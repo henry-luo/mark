@@ -35,10 +35,16 @@ test('Stringify Mark object', function(assert) {
 	// stringify omitting comma
 	assert.equal(Mark.stringify(Mark.parse('{div width:10 height:"15px" margin:[5 10 10 5]}'), {omitComma:true}), '{div width:10 height:"15px" margin:[5 10 10 5]}', "Stringify without comma");
 
-	// stringify binary data
+	// stringify base64 data
 	assert.equal(Mark.stringify(stringArrayBuffer('Hello')), '{:SGVsbG8=}', "Stringify binary data 'hello'");
 	assert.equal(Mark.stringify(stringArrayBuffer('Hello worlds!')), '{:SGVsbG8gd29ybGRzIQ==}', "Stringify binary data 'Hello worlds!'");
 	var doc = Mark('doc', {mime:'text/html', data:stringArrayBuffer("<h1>Mark binary!</h1>")});
 	assert.equal(Mark.stringify(doc), '{doc mime:"text/html", data:{:PGgxPk1hcmsgYmluYXJ5ITwvaDE+}}', "Stringify nested binary data");
+	
+	// stringify base85 data
+	assert.equal(Mark.stringify(Mark("{:~BOu!rDZ~}")), "{:~BOu!rDZ~}", "Stringify base85");
+	assert.equal(Mark.stringify(Mark("{:~\n@p\ns7\ntD.3~}")), "{:~@ps7tD.3~}", "Stringify base85");
+	assert.equal(Mark.stringify(Mark("{:~ @<5pm \rBfIs ~}")), "{:~@<5pmBfIs~}", "Parse base85 of 'ascii85'");	
+	
 	assert.end();
 });

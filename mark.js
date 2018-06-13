@@ -9,9 +9,10 @@
 "use strict";
 
 // symbols used internally
-const $length = Symbol('Mark.length'),
-	$parent = Symbol('Mark.parent'),
-	$pragma = Symbol('Mark.pragma');
+const $length = Symbol('Mark.length'), // for content length
+	$parent = Symbol('Mark.parent'), // for parent object
+	$pragma = Symbol('Mark.pragma'), // for pragma value
+	$encode = Symbol('Mark.encode');  // for binary encoding
 	
 let $convert = null,  // Mark Convert API
 	constructors = {};	// cached constructors for the Mark objects
@@ -270,17 +271,11 @@ function isNameStart(c) {
 	return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || c === '_' || c === '$';
 }
 MARK.isName = function(key) {
-	if (typeof key !== 'string') {
-		return false;
-	}
-	if (!isNameStart(key[0])) {
-		return false;
-	}
+	if (typeof key !== 'string') { return false; }
+	if (!isNameStart(key[0])) { return false; }
 	var i = 1, length = key.length;
 	while (i < length) {
-		if (!isNameChar(key[i])) {
-			return false;
-		}
+		if (!isNameChar(key[i])) { return false; }
 		i++;
 	}
 	return true;
@@ -338,21 +333,15 @@ MARK.parse = (function() {
 	next = function (c) {
 		// If a c parameter is provided, verify that it matches the current character.
 		if (c && c !== ch) {
-			error("Expected " + renderChar(c) + " instead of " + renderChar(ch));
+			error("Expected '" + c + "' instead of " + renderChar(ch));
 		}
 		// Get the next character. When there are no more characters, return the empty string.
 		ch = text.charAt(at);
 		at++;
-		if (ch === '\n' || ch === '\r' && peek() !== '\n') {
+		if (ch === '\n' || ch === '\r' && text[at] !== '\n') {
 			lineNumber++;  columnStart = at;
 		}
 		return ch;
-	},
-
-	peek = function () {
-		// Get the next character without consuming it or
-		// assigning it to the ch varaible.
-		return text.charAt(at);
 	},
 
 	// Parse an identifier.
@@ -364,15 +353,10 @@ MARK.parse = (function() {
 		if ((ch !== '_' && ch !== '$') && (ch < 'a' || ch > 'z') && (ch < 'A' || ch > 'Z')) {
 			error("Bad identifier as unquoted key");
 		}
-
-		// subsequent characters can contain digits.
-		while (next() && (
-			('a' <= ch && ch <= 'z') ||
-			('A' <= ch && ch <= 'Z') ||
-			('0' <= ch && ch <= '9') ||
-			ch === '_' || ch === '$' ||
-			ch === '.' || ch === '-'  // add 2 special chars commonly used in html and xml names, which are not valid JS name chars
-			)) {
+		// subsequent characters can contain digits
+		while (next() && (('a' <= ch && ch <= 'z') || ('A' <= ch && ch <= 'Z') || ('0' <= ch && ch <= '9') || ch === '_' || ch === '$' ||
+			// '.' and '-' are commonly used in html and xml names, but not valid JS name chars
+			ch === '.' || ch === '-')) {
 			key += ch;
 		}
 
@@ -455,7 +439,7 @@ MARK.parse = (function() {
 		// when parsing for string values, we must look for ' or " and \ characters.
 		if (ch === '"' || ch === "'") {
 			delim = ch;
-			if (peek() === delim && text.charAt(at+1) === delim) { // got tripple quote
+			if (text[at] === delim && text[at+1] === delim) { // got tripple quote
 				triple = true;  next();  next();
 			}
 			while (next()) {
@@ -464,7 +448,7 @@ MARK.parse = (function() {
 					if (!triple) { // end of string
 						return string;
 					}
-					else if (ch === delim && peek() === delim) { // end of tripple quoted text
+					else if (ch === delim && text[at] === delim) { // end of tripple quoted text
 						next();  next();  return string;
 					}
 					else {
@@ -488,7 +472,7 @@ MARK.parse = (function() {
 							string += String.fromCharCode(uffff);
 						} 
 						else if (ch === '\r') { // ignore the line-end, as defined in ES5
-							if (peek() === '\n') {
+							if (text[at] === '\n') {
 								next();
 							}
 						} else if (typeof escapee[ch] === 'string') {
@@ -584,36 +568,25 @@ MARK.parse = (function() {
 		}
 	},
 
+	isSuffix = function(suffix) {
+		let len = suffix.length;
+		for (let i=0; i<len; i++) {
+			if (text[at+i] !== suffix[i]) { at += i+1;  return false; }
+		}
+		if (isNameStart(text[at+len])) { at += len+1;  return false; }
+		ch = text[at+len];  at += len + 1;  
+		return true;
+	},
 	// Parse true, false, null, Infinity, NaN
 	word = function() {
 		switch (ch) {
-		case 't':
-			if (text[at] === 'r' && text[at+1] === 'u' && text[at+2] === 'e' && !isNameStart(text[at+3])) {
-				ch = text[at+3];  at += 4;  return true;
-			}
-			break;
-		case 'f':
-			if (text[at] === 'a' && text[at+1] === 'l' && text[at+2] === 's' && text[at+3] === 'e' && !isNameStart(text[at+4])) {
-				ch = text[at+4];  at += 5;  return false;
-			}				
-			break;
-		case 'n':
-			if (text[at] === 'u' && text[at+1] === 'l' && text[at+2] === 'l' && !isNameStart(text[at+3])) {
-				ch = text[at+3];  at += 4;  return null;
-			}
-			break;
-		case 'I':
-			if (text[at] === 'n' && text[at+1] === 'f' && text[at+2] === 'i' && text[at+3] === 'n' && text[at+4] === 'i' 
-				&& text[at+5] === 't' && text[at+6] === 'y' && !isNameStart(text[at+7])) {
-				ch = text[at+7];  at += 8;  return Infinity;
-			}
-			break;
-		case 'N':
-			if (text[at] === 'a' && text[at+1] === 'N' && !isNameStart(text[at+2])) {
-				ch = text[at+2];  at += 3;  return NaN;
-			}
+		case 't':  if (isSuffix('rue')) { return true; }  break;
+		case 'f':  if (isSuffix('alse')) { return false; }  break;
+		case 'n':  if (isSuffix('ull')) { return null; }  break;
+		case 'I':  if (isSuffix('nfinity')) { return Infinity; }  break;
+		case 'N':  if (isSuffix('aN')) { return NaN; }
 		}
-		error("Unexpected character " + renderChar(ch));
+		error("Unexpected character "+ renderChar(text.charAt(at-1)));
 	},
 
 	value,  // Place holder for the value function.
@@ -643,18 +616,63 @@ MARK.parse = (function() {
 	};
 
 	// Parse binary
+	
 	// Use a lookup table to find the index.
-	let lookup = new Uint8Array(256);
-	lookup.fill(65); // denote invalid value
-	for (var i = 0; i < 64; i++) {
-		lookup[base64.charCodeAt(i)] = i;
-	}
+	let lookup64 = new Uint8Array(128);
+	lookup64.fill(65); // denote invalid value
+	for (var i = 0; i < 64; i++) { lookup64[base64.charCodeAt(i)] = i; }
 	// ' ', \t', '\r', '\n' spaces also allowed in base64 stream
-	lookup[32] = lookup[9] = lookup[13] = lookup[10] = 64;
+	lookup64[32] = lookup64[9] = lookup64[13] = lookup64[10] = 64;
 
+	let lookup85 = new Uint8Array(128);
+	lookup85.fill(86); // denote invalid value
+	for (var i = 0; i < 128; i++) { if (33 <= i && i <= 117) lookup85[i] = i - 33; }
+	// ' ', \t', '\r', '\n' spaces also allowed in base85 stream
+	lookup85[32] = lookup85[9] = lookup85[13] = lookup85[10] = 85;
+	
 	let binary = function(parent) {
 		at++;  // skip the starting '{:'
 		if (text[at] === '~') { // base85
+			at++;  // skip '~'
+			// code based on https://github.com/noseglid/base85/blob/master/lib/base85.js
+			let end = text.indexOf('~}', at);  // scan binary end
+			if (end < 0) { error("Missing base85 end delimiter"); }
+			
+			// first run decodes into base85 int values, and skip the spaces
+			let p = 0, base = new Uint8Array(new ArrayBuffer(end - at + 3));  // 3 extra bytes of padding
+			while (at < end) {
+				let code = lookup85[text.charCodeAt(at)];  // console.log('bin: ', text[at], code);
+				if (code > 85) { error("Invalid base85 encoding"); }
+				if (code < 85) { base[p++] = code; }
+				// else skip spaces
+				at++;
+			}
+			at = end+2;  next();  // skip '~}'			
+		
+			// second run decodes into actual binary data
+			let dataLength = p, padding = (dataLength % 5 === 0) ? 0 : 5 - dataLength % 5,
+				buffer = new ArrayBuffer(4 * Math.ceil(dataLength / 5) - padding), 
+				bytes = new DataView(buffer), trail = buffer.byteLength - 4;
+			base[p] = base[p+1] = base[p+2] = 84;  // 3 extra bytes of padding
+			console.log('base85 byte length: ', buffer.byteLength);
+			for (let i = 0, p = 0; i < dataLength; i += 5, p+=4) {
+				let num = (((base[i] * 85 + base[i+1]) * 85 + base[i+2]) * 85 + base[i+3]) * 85 + base[i+4];
+				console.log("set byte to val:", p, num, String.fromCodePoint(num >> 24), String.fromCodePoint((num >> 16) & 0xff),
+					String.fromCodePoint((num >> 8) & 0xff), String.fromCodePoint(num & 0xff));
+				// write the uint32 value
+				if (p <= trail) { // bulk of bytes
+					bytes.setUint32(p, num); // big endian
+				} else { // trailing bytes
+					console.log("got padding bytes:", padding);
+					switch (padding) {
+					case 1:  bytes.setUint8(p+2, (num >> 8) & 0xff);  // fall through
+					case 2:  bytes.setUint16(p, num >> 16);  break;
+					case 3:  bytes.setUint8(p, num >> 24);
+					}
+				}
+			}			
+			buffer[$parent] = parent;  buffer[$encode] = 85;
+			return buffer;			
 		}
 		else { // base64
 			// code based on https://github.com/niklasvh/base64-arraybuffer
@@ -673,7 +691,7 @@ MARK.parse = (function() {
 			// first run decodes into base64 int values, and skip the spaces
 			let base = new Uint8Array(new ArrayBuffer(bufEnd - at)), p = 0;
 			while (at < bufEnd) {
-				let code = lookup[text.charCodeAt(at)];  // console.log('bin: ', text[at], code);
+				let code = lookup64[text.charCodeAt(at)];  // console.log('bin: ', text[at], code);
 				if (code > 64) { error("Invalid base64 encoding"); }
 				if (code < 64) { base[p++] = code; }
 				// else skip spaces
@@ -684,23 +702,23 @@ MARK.parse = (function() {
 			// second run decodes into actual binary data
 			let len = Math.floor(p * 0.75), code1, code2, code3, code4,
 				buffer = new ArrayBuffer(len), bytes = new Uint8Array(buffer);
-			console.log('binary length: ', len);
+			// console.log('binary length: ', len);
 			for (let i = 0, p = 0; p < len; i += 4) {
 				code1 = base[i];  code2 = base[i+1];
 				code3 = base[i+2];  code4 = base[i+3];
 				bytes[p++] = (code1 << 2) | (code2 >> 4);
-				// extra bytes will be ignored by JS arraybuffer
+				// extra undefined bytes casted into 0 by JS binary operator
 				bytes[p++] = ((code2 & 15) << 4) | (code3 >> 2);
 				bytes[p++] = ((code3 & 3) << 6) | (code4 & 63);
 			}
 			// console.log('binary decoded length:', p);
-			buffer[$parent] = parent;
+			buffer[$parent] = parent;  buffer[$encode] = 64;
 			return buffer;
 		}
-	},
+	};
 
 	// Parse an object, pragma or binary
-	object = function(parent) {
+	let object = function(parent) {
 		let obj = {}, 
 			key = null, 		// property key
 			extended = false, 	// whether the is extended Mark object or legacy JSON object
@@ -1037,21 +1055,59 @@ MARK.stringify = function(obj, options) {
                     buffer += "]";
                 }
 				else if (value instanceof ArrayBuffer) { // binary
-					var bytes = new Uint8Array(value), i, fullLen = bytes.length, len = fullLen - (fullLen % 3);
-					buffer = '{:';
-					// bulk encoding
-					for (i = 0; i < len; i+=3) {
-						buffer += base64[bytes[i] >> 2];
-						buffer += base64[((bytes[i] & 3) << 4) | (bytes[i + 1] >> 4)];
-						buffer += base64[((bytes[i + 1] & 15) << 2) | (bytes[i + 2] >> 6)];
-						buffer += base64[bytes[i + 2] & 63];
+					if (value[$encode] === 85) { // base85
+						let bytes = new DataView(value), fullLen = value.byteLength, len = fullLen - (fullLen % 4), chars = new Array(5);
+						buffer = '{:~';
+						// bulk of encoding
+						let i = 0;
+						for (; i < len; i+=4) {
+							let num = bytes.getUint32(i);  // big endian
+							// encode into 5 bytes
+							if (num) {
+								for (let j = 0; j < 5; ++j) {
+									chars[j] = String.fromCodePoint(num % 85 + 33);
+									num = Math.floor(num / 85);
+								}
+								buffer += chars[4] + chars[3] + chars[2] + chars[1] + chars[0];  // need to reverse the bytes
+							} else { // special case zero
+								buffer += 'z';
+							}
+						}
+						// trailing bytes and padding
+						let padding = 4 - fullLen % 4, num;
+						if (padding) {
+							console.log('got base85 padding', padding, i, bytes.getUint8(i));
+							switch (padding) {
+							case 1:  num = ((bytes.getUint16(i)<<8) + bytes.getUint8(i+2))<<8;  break;
+							case 2:  num = bytes.getUint16(i) << 16;  break;
+							case 3:  num = bytes.getUint8(i) << 24;
+							}
+							for (let j = 0; j < 5; ++j) {
+								chars[j] = String.fromCodePoint(num % 85 + 33);
+								num = Math.floor(num / 85);
+							}
+							// reverse the bytes and remove padding bytes
+							buffer += (chars[4] + chars[3] + chars[2] + chars[1] + chars[0]).substr(0, 5 - padding);
+						}
+						buffer += '~}';					
+					} 
+					else { // base64
+						let bytes = new Uint8Array(value), i, fullLen = bytes.length, len = fullLen - (fullLen % 3);
+						buffer = '{:';
+						// bulk of encoding
+						for (i = 0; i < len; i+=3) {
+							buffer += base64[bytes[i] >> 2];
+							buffer += base64[((bytes[i] & 3) << 4) | (bytes[i + 1] >> 4)];
+							buffer += base64[((bytes[i + 1] & 15) << 2) | (bytes[i + 2] >> 6)];
+							buffer += base64[bytes[i + 2] & 63];
+						}
+						// trailing bytes and padding
+						if (fullLen % 3) {
+							buffer += base64[bytes[i] >> 2] + base64[((bytes[i] & 3) << 4) | (bytes[i + 1] >> 4)] +
+								(fullLen % 3 === 2 ? base64[(bytes[i + 1] & 15) << 2] : "=") + "=";
+						}
+						buffer += '}';
 					}
-					// trailing bytes and padding
-					if (fullLen % 3) {
-						buffer += base64[bytes[i] >> 2] + base64[((bytes[i] & 3) << 4) | (bytes[i + 1] >> 4)] +
-							(fullLen % 3 === 2 ? base64[(bytes[i + 1] & 15) << 2] : "=") + "=";
-					}
-					buffer += '}';
 				}
 				else { // pragma or object
                     checkForCircular(value);  // console.log('print obj', value);
