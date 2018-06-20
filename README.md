@@ -93,7 +93,7 @@ Comparing to JSON, Mark has the following advantages:
 
 - It has a type-name, which is important in identifying what the data represents; whereas JSON is actually an anonymous object, missing the type name.
 - It can have nested content objects, which is common in all markup formats, and thus allows Mark to convenient represent document-oriented data, which is awkward for JSON.
-- It incorporates most of the enhancements of [JSON5](http://json5.org/) to JSON (e.g. allowing comments, property name without quotes, etc.), and makes the format more friendly for human.
+- It incorporates some enhancements to JSON (e.g. allowing comments, property name without quotes, optional trailing comma or between properties and array values), and makes the format more friendly for human.
 
 Some disadvantages of Mark, comparing to JSON would be:
 
@@ -127,7 +127,7 @@ The advantage of Mark over S-expressions is that it takes a more modern, JS-firs
 
 ## mark.js
 
-`mark.js` is the JS library to work with data in Mark format. It consists of 3 modules:
+`mark.js` is the JS library to work with data in Mark format. It consists of 4 modules:
 
 - The core module `mark.js`, which provides `parse()` and `stringify()` functions, like JSON, and a direct Mark object construction function `Mark()`, and some functional APIs to work with the object content.
 - Sub-module `mark.mutate.js`, which provides mutative APIs to change the Mark object data model.
