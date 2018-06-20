@@ -88,7 +88,7 @@ Other syntax extensions made to JSON are pretty much just syntax sugars. Most of
 
 ### 3.5 Binary Data
 
-- Binary data can be encoded as a sequence of characters delimited by '{:' and '}'. 
+- Binary data can be encoded as a sequence of characters delimited by '`{:`' and '`}`'. 
 - It can encoded in either [base64](https://en.wikipedia.org/wiki/Base64) or [ascii85](https://en.wikipedia.org/wiki/Ascii85) *(Adobe version)* encoding.
 - Whitespaces are allowed between the encoded characters and are ignored by the parser. 
 
@@ -112,4 +112,4 @@ The formal grammar specification in BNF is [here](mark.bnf).
 
 Following the JSON convention, a [railroad diagram](https://mark.js.org/mark-grammar.html) of the entire grammar is also provided to help you visualize the grammar. You can click on the grammar terms to navigate around. Below is just a small portion of it.
 
-<img src='mark-railway-diagram.png' width="500px">
+<img src='mark-railway-diagram.png' width="600px">

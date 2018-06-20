@@ -14,7 +14,7 @@ Roughly speaking, JSON, HTML and XML data models are subsets of Mark data model,
 
 A binary object is represented by an JS ArrayBuffer, containing the bytes decoded from the source characters in either base64 or ascii85 encoding.
 
-It has a property *encoding*, which can have the value `b64` or `a85`.
+It has a property **encoding**, which can have the value `b64` or `a85`.
 
 Unlike string, consecutive binary objects within the content of a Mark object are not merged.
 
@@ -106,7 +106,7 @@ Mark does not support `reviver` function defined in `JSON.parse()`, and `replace
 
 ### 3.3 Mutative API
 
-Mutative API functions are now separated from the core API, which allows this part to be easily excluded from the package, if Mark is used in a pure functional manner.
+Mutative API functions are now separated into its own sub-module `mark.mutate.js`, which allows this part to be easily excluded from the package, if Mark is used in a pure functional manner.
 
 The mutative API functions define on a Mark object are:
 
@@ -120,8 +120,8 @@ The mutative API functions define on a Mark object are:
 
 These are additional prototype functions implemented in `mark.converter.js`, for mapping Mark into other formats:
 
-- `markObj.html()`: serializes the Mark object into HTML.
-- `markObj.xml()`: serializes the Mark object into XML.
+- `markObj.html(options)`: serializes the Mark object into HTML. `options` parameter is same as that of `Mark.stringify()`.
+- `markObj.xml(options)`: serializes the Mark object into XML.  `options` parameter is same as that of `Mark.stringify()`.
 
 ### 3.4 Selector API
 

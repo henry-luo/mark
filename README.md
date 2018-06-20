@@ -44,7 +44,7 @@ For example, a HTML registration form:
 
 Could be represented in Mark as:
 
-```json
+```text
 {form                                   // object type-name 'form'
   {!-- comment --}                      // Mark pragma, similar to HTML comment
   {div class:"form-group"               // nested Mark object
@@ -160,7 +160,7 @@ console.log("Greeting from Mark: " + Mark.stringify(obj));
 </script>
 ```
 
-*Note: /dist/mark.js has bundled mark.mutate.js, mark.convert.js and mark.selector.js and all dependencies with it, and is meant to run in browser. The entire script is about 13K after gzip. It supports latest browsers, including Chrome, Safari, Firefox, Edge.*
+*Note: /dist/mark.js has bundled mark.mutate.js, mark.convert.js and mark.selector.js and all dependencies with it, and is meant to run in browser. The entire script is about 14K after gzip. It supports latest browsers, including Chrome, Safari, Firefox, Edge.*
 
 *If you just want the core functional API, without the sub-modules, you can also use mark.core.js, which is only 7K after gzip. You can also refer to the package.json to create your own custom bundle with the sub-modules you need.* 
 
