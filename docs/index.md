@@ -93,7 +93,7 @@ Comparing to JSON, Mark has the following advantages:
 
 - It has a type-name, which is important in identifying what the data represents; whereas JSON is actually an anonymous object, missing the type name.
 - It can have nested content objects, which is common in all markup formats, and thus allows Mark to convenient represent document-oriented data, which is awkward for JSON.
-- It incorporates some enhancements to JSON (e.g. allowing comments, property name without quotes, optional trailing comma or between properties and array values), and makes the format more friendly for human.
+- It incorporates some syntax enhancements to JSON (e.g. allowing comments, property name without quotes, optional trailing comma or between properties and array values), and makes the format more friendly for human.
 
 Some disadvantages of Mark, comparing to JSON would be:
 
