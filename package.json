@@ -1,6 +1,6 @@
 {
   "name": "mark-js",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "The core library for working with Mark, an unified notation for both object and markup data.",
   "main": "mark.js",
   "directories": {
@@ -20,7 +20,7 @@
     "coverage": "istanbul cover -v --config .istanbul.yml node_modules/tape/bin/tape ./test/*.js",
     "karma": "(clear || cls) && karma start",
     "karma-ie": "(clear || cls) && (export BROWSER=ie || set BROWSER=ie) && karma start --browsers IE",
-    "build": "npm run build-core && npm run build-mark && cp-cli README.md docs/index.md",
+    "build": "npm run build-core && npm run build-mark && npm run build-es5 && cp-cli README.md docs/index.md",
     "build-core": "browserify -x ./lib/mark.update.js -x ./lib/mark.convert.js -x ./lib/mark.selector.js -x htmlparser2 --standalone Mark mark.js | uglifyjs > dist/mark.core.js",
     "build-mark": "browserify -x htmlparser2 --standalone Mark mark.js | uglifyjs > dist/mark.js",
     "build-es5": "browserify -x htmlparser2 -t [ babelify --presets [ es2015 ] --plugins [ transform-runtime ] ] --standalone Mark mark.js | uglifyjs > dist/mark.es5.js",
@@ -61,6 +61,7 @@
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
+    "babel-plugin-transform-remove-strict-mode": "0.0.2",
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-es2015": "^6.24.1",
     "babelify": "^8.0.0",

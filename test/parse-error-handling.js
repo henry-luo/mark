@@ -30,7 +30,7 @@ test('Mark parse error handling ', function(assert) {
 	try {
 		Mark.parse('{obj \n p:true 123}');
 	} catch (e) {
-		assert.equal(e.message.startsWith("Bad object"), true, "Error message");
+		assert.equal(e.message.lastIndexOf("Bad object") === 0, true, "Error message");
 		assert.equal(e.lineNumber, 2, "Error line number");
 		assert.equal(e.columnNumber, 9, "Error column number");
 	}

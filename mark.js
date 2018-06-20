@@ -14,13 +14,13 @@ const $length = Symbol('Mark.length'), // for content length
 	$pragma = Symbol('Mark.pragma'); // for pragma value
 	
 let $convert = null,  // Mark Convert API
-	constructors = {};	// cached constructors for the Mark objects
+	$ctrs = {};	// cached constructors for the Mark objects
 
 // MARK is the static Mark API, it is different from the Mark.prototype that Mark object extends
 var MARK = (function() {
 	// patch IE11
-	if (!constructors.constructor.name) { // IE11 does not set constructor.name to 'Object'
-		obj.constructor.name = 'Object';
+	if (!$ctrs.constructor.name) { // IE11 does not set constructor.name to 'Object'
+		$ctrs.constructor.name = 'Object';
 	}
 	
 	// Mark.prototype and Mark object constructor
@@ -31,10 +31,10 @@ var MARK = (function() {
 		}
 		
 		// 1. prepare the constructor
-		let con = constructors[typeName];
+		let con = $ctrs[typeName];
 		if (!con) {
 			if (typeof typeName !== 'string') { throw "Type name should be a string"; }
-			con = constructors[typeName] = function(){};
+			con = $ctrs[typeName] = function(){};
 			// con.prototype.constructor is set to con by JS
 			// sets the type name
 			Object.defineProperty(con, 'name', {value:typeName, configurable:true}); // non-writable, as we don't want the name to be changed
@@ -244,14 +244,14 @@ var MARK = (function() {
 	
 	// Mark pragma constructor
 	Mark.pragma = function(pragma) {
-		let con = constructors[$pragma];
+		let con = $ctrs[$pragma];
 		if (!con) {
 			con = Object.create(null);
 			Object.defineProperty(con, 'pragma', {value:api.pragma});
 			Object.defineProperty(con, 'parent', {value:api.parent});
 			Object.defineProperty(con, 'valueOf', {value:Object.valueOf});
 			Object.defineProperty(con, 'toString', {value:function() { return '[object Pragma]'; }});
-			constructors[$pragma] = con;
+			$ctrs[$pragma] = con;
 		}
 		let obj = Object.create(con);
 		obj[$pragma] = pragma;  // pragma conent stored as Symbol
@@ -616,14 +616,14 @@ MARK.parse = (function() {
 
 	// Parse binary value
 	// Use a lookup table to find the index.
-	let lookup64 = new Uint8Array(128);
-	lookup64.fill(65); // denote invalid value
+	let lookup64 = new Uint8Array(128), lookup85 = new Uint8Array(128);
+	if (lookup64.fill) { lookup64.fill(65); lookup85.fill(86); } // '65' denotes invalid value
+	else { // patch for IE11
+		for (var i = 0; i < 128; i++) { lookup64[i] = 65;  lookup85[i] = 86; } 
+	}
 	for (var i = 0; i < 64; i++) { lookup64[base64.charCodeAt(i)] = i; }
 	// ' ', \t', '\r', '\n' spaces also allowed in base64 stream
 	lookup64[32] = lookup64[9] = lookup64[13] = lookup64[10] = 64;
-
-	let lookup85 = new Uint8Array(128);
-	lookup85.fill(86); // denote invalid value
 	for (var i = 0; i < 128; i++) { if (33 <= i && i <= 117) lookup85[i] = i - 33; }
 	// ' ', \t', '\r', '\n' spaces also allowed in base85 stream
 	lookup85[32] = lookup85[9] = lookup85[13] = lookup85[10] = 85;

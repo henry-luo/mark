@@ -31,7 +31,7 @@ module.exports = function(karma) {
     browserify: {
 		// debug: true,
 		transform:
-			process.env.BROWSER == 'ie' ? [['babelify', {presets:['es2015'], plugins:['transform-runtime']}]]:[]
+			process.env.BROWSER == 'ie' ? [['babelify', {presets:['es2015'], plugins:['transform-runtime', "transform-remove-strict-mode"]}]]:[]
     }
   });
 };
