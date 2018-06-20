@@ -28,11 +28,10 @@ pchar_non_star ::= [#x20-#x29] | [#x2B-#x7E] | [#x80-#x10FFFF] /* Printable char
 pchar_non_slash ::= [#x20-#x2E] | [#x30-#x7E] | [#x80-#x10FFFF] /* Printable character except / */
 
 /*--------------------------------------------------------*/
-
-ws ::= (SP |                /* Space */
-        HTAB |             /* Horizontal tab */
-        eol |               /* Line ending */
-		comment)*           /* Comment */
+ws_char ::= SP |        /* Space */
+        HTAB |          /* Horizontal tab */
+        eol				/* Line ending */
+ws ::= (ws_char | comment)*
 
 /*--------------------------------------------------------*/
 
@@ -55,6 +54,13 @@ exp ::= ('e' | 'E') ('+' | '-')? digit+
 int ::= '0' | ([1-9] digit*)
 
 digit ::= [0-9]
+
+/*-- binary data ------------------------------------------------------*/
+binary ::=  base64_binary | ascii85_binary
+
+base64_binary ::= '{:' ([0-9a-zA-Z] | '+' | '/' | ws_char)* '='? '='? '}' /* 2 optional padding characters */
+
+ascii85_binary ::= '{:~' ([#x21-u] | 'z' | ws_char)* '~}'
 
 /*-- string ------------------------------------------------------*/
 
@@ -145,6 +151,6 @@ pchar_no_brace_colon ::= [#x20-#x39] | [#x3C-#x7A] | '|' | [#x7E-#x10FFFF] /* Pr
 
 /*-- root ------------------------------------------------------*/
 
-value ::= null | boolean | number | string | array | json_object | mark_object | mark_pragma
+value ::= null | boolean | number | string | binary | array | json_object | mark_object | mark_pragma
 
 Mark ::= ws value ws

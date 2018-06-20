@@ -9,7 +9,7 @@ Below are the key grammar rules for the new Mark object in BNF notation:
 ```BNF
 Mark ::= value     /* root */
 
-value ::= null | boolean | number | string | array | json_object | mark_object | mark_pragma
+value ::= null | boolean | number | string | binary | array | json_object | mark_object | mark_pragma
 
 mark_object ::= '{' type_name properties contents '}'
 
@@ -51,7 +51,7 @@ continue_identifier ::= begin_identifier | digit | '-' | '.'
 
 ## 2. Mark Pragma
 
-Mark pragma, it is a sequence of characters enclosed in '{' and '}', as long as it is not a valid JSON or Mark object. It can contain any character in it except '{', '}', ':' and ';', which need to be escaped using backslash '\'.
+Mark pragma, it is a sequence of characters enclosed in '{' and '}'. It is must not be a valid JSON or Mark object. It can contain any character in it except '{', '}', ':' and ';', which need to be escaped using backslash '\'.
 
 ```BNF
 mark_pragma ::= '{' pragma_escape | pchar_no_brace_colon+ '}'
@@ -86,7 +86,23 @@ Other syntax extensions made to JSON are pretty much just syntax sugars. Most of
 - Numbers can include `Infinity`, `-Infinity`,  `NaN`, and `-NaN`.
 - Numbers can begin with an explicit plus sign.
 
-### 3.5 Comments
+### 3.5 Binary Data
+
+- Binary data can be encoded as a sequence of characters delimited by '{:' and '}'. 
+- It can encoded in either [base64](https://en.wikipedia.org/wiki/Base64) or [ascii85](https://en.wikipedia.org/wiki/Ascii85) *(Adobe version)* encoding.
+- Whitespaces are allowed between the encoded characters and are ignored by the parser. 
+
+```BNF
+binary ::=  base64_binary | ascii85_binary
+
+base64_binary ::= '{:' ([0-9a-zA-Z] | '+' | '/' | ws_char)* '='? '='? '}'
+
+ascii85_binary ::= '{:~' ([#x21-u] | 'z' | ws_char)* '~}'
+```
+
+
+
+### 3.6 Comments
 
 - Both inline (single-line) and block (multi-line) comments are allowed, similar to those in JS.
 

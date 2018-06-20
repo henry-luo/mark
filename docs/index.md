@@ -44,7 +44,7 @@ For example, a HTML registration form:
 
 Could be represented in Mark as:
 
-```text
+```json
 {form                                   // object type-name 'form'
   {!-- comment --}                      // Mark pragma, similar to HTML comment
   {div class:"form-group"               // nested Mark object
@@ -129,9 +129,10 @@ The advantage of Mark over S-expressions is that it takes a more modern, JS-firs
 
 `mark.js` is the JS library to work with data in Mark format. It consists of 3 modules:
 
-- The core module `mark.js`, which provides `parse()` and `stringify()` functions, like JSON, and a direct Mark object construction function `Mark()`. *(in beta)*
-- Sub-module `mark.convert.js`, which provides conversion between Mark format and other formats like HTML, XML, etc. *(in beta)*
-- Sub-module `mark.selector.js`, which provides CSS selector based query interface on the Mark object model, like jQuery. *(in beta)*
+- The core module `mark.js`, which provides `parse()` and `stringify()` functions, like JSON, and a direct Mark object construction function `Mark()`, and some functional APIs to work with the object content.
+- Sub-module `mark.mutate.js`, which provides mutative APIs to change the Mark object data model.
+- Sub-module `mark.convert.js`, which provides conversion between Mark format and other formats like HTML and XML.
+- Sub-module `mark.selector.js`, which provides CSS selector based query interface on the Mark object model, like jQuery.
 
 ## Usage
 
@@ -159,7 +160,9 @@ console.log("Greeting from Mark: " + Mark.stringify(obj));
 </script>
 ```
 
-*Note: /dist/mark.js has bundled mark.convert.js and mark.selector.js and all dependencies with it, and is meant to run in browser. The entire script is about 13K after gzip. It supports latest browsers, including Chrome, Safari, Firefox, Edge.*
+*Note: /dist/mark.js has bundled mark.mutate.js, mark.convert.js and mark.selector.js and all dependencies with it, and is meant to run in browser. The entire script is about 13K after gzip. It supports latest browsers, including Chrome, Safari, Firefox, Edge.*
+
+*If you just want the core functional API, without the sub-modules, you can also use mark.core.js, which is only 7K after gzip. You can also refer to the package.json to create your own custom bundle with the sub-modules you need.* 
 
 *If you need to support legacy browsers, like IE11, which do not have proper ES6 support, you need to use /dist/mark.es5.js. IE < 11 are not supported.*
 
