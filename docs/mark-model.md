@@ -83,7 +83,10 @@ The constructed Mark object is just a simple POJO. So basically:
 Besides the above POJO behaviors, there are some additional prototype functions defined to work with the data model:
 
 - `length()`: returns the number of content items stored in the Mark object.
+- `contents()`: returns the list of content items stored in the Mark object.
 - `parent()`: returns the parent object of current Mark object.
+- `source(options)`: shorthand for stringifying the Mark object.
+- `text()`: returns a string, which is the concatenation of all descendant text content items.
 - `filter(callback, thisArg)`: similar to JS `Array.prototype.filter` that iterates through the content items.
 - `map(callback, thisArg)`: similar to JS `Array.prototype.map` that iterates through the content items.
 - `reduce(callback)`: similar to JS `Array.prototype.reduce` that iterates through the content items.
@@ -111,8 +114,8 @@ Mutative API functions are now separated into its own sub-module `mark.mutate.js
 The mutative API functions define on a Mark object are:
 
 - `set(key, value)`: if the `key` is numeric, then it sets the indexed content item of the Mark object; otherwise, it sets a named property of the Mark object. 
-- `push(item, ...)`: similar to JS `Array.prototype.push` that pushes item(s) at the end of the contents.
-- `pop(item)`: pop an item from the end of contents.
+- `push(item, ...)`: pushes item(s) at the end of the contents of current Mark object. However, unlike JS `Array.prototype.push`, which returns the new array length, this function returns the current this object, so that the function call can be chained.
+- `pop()`: pop an item from the end of contents.
 - `insert(item, index)`: inserts the given item(s) at the given `index`. If `index` is omitted, it defaults to 0.
 - `remove(index)`: removes the content item at the given `index`.
 
