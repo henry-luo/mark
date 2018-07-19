@@ -1178,3 +1178,4 @@ MARK.stringify = function(obj, options) {
 
 // export the Mark interface
 module.exports = MARK;
+if (typeof window !== 'undefined') { window.Mark = MARK; }

@@ -1,6 +1,6 @@
 {
   "name": "mark-js",
-  "version": "0.6.2",
+  "version": "0.6.3",
   "description": "The core library for working with Mark, an unified notation for both object and markup data.",
   "main": "mark.js",
   "directories": {
@@ -21,15 +21,15 @@
     "karma": "(clear || cls) && karma start",
     "karma-ie": "(clear || cls) && (export BROWSER=ie || set BROWSER=ie) && karma start --browsers IE",
     "build": "npm run build-core && npm run build-mark && npm run build-es5 && cp-cli README.md docs/index.md",
-    "build-core": "browserify -x ./lib/mark.update.js -x ./lib/mark.convert.js -x ./lib/mark.selector.js -x htmlparser2 --standalone Mark mark.js | uglifyjs > dist/mark.core.js",
-    "build-mark": "browserify -x htmlparser2 --standalone Mark mark.js | uglifyjs > dist/mark.js",
-    "build-es5": "browserify -x htmlparser2 -t [ babelify --presets [ es2015 ] --plugins [ transform-runtime ] ] --standalone Mark mark.js | uglifyjs > dist/mark.es5.js",
+    "build-core": "browserify -x ./lib/mark.update.js -x ./lib/mark.convert.js -x ./lib/mark.selector.js -x htmlparser2 mark.js | uglifyjs > dist/mark.core.js",
+    "build-mark": "browserify -x htmlparser2 mark.js | uglifyjs > dist/mark.js",
+    "build-es5": "browserify -x htmlparser2 -t [ babelify --presets [ es2015 ] --plugins [ transform-runtime ] ] mark.js | uglifyjs > dist/mark.es5.js",
     "build-find": "browserify --full-paths -x debug ./dev/mark.find.js | discify --open",
     "list-core": "browserify --full-paths -x ./lib/mark.mutate.js -x ./lib/mark.convert.js -x ./lib/mark.selector.js -x htmlparser2 mark.js | discify --open",
     "list-convert": "browserify --full-paths -x htmlparser2 ./lib/mark.convert.js | discify --open",
     "list-selector": "browserify --full-paths ./lib/mark.selector.js | discify --open",
     "list-mark": "browserify --full-paths -x htmlparser2 mark.js | discify --open",
-    "dev": "watchify mark.js --standalone Mark -o dist/mark.js -v",
+    "dev": "watchify mark.js -o dist/mark.js -v",
     "benchmark": "node test/perf/benchmark.js",
     "gen-grammar-diagram": "cp-cli dev/viewer.html node_modules/grammkit/template/viewer.html && grammkit docs/mark.bnf -o docs/mark-grammar.html"
   },
