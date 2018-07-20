@@ -65,7 +65,7 @@ test('Mark object model', function(assert) {
 	assert.equal(arrayEqual(div_contents, ["text"]), true, "Mark object div contents should be ['text']");
 		
 	// filter
-	div = Mark.parse('{div "text" {br} "more" {b "bold"} {!-- comment --}}');
+	div = Mark.parse('{div "text" {br} "more" {b "bold"} `!-- comment --`}');
 	assert.deepEqual(div.filter(n => typeof n === 'string'), ["text", "more"], "Mark filter API");
 	// map
 	assert.deepEqual(div.map(n => typeof n), ["string", "object", "string", "object", "object"], "Mark map API");
@@ -132,7 +132,7 @@ test('Mark object model', function(assert) {
 	assert.equal(div.source(), '{div width:10 "text"}', "Mark source()");
 	
 	// text API
-	div = Mark.parse('{div width:10 "text " {span "more"} {!--comment--}}');
+	div = Mark.parse('{div width:10 "text " {span "more"} `!--comment--`}');
 	assert.equal(div.text(), "text more", "Mark text()");
 	
 	// JSON API

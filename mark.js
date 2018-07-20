@@ -288,7 +288,8 @@ MARK.parse = (function() {
 	// It is a simple, recursive descent parser. It does not use eval or regular expressions, 
 	// so it can be used as a model for implementing a Mark parser in other languages.
 	"use strict";
-	let UNEXPECT_END = "Unexpected end of input";
+	let UNEXPECT_END = "Unexpected end of input",
+		UNEXPECT_CHAR = "Unexpected character ";
 	
     let at,           	// The index of the current character
         lineNumber,   	// The current line number
@@ -350,7 +351,7 @@ MARK.parse = (function() {
 
 		// identifiers must start with a letter, _ or $.
 		if ((ch !== '_' && ch !== '$') && (ch < 'a' || ch > 'z') && (ch < 'A' || ch > 'Z')) {
-			error("Bad identifier as unquoted key");
+			error(UNEXPECT_CHAR + renderChar(ch));
 		}
 		// subsequent characters can contain digits
 		while (next() && (('a' <= ch && ch <= 'z') || ('A' <= ch && ch <= 'Z') || ('0' <= ch && ch <= '9') || ch === '_' || ch === '$' ||
@@ -585,7 +586,24 @@ MARK.parse = (function() {
 		case 'I':  if (isSuffix('nfinity')) { return Infinity; }  break;
 		case 'N':  if (isSuffix('aN')) { return NaN; }
 		}
-		error("Unexpected character "+ renderChar(text.charAt(at-1)));
+		error(UNEXPECT_CHAR + renderChar(text.charAt(at-1)));
+	},
+	
+	pragma = function() {
+		let prag = '';
+		next();  // skip '`'
+		while (ch) {
+			if (ch === '`') {
+				next();
+				if (ch !== '`') { // end of pragma
+					return MARK.pragma(prag);				
+				}
+				// else double back tick escape
+			}
+			prag += ch;
+			next();
+		}
+		error(UNEXPECT_END);
 	},
 
 	value,  // Place holder for the value function.
@@ -628,7 +646,7 @@ MARK.parse = (function() {
 	// ' ', \t', '\r', '\n' spaces also allowed in base85 stream
 	lookup85[32] = lookup85[9] = lookup85[13] = lookup85[10] = 85;
 	
-	let binary = function(parent) {
+	let binary = function() {
 		at++;  // skip the starting '{:'
 		if (text[at] === '~') { // base85
 			at++;  // skip '~'
@@ -670,7 +688,7 @@ MARK.parse = (function() {
 					}
 				}
 			}			
-			buffer[$parent] = parent;  buffer.encoding = 'a85';
+			buffer.encoding = 'a85';
 			return buffer;			
 		}
 		else { // base64
@@ -712,25 +730,18 @@ MARK.parse = (function() {
 				bytes[p++] = ((code3 & 3) << 6) | (code4 & 63);
 			}
 			// console.log('binary decoded length:', p);
-			buffer[$parent] = parent;  buffer.encoding = 'b64';
+			buffer.encoding = 'b64';
 			return buffer;
 		}
 	};
 
 	// Parse an object, pragma or binary
-	let object = function(parent) {
+	let object = function() {
 		let obj = {}, 
 			key = null, 		// property key
 			extended = false, 	// whether the is extended Mark object or legacy JSON object
-			hasBrace = false, 	// whether the object has any unescaped brace
-			index = 0;  	
-		// all 3 types: Mark object, JSON object, Mark pragma store reference to parent 
-		if (parent) { obj[$parent] = parent; } 
-
-		next();  // skip the starting '{'
-		// store the current source position, in case we need to backtrack later
-		let bkAt = at, bkLineNumber = lineNumber, bkColumnStart = columnStart;
-
+			index = 0;
+		
 		let putText = function(text) {
 			// check preceding node
 			if (index > 0 && typeof obj[index-1] === 'string') {
@@ -743,11 +754,11 @@ MARK.parse = (function() {
 		},
 		parseContent = function() {
 			while (ch) {
-				if (ch === '{') { // child object
-					hasBrace = true;
-					let child = (text[at] === ':') ? binary(obj) : object(obj);  child[$parent] = obj;
+				if (ch === '{' || ch === '`') { // child object
+					let child = (ch === '`') ? pragma(obj) : (text[at] === ':' ? binary(obj):object(obj));  
 					Object.defineProperty(obj, index, {value:child, writable:true, configurable:true}); // make content non-enumerable
-					index++;  
+					// all 4 types: Mark object, JSON object, Mark pragma, Mark binary store reference to parent 
+					child[$parent] = obj;  index++;  
 				}
 				else if (ch === '"' || ch === "'") { // text node
 					let str = string();
@@ -759,44 +770,14 @@ MARK.parse = (function() {
 					return;
 				}
 				else {
-					error("Unexpected character " + renderChar(ch));
+					error(UNEXPECT_CHAR + renderChar(ch));
 				}
 				white();
 			}
 			error(UNEXPECT_END);		
-		},
-		parsePragma = function() {
-			if (hasBrace || key) { error("Bad object"); } // cannot be parsed as Mark pragma, as brace needs to be escaped in Mark pragma
-			// restore parsing position, and try parse as Mark pragma
-			at = bkAt;  lineNumber = bkLineNumber;  columnStart = bkColumnStart;
-			ch = text.charAt(at - 1);
-			
-			let pragma = '';
-			while (ch) {
-				if (ch === '}') { // end of pragma
-					next();
-					let pgm = MARK.pragma(pragma);  pgm[$parent] = parent;
-					return pgm;
-				}				
-				else if (ch === '\\') { 
-					// escape seq for '{', '}', ':', ';', as html, xml comment may contain these characters
-					next();
-					if (ch !== '{' && ch !== '}' && ch !== ':' && ch !== ';') { pragma += '\\'; }
-					// else treated as normal character
-				}
-				else if (ch === '{' || ch === '}' || ch === ':') {
-					error("Bad object"); // throw error 'Bad object', assuming user wants to write JSON or Mark object, not pragma
-				}
-				else if (ch === ';') {
-					error("Character ';' should be escaped in Mark pragma");
-				}
-				pragma += ch;
-				next();
-			}
-			error(UNEXPECT_END);
 		};
 		
-		white();
+		next();  white();  // skip the starting '{'
 		while (ch) {
 			if (ch === '}') { // end of the object
 				next();  
@@ -804,11 +785,11 @@ MARK.parse = (function() {
 				return obj;   // could be empty object
 			}
 			// scan the key
-			if (ch === '{') { // child object
+			if (ch === '{' || ch === '`') { // child object or pragma
 				if (extended) {
-					hasBrace = true;  parseContent();  return obj;
+					parseContent();  return obj;
 				}
-				error("Unexpected character '{'");
+				error(UNEXPECT_CHAR + "'{'");
 			}
 			if (ch === '"' || ch === "'") { // quoted key
 				var str = string();  white();
@@ -818,10 +799,7 @@ MARK.parse = (function() {
 					if (extended) { // already got type name
 						// only output non-empty text
 						if (str) putText(str);
-						if (ch === '}' || ch === '{' || ch === '"' || ch === "'") { 
-							parseContent();  return obj;
-						}
-						else { return parsePragma(); }
+						parseContent();  return obj;
 					}
 					else if (!key) { // at the starting of the object
 						// create the object
@@ -830,12 +808,11 @@ MARK.parse = (function() {
 						continue;							
 					}
 					else { 
-						return parsePragma();
+						error(UNEXPECT_CHAR + renderChar(ch));
 					}
 				}
 			}
-			// Mark key or binary literal
-			else if (ch==='_' || ch==='$' || 'a'<=ch && ch<='z' || 'A'<=ch && ch<='Z') {
+			else { // if (ch==='_' || ch==='$' || 'a'<=ch && ch<='z' || 'A'<=ch && ch<='Z')
 				// Mark unquoted key, which needs to be valid JS identifier.
 				var ident = identifier();  white();
 				if (ch == ':') { // property value
@@ -846,17 +823,12 @@ MARK.parse = (function() {
 						extended = true;  // key = ident;
 						continue;
 					}
-					return parsePragma();
+					error(UNEXPECT_CHAR + renderChar(ch));
 				}
-			}
-			else { 
-				return parsePragma();
 			}
 			
 			// key-value pair
-			// assert(ch == ':');
 			next(); // skip ':'
-			if (ch === '{') { hasBrace = true; }
 			var val = value();
 			if (extended && !isNaN(key*1)) { // any numeric key is rejected for Mark object
 				error("Numeric key not allowed as Mark property name");
@@ -885,6 +857,8 @@ MARK.parse = (function() {
         case '"':
         case "'":
             return string();
+		case '`':
+			return pragma();
         case '-':
         case '+':
         case '.':
@@ -1114,7 +1088,7 @@ MARK.stringify = function(obj, options) {
                     var nonEmpty = false;
 					if (!value.constructor) { // assume Mark pragma
 						// todo: should escape '{','}' in $pragma
-						return value[$pragma] ? '{' + value[$pragma] + '}' : 'null'/* unknown object */;
+						return value[$pragma] ? '`' + value[$pragma] + '`' : 'null'/* unknown object */;
 					}
 					// Mark or JSON object
 					objStack.push(value);

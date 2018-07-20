@@ -10,11 +10,6 @@ test('Mark parse error handling ', function(assert) {
 	assert.throws(function () { Mark.parse('{div "text"'); }, /Unexpected end of input/, "Missing closing bracket");
 	assert.throws(function () { Mark.parse('Infinte'); }, /Unexpected character/, "Unexpected word for number");
 	assert.throws(function () { Mark.parse('{div "123":123}'); }, /Numeric key not allowed as Mark property name/, "Number not allowed as key");
-
-	assert.throws(function () { Mark.parse('{a;2}'); }, /Character ';' should be escaped in Mark pragma/, "Character ';' should be escaped in pragma");
-	assert.throws(function () { Mark.parse('{obj prop:{a;2}}'); }, /Character ';' should be escaped in Mark pragma/, "Character ';' should be escaped in pragma");
-	assert.throws(function () { Mark.parse("{a > b ? true:false}"); }, /Bad object/, "Character ':' should be escaped in pragma");
-	assert.throws(function () { Mark.parse("{div 'text' 'text'?}"); }, /Unexpected character/, "This is not a valid pragma");
 	
 	assert.throws(function () { Mark.parse('[1,,2]'); }, /Missing array element/, "Missing array element");
 	
@@ -30,7 +25,8 @@ test('Mark parse error handling ', function(assert) {
 	try {
 		Mark.parse('{obj \n p:true 123}');
 	} catch (e) {
-		assert.equal(e.message.lastIndexOf("Bad object") === 0, true, "Error message");
+		console.log(e.message);
+		assert.equal(e.message.lastIndexOf("Unexpected character") === 0, true, "Error message");
 		assert.equal(e.lineNumber, 2, "Error line number");
 		assert.equal(e.columnNumber, 9, "Error column number");
 	}

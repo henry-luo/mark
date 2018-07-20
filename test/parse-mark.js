@@ -53,16 +53,15 @@ test('Parse Mark object', function(assert) {
 	assert.equal(Mark.parse('{div {"width":1}}')[0].width, 1, "JSON object allowed as Mark content");
 	
 	// test Mark pragma
-	assert.equal(Mark.parse('{!-- comment --}').constructor, undefined, "Mark pragma");
-	assert.equal(Mark.parse('{!-- comment --}').pragma(), "!-- comment --", "Mark pragma as root");
-	assert.equal(Mark.parse('{!-- comment with escape \\{\\} \\ --}').pragma(), "!-- comment with escape {} \\ --", "Mark pragma with escape");
-	assert.equal(Mark.parse('{div {!-- comment --} }')[0].pragma(), "!-- comment --", "Mark pragma as content");
-	assert.equal(Mark.parse("{'some text' + ' and more'}").pragma(), "'some text' + ' and more'", "Mark pragma parsing that needs backtracking");
+	assert.equal(Mark.parse('`!-- comment --`').constructor, undefined, "Mark pragma");
+	assert.equal(Mark.parse('`!-- comment --`').pragma(), "!-- comment --", "Mark pragma as root");
+	assert.equal(Mark.parse('`!-- comment with escape `` \\ --`').pragma(), "!-- comment with escape ` \\ --", "Mark pragma with escape");
+	assert.equal(Mark.parse('{div `!-- comment --`}')[0].pragma(), "!-- comment --", "Mark pragma as content");
 	//let pragma = Mark.parse("{div '100%' 'text'!}");
 	//assert.equal(pragma.pragma(), "div '100%' 'text'!", "Mark pragma parsing that needs backtracking");
-	pragma = Mark.parse("{field name:'test', required:{this.context.user.hasRole('admin')}}");
+	pragma = Mark.parse("{field name:'test', required:`this.context.user.hasRole('admin')`}");
 	assert.equal(pragma.required.pragma(), "this.context.user.hasRole('admin')", "Mark pragma parsing that needs backtracking");
-	assert.equal(Mark.parse(`{var t = "\r\n"}`).pragma(), `var t = "\r\n"`, "Mark pragma should preserve JS escape");
+	assert.equal(Mark.parse('`var t = "\r\n"`').pragma(), `var t = "\r\n"`, "Mark pragma should preserve JS escape");
 	
 	// test multiline text
 	assert.equal(Mark.parse('{div "string"\n" 2nd line"\n\t\t" and 3rd"}')[0], "string 2nd line and 3rd", "Mark multiline text");
