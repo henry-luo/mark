@@ -29,7 +29,7 @@ For example, a HTML registration form:
 
 ```html
 <form>
-  <!-- comment -->
+  <!--comment-->
   <div class="form-group">
     <label for="email">Email address:</label>
     <input type="email" id="email">
@@ -46,7 +46,7 @@ Could be represented in Mark as:
 
 ```text
 {form                                   // object type-name 'form'
-  {!-- comment --}                      // Mark pragma, similar to HTML comment
+  `comment`                             // Mark pragma, similar to HTML comment
   {div class:"form-group"               // nested Mark object
     {label for:"email"                  // object with property 'for'
       "Email address:"                  // text needs to be quoted
@@ -67,17 +67,19 @@ You can refer to the [syntax spec](https://mark.js.org/mark-syntax.html) for det
 
 ## Mark Data Model
 
-Mark object has a very simple and fully-typed data model. Each Mark object has 3 facets of data:
+Mark has a very simple and fully-typed data model. 
+
+Each Mark object has 3 facets of data:
 
 - **Type name**, which is mapped to `object.constructor.name` under JavaScript.
 - **Properties**, which is a collection of key-value pairs, stored as normal JavaScript *named properties*.
 - **Contents**, which is a list of content objects, stored as *indexed properties* inside the same JavaScript object.
 
-Mark utilizes a novel feature in JavaScript that an plain JS object is actually *array-like*, it can contain both named properties and indexed properties.
+Mark utilizes a novel feature in JavaScript that a plain JS object is actually *array-like*, it can contain both named properties and indexed properties.
 
-So each Mark object is mapped to just **one** plain JavaScript object, which is more compact and efficient comparing to other JSON-based DOM models (e.g. [JsonML](http://www.jsonml.org/), [virtual-dom](https://github.com/Matt-Esch/virtual-dom)), and more intuitive to used in JS.
+So each Mark object is mapped to just **one** plain JavaScript object, which is more compact and efficient comparing to other JSON-based DOM models (e.g. [JsonML](http://www.jsonml.org/), [virtual-dom](https://github.com/Matt-Esch/virtual-dom), [MicroXML](https://dvcs.w3.org/hg/microxml/raw-file/tip/spec/microxml.html)), and more intuitive to used in JS.
 
-Roughly speaking, data model of JSON, XML/HTML are subsets of Mark, and Mark data model is a subset of JS data model.
+Roughly speaking, data models of JSON, XML/HTML are subsets of Mark data model, and Mark data model is a subset of JS data model.
 
 <div align="center">
 <img src='https://mark.js.org/data-model.png' width='300'>
@@ -171,7 +173,7 @@ console.log("Greeting from Mark: " + Mark.stringify(obj));
 - [Syntax specification](https://mark.js.org/mark-syntax.html)
 - [Data model and API specification](https://mark.js.org/mark-model.html)
 - [FAQ](https://mark.js.org/faq.html)
-- Past discussion about Mark at [Hacker News](https://news.ycombinator.com/item?id=16308581)
+- Discussion about Mark at [Hacker News](https://news.ycombinator.com/item?id=16308581)
 - Examples:
   - You can take a look at all the [test scripts](https://github.com/henry-luo/mark/tree/master/test), which also serve as basic demonstration of API usage.
   - [Mark HTML example](https://plnkr.co/edit/DCgNxf?p=preview)

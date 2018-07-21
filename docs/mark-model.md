@@ -59,7 +59,7 @@ Mark has some restrictions on the objects that can be stored in the content:
 
 - Objects allowed in Mark content are: `string`, `binary object` (i.e. `ArrayBuffer`), `Mark pragma`, `JSON object`, `Mark object`.
 - `Array`, `number`, `boolean` and `null` values are not allowed in Mark content.
-- Consecutive strings must be merged into one single string.
+- Consecutive strings are merged into one single string.
 
 These restrictions are defined so that Mark content model can align with that of HTML and XML.
 

@@ -1,6 +1,5 @@
 /*--------------------------------------------------------
-Modified from JSON5 grammar at: 
-https://github.com/json5/json5-spec/blob/master/json5.abnf
+Modified from JSON5 grammar
 --------------------------------------------------------*/
 
 eol ::= LF | CRLF | CR          /* End-of-line */
@@ -11,9 +10,9 @@ eof ::= EOF           			/* End-of-input */
 
 comment ::= sl_comment | ml_comment
 
-sl_comment ::= begin_sl_comment (pchar | ows)* (eol | eof)
+sl_comment ::= begin_sl_comment char_no_eol* (eol | eof)
 
-ml_comment ::= begin_ml_comment (pchar_non_star | ('*' pchar_non_slash) | ows | eol)* end_ml_comment
+ml_comment ::= begin_ml_comment (char_no_star | ('*' char_no_slash))* end_ml_comment
 
 begin_sl_comment ::= '//'
 
@@ -21,15 +20,17 @@ begin_ml_comment ::= '/*'
 
 end_ml_comment   ::= '*/'
 
-pchar ::= [#x20-#x7E] | [#x80-#x10FFFF] /* Printable character */
+char ::= [#x00-#x10FFFF] /* Any Unicode character */
 
-pchar_non_star ::= [#x20-#x29] | [#x2B-#x7E] | [#x80-#x10FFFF] /* Printable character except * */
+char_no_eol ::= [#x00-#x09] | [#x0B-#x0C] | [#x0E-#x10FFFF] /* Character except LF, CR */
 
-pchar_non_slash ::= [#x20-#x2E] | [#x30-#x7E] | [#x80-#x10FFFF] /* Printable character except / */
+char_no_star ::= [#x00-#x29] | [#x2B-#x10FFFF] /* Character except star * */
 
-/*--------------------------------------------------------*/
+char_no_slash ::= [#x20-#x2E] | [#x30-#x10FFFF] /* Character except slash / */
+
+/*-- whitespace ------------------------------------------------------*/
 ws_char ::= SP |        /* Space */
-        HTAB |          /* Horizontal tab */
+        TAB |           /* Horizontal tab */
         eol				/* Line ending */
 ws ::= (ws_char | comment)*
 
@@ -73,7 +74,7 @@ s_string ::= "'" (char | '"')* "'"
 /* tripple quoted string */
 t_string ::= ("'''" triple_single "'''") | ('"""' triple_double '"""')
 
-tchar ::= [#x20-#x21] | [#x23-#x26] | [#x28-#x7E] | [#x80-#x10FFFF] /* printable characters except " and ' */
+tchar ::= [#x00-#x21] | [#x23-#x26] | [#x28-#x10FFFF] /* Characters except " and ' */
 
 triple_single ::= (tchar | '"' | ("'" tchar) | ("''" tchar))* "'"? "'"? /* chars without tripple single quote */
 
@@ -81,7 +82,7 @@ triple_double ::= (tchar | "'" | ('"' tchar) | ('""' tchar))* '"'? '"'? /* chars
 
 char ::= unescaped | escaped
 
-unescaped ::= [#x20-#x21] | [#x23-#x26] | [#x28-#x5B] | [#x5D-#x7E] | [#x80-#x10FFFF]
+unescaped ::= [#x00-#x21] | [#x23-#x26] | [#x28-#x5B] | [#x5D-#x10FFFF]  /* Characters except ", ', \ */
    
 escaped ::= '\' (
    "'" |			/* this is needed as we allows single quote string */
@@ -139,15 +140,13 @@ mark_object ::= begin_object type_name properties contents end_object
 
 type_name ::= key ws
 
-contents ::= (text | json_object | mark_object | mark_pragma | ws)*
+contents ::= (text | binary | json_object | mark_object | mark_pragma | ws)*
 
 text ::= (string ws)+   /* Mark text can be multiple consecutive strings */
 
-mark_pragma ::= '{' (pragma_escape | pchar_no_brace_colon)+ '}'
+mark_pragma ::= '`' (char_no_backtick | '``')* '`'
 
-pragma_escape ::= '\' ('{' | '}' | ':' | ';')
-
-pchar_no_brace_colon ::= [#x20-#x39] | [#x3C-#x7A] | '|' | [#x7E-#x10FFFF] /* Printable characters except {, }, :, ; */
+char_no_backtick ::= [#x00-#x5F] | [#x61-#x10FFFF] /* Characters except ` */
 
 /*-- root ------------------------------------------------------*/
 

@@ -7,19 +7,13 @@ Mark syntax is a superset of JSON. The primary extension that Mark makes to JSON
 Below are the key grammar rules for the new Mark object in BNF notation:
 
 ```BNF
-Mark ::= value     /* root */
+Mark ::= value     /* root of Mark grammar */
 
 value ::= null | boolean | number | string | binary | array | json_object | mark_object | mark_pragma
 
 mark_object ::= '{' type_name properties contents '}'
 
 type_name ::= key
-
-properties ::= (property ','?)*
-
-contents ::= (text | json_object | mark_object | mark_pragma)*
-
-property ::= key ':' value
 
 key ::= string | identifier
 ```
@@ -28,12 +22,16 @@ key ::= string | identifier
 
 Comparing to a JSON object, a Mark object has two extensions:
 
-- A **type name**: which corresponds to class name or type name of an object. In JavaScript, that is `obj.constructor.name`. In HTML and XML, that's the element name.
-- Optional list of **content** values following the properties: the content values corresponds to child nodes in markup data.
+- A **type name**, which corresponds to class name or type name of an object. In JavaScript, that is `obj.constructor.name`. In HTML and XML, that's the element name.
+- Optional list of **content** values following the named properties, which corresponds to child nodes in markup documents like HTML and XML.
 
 ### 1.1 Properties
 
 ```BNF
+properties ::= (property ','?)*
+
+property ::= key ':' value
+
 identifier ::= begin_identifier continue_identifier*
 
 begin_identifier ::= [a-zA-Z] | '_' | '$'
@@ -49,23 +47,30 @@ continue_identifier ::= begin_identifier | digit | '-' | '.'
 - Property keys **must be unique** (for both Mark and JSON object).
 - Comma between properties are optional, and last property can have trailing comma.
 
-## 2. Mark Pragma
-
-Mark pragma, it is a sequence of characters enclosed in '{' and '}'. It is must not be a valid JSON or Mark object. It can contain any character in it except '{', '}', ':' and ';', which need to be escaped using backslash '\'.
+### 1.2 Contents
 
 ```BNF
-mark_pragma ::= '{' pragma_escape | pchar_no_brace_colon+ '}'
-
-pragma_escape ::= '\' ('{' | '}' | ':' | ';')
+contents ::= (text | binary | json_object | mark_object | mark_pragma)*
 ```
 
-It is designed to support markup content like comment in HTML and processing instruction in XML.
+- To better support mixed content, not all Mark values are allowed in the contents of a Mark object. Array, number, boolean and null values are not allowed.
+- Consecutive text nodes are merged into one text node.
+
+## 2. Mark Pragma
+
+Mark pragma is a sequence of characters enclosed in back-tick character '`' . It can contain any character in it, and the only character that needs to be escaped is the back-tick character itself, which can be escaped as double back-ticks '``', like SQL.
+
+```BNF
+mark_pragma ::= '`' (pchar_no_back_tick | '``')* '`'
+```
+
+It is designed to support markup content like comments in HTML and processing instructions in XML.
 
 ## 3. Other Syntax Extensions to JSON
 
 Other syntax extensions made to JSON are pretty much just syntax sugars. Most of them are inherited from [JSON5](http://json5.org/).
 
-### 3.1 Object
+### 3.1 Unique property keys
 
 - Property keys of JSON object in Mark must be **unique** under the same object. (JSON spec has left this open, and there are many implementations that accept duplicate keys. This is probably an overlooked issue in initial JSON design.)
 
@@ -75,10 +80,11 @@ Other syntax extensions made to JSON are pretty much just syntax sugars. Most of
 
 ### 3.3 Strings
 
-- Strings can be single, double quoted.
-- Strings can be split across multiple lines.
+- Strings can be single or double quoted.
+- Strings can split across multiple lines.
 - String can also be triple-quoted with single or double quote character, similar to Python or Scala.
   - The quoted sequence of characters is arbitrary, except that it may contain three or more consecutive quote characters only at the very end. Escape sequences are not interpreted.
+- Unlike JSON string, control characters, like Tab and Line Feed, are allowed in Mark string. Actually, all Unicode characters are allowed in Mark string, just like JS string. Only ", ' and \\ need to be escaped.
 
 ### 3.4 Numbers
 
@@ -86,7 +92,7 @@ Other syntax extensions made to JSON are pretty much just syntax sugars. Most of
 - Numbers can include `Infinity`, `-Infinity`,  `NaN`, and `-NaN`.
 - Numbers can begin with an explicit plus sign.
 
-### 3.5 Binary Data
+### 3.5 Binary Object
 
 - Binary data can be encoded as a sequence of characters delimited by '`{:`' and '`}`'. 
 - It can encoded in either [base64](https://en.wikipedia.org/wiki/Base64) or [ascii85](https://en.wikipedia.org/wiki/Ascii85) *(Adobe version)* encoding.
@@ -99,8 +105,6 @@ base64_binary ::= '{:' ([0-9a-zA-Z] | '+' | '/' | ws_char)* '='? '='? '}'
 
 ascii85_binary ::= '{:~' ([#x21-u] | 'z' | ws_char)* '~}'
 ```
-
-
 
 ### 3.6 Comments
 

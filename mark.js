@@ -483,8 +483,7 @@ MARK.parse = (function() {
 					}
 				} 
 				// else if (ch === '\n') {
-					// unescaped newlines are invalid in JSON, but valid in Mark; 
-					// see: https://github.com/json5/json5/issues/24
+					// control characters like TAB and LF are invalid in JSON, but valid in Mark; 
 					// break;
 				// } 
 				else { // normal char

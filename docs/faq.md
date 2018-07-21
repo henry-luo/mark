@@ -32,7 +32,7 @@ Mark shall support serialize and deserialize custom data types under a separate 
 
 ## Is Mark Turing complete?
 
-No, by itself, Mark is just a markup format, and is not Turing complete.
+No. By itself, Mark is just a markup notation, thus not Turing complete.
 
 However, if some interpretation is applied to the content embodied in the Mark document, then it can be a very powerful Turing complete scripting language. [Mark Template](https://github.com/henry-luo/mark-template) is such an example. Ant and XSLT are similar examples in XML.
 
