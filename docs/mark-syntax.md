@@ -54,14 +54,14 @@ contents ::= (text | binary | json_object | mark_object | mark_pragma)*
 ```
 
 - To better support mixed content, not all Mark values are allowed in the contents of a Mark object. Array, number, boolean and null values are not allowed.
-- Consecutive text nodes are merged into one text node.
+- Consecutive text values are merged into a single text value.
 
 ## 2. Mark Pragma
 
-Mark pragma is a sequence of characters enclosed in back-tick character '`' . It can contain any character in it, and the only character that needs to be escaped is the back-tick character itself, which can be escaped as double back-ticks '``', like SQL.
+Mark pragma is a sequence of characters enclosed in back-tick character '\`' . It can contain any character in it, and the only character that needs to be escaped is the back-tick character itself, which can be escaped as double back-ticks '\`\`', like SQL.
 
 ```BNF
-mark_pragma ::= '`' (pchar_no_back_tick | '``')* '`'
+mark_pragma ::= '`' (char_no_backtick | '``')* '`'
 ```
 
 It is designed to support markup content like comments in HTML and processing instructions in XML.

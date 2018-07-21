@@ -97,9 +97,9 @@ escaped ::= '\' (
    unicode			/* uXXXX                U+XXXX */
    )
 
-unicode ::= 'u' hexdig hexdig hexdig hexdig	
+unicode ::= 'u' hex hex hex hex	
 
-hexdig ::= [0-9a-fA-F]
+hex ::= [0-9a-fA-F]
 
 /*-- array ------------------------------------------------------*/
 
