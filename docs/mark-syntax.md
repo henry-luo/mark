@@ -58,13 +58,13 @@ contents ::= (text | binary | json_object | mark_object | mark_pragma)*
 
 ## 2. Mark Pragma
 
-Mark pragma is a sequence of characters enclosed in back-tick character '\`' . It can contain any character in it, and the only character that needs to be escaped is the back-tick character itself, which can be escaped as double back-ticks '\`\`', like SQL.
+Mark pragma is a sequence of characters enclosed in brackets `( ... )`. It can contain embedded brackets, as long as they are balanced, and embedded brackets are treated as part of the pragma content.
 
 ```BNF
-mark_pragma ::= '`' (char_no_backtick | '``')* '`'
+mark_pragma ::= '(' (char_no_bracket | mark_pragma)* ')'
 ```
 
-It is designed to support markup content like comments in HTML and processing instructions in XML.
+It can be used for markup content like comments in HTML and processing instructions in XML.
 
 ## 3. Other Syntax Extensions to JSON
 

@@ -144,9 +144,9 @@ contents ::= (text | binary | json_object | mark_object | mark_pragma | ws)*
 
 text ::= (string ws)+   /* Mark text can be multiple consecutive strings */
 
-mark_pragma ::= '`' (char_no_backtick | '``')* '`'
+mark_pragma ::= '(' (char_no_bracket | mark_pragma)* ')'
 
-char_no_backtick ::= [#x00-#x5F] | [#x61-#x10FFFF] /* Characters except ` */
+char_no_bracket ::= [#x00-#x27] | [#x2A-#x10FFFF] /* Characters except ( ) */
 
 /*-- root ------------------------------------------------------*/
 

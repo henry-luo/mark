@@ -46,7 +46,7 @@ Could be represented in Mark as:
 
 ```text
 {form                                   // object type-name 'form'
-  `comment`                             // Mark pragma, similar to HTML comment
+  (!--comment)                          // Mark pragma, like HTML comment
   {div class:"form-group"               // nested Mark object
     {label for:"email"                  // object with property 'for'
       "Email address:"                  // text needs to be quoted

@@ -1,6 +1,6 @@
 {
   "name": "mark-js",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "The core library for working with Mark, an unified notation for both object and markup data.",
   "main": "mark.js",
   "directories": {

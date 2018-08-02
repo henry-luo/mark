@@ -9,9 +9,9 @@
 "use strict";
 
 // symbols used internally
-const $length = Symbol('Mark.length'), // for content length
-	$parent = Symbol('Mark.parent'), // for parent object
-	$pragma = Symbol('Mark.pragma'); // for pragma value
+const $length = Symbol.for('Mark.length'), // for content length
+	$parent = Symbol.for('Mark.parent'), // for parent object
+	$pragma = Symbol.for('Mark.pragma'); // for pragma value
 	
 let $convert = null,  // Mark Convert API
 	$ctrs = {};	// cached constructors for the Mark objects
@@ -589,16 +589,18 @@ MARK.parse = (function() {
 	},
 	
 	pragma = function() {
-		let prag = '';
-		next();  // skip '`'
+		let prag = '', level = 0;
+		next();  // skip starting '('
 		while (ch) {
-			if (ch === '`') {
-				next();
-				if (ch !== '`') { // end of pragma
+			if (ch === ')') {
+				if (level) { level--; } // embedded (...)
+				else { // end of pragma
+					next();  // skip ending ')'
 					return MARK.pragma(prag);				
 				}
-				// else double back tick escape
 			}
+			else if (ch === '(') { level++; } // store as normal char
+			// else - normal char
 			prag += ch;
 			next();
 		}
@@ -753,8 +755,8 @@ MARK.parse = (function() {
 		},
 		parseContent = function() {
 			while (ch) {
-				if (ch === '{' || ch === '`') { // child object
-					let child = (ch === '`') ? pragma(obj) : (text[at] === ':' ? binary(obj):object(obj));  
+				if (ch === '{' || ch === '(') { // child object
+					let child = (ch === '(') ? pragma(obj) : (text[at] === ':' ? binary(obj):object(obj));  
 					Object.defineProperty(obj, index, {value:child, writable:true, configurable:true}); // make content non-enumerable
 					// all 4 types: Mark object, JSON object, Mark pragma, Mark binary store reference to parent 
 					child[$parent] = obj;  index++;  
@@ -784,7 +786,7 @@ MARK.parse = (function() {
 				return obj;   // could be empty object
 			}
 			// scan the key
-			if (ch === '{' || ch === '`') { // child object or pragma
+			if (ch === '{' || ch === '(') { // child object or pragma
 				if (extended) {
 					parseContent();  return obj;
 				}
@@ -856,7 +858,7 @@ MARK.parse = (function() {
         case '"':
         case "'":
             return string();
-		case '`':
+		case '(':
 			return pragma();
         case '-':
         case '+':
@@ -1087,7 +1089,7 @@ MARK.stringify = function(obj, options) {
                     var nonEmpty = false;
 					if (!value.constructor) { // assume Mark pragma
 						// todo: should escape '{','}' in $pragma
-						return value[$pragma] ? '`' + value[$pragma] + '`' : 'null'/* unknown object */;
+						return value[$pragma] ? '(' + value[$pragma] + ')' : 'null'/* unknown object */;
 					}
 					// Mark or JSON object
 					objStack.push(value);
