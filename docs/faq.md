@@ -30,6 +30,12 @@ JSON.parse() and JSON.stringify() also accept an optional parameter of a reviver
 
 Mark shall support serialize and deserialize custom data types under a separate project Mark Schema.
 
+## Can Mark be used in languages other than JS?
+
+Yes. Mark is designed to be a generalized data format, like JSON and XML. It is no meant just for JavaScript.
+
+However, due to limited resource, the Mark handling library is currently only implemented in JS. But as Mark has a very simple syntax and data model, it should not be hard to port it to other languages. 
+
 ## Is Mark Turing complete?
 
 No. By itself, Mark is just a markup notation, thus not Turing complete.
