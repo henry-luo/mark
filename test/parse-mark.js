@@ -60,8 +60,9 @@ test('Parse Mark object', function(assert) {
 	assert.equal(Mark.parse('{div {"width":1}}')[0].width, 1, "JSON object allowed as Mark content");
 	
 	// test Mark pragma
-	assert.equal(Mark.parse('(!-- comment --)').constructor, undefined, "Mark pragma");
+	assert.equal(Mark.parse('(?-- comment ?)').pragma(), "-- comment ", "Mark pragma as root");
 	assert.equal(Mark.parse('(!-- comment --)').pragma(), "!-- comment --", "Mark pragma as root");
+	assert.equal(Mark.parse('(!-- comment --)').constructor, undefined, "Mark pragma");
 	assert.equal(Mark.parse('(!-- comment with embedded (...) \\ --)').pragma(), "!-- comment with embedded (...) \\ --", "Mark pragma with embedded ()");
 	assert.equal(Mark.parse('{div (!-- comment --)}')[0].pragma(), "!-- comment --", "Mark pragma as content");
 	//let pragma = Mark.parse("{div '100%' 'text'!}");

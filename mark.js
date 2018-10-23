@@ -11,7 +11,8 @@
 // symbols used internally
 const $length = Symbol.for('Mark.length'), // for content length
 	$parent = Symbol.for('Mark.parent'), // for parent object
-	$pragma = Symbol.for('Mark.pragma'); // for pragma value
+	$pragma = Symbol.for('Mark.pragma'), // for pragma value
+	$paired = Symbol.for('Mark.pragmaPaired');
 	
 let $convert = null,  // Mark Convert API
 	$ctrs = {};	// cached constructors for the Mark objects
@@ -592,18 +593,32 @@ MARK.parse = (function() {
 	pragma = function() {
 		let prag = '', level = 0;
 		next();  // skip starting '('
-		while (ch) {
-			if (ch === ')') {
-				if (level) { level--; } // embedded (...)
-				else { // end of pragma
-					next();  // skip ending ')'
-					return MARK.pragma(prag);				
+		if (ch === '?') { 
+			next();  // skip '?'
+			while (ch) {
+				if (ch === '?' && text[at] === ')') {
+					// end of pragma
+					at++;  next();  // skip ending ')'
+					return MARK.pragma(prag);
 				}
+				// else - normal char
+				prag += ch;  next();
 			}
-			else if (ch === '(') { level++; } // store as normal char
-			// else - normal char
-			prag += ch;
-			next();
+		} else {
+			while (ch) {
+				if (ch === ')') {
+					if (level) { level--; } // embedded (...)
+					else { // end of pragma
+						next();  // skip ending ')'
+						let p = MARK.pragma(prag);
+						p[$paired] = true; 
+						return p;
+					}
+				}
+				else if (ch === '(') { level++; } // store as normal char
+				// else - normal char
+				prag += ch;  next();
+			}
 		}
 		error(UNEXPECT_END);
 	},
@@ -1090,7 +1105,7 @@ MARK.stringify = function(obj, options) {
                     var nonEmpty = false;
 					if (!value.constructor) { // assume Mark pragma
 						// todo: should escape '{','}' in $pragma
-						return value[$pragma] ? '(' + value[$pragma] + ')' : 'null'/* unknown object */;
+						return value[$pragma] ?  (value[$paired] ? '('+ value[$pragma] +')' : '(?'+ value[$pragma] +'?)') : 'null'/* unknown object */;
 					}
 					// Mark or JSON object
 					objStack.push(value);
