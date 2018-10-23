@@ -106,7 +106,10 @@ test('Mark object model', function(assert) {
 	div.push(Mark('p'), Mark('hr'));
 	assert.equal(Mark.stringify(div), "{div {br} {p} {hr}}", "push {p} {hr} into Mark object {div}");
 	div.push(); // empty push 
-	assert.equal(Mark.stringify(div), "{div {br} {p} {hr}}", "push {p} {hr} into Mark object {div}");
+	assert.equal(Mark.stringify(div), "{div {br} {p} {hr}}", "push null into Mark object {div}");
+	div.push([['text']]); // nested array
+	assert.equal(Mark.stringify(div), '{div {br} {p} {hr} "text"}', "push nested array into Mark object {div}");
+	assert.equal(div.length(), 4, "div legnth should be 4");
 	
 	// pop API
 	div = Mark.parse('{div "text" {br}}');  var item = div.pop();
@@ -117,15 +120,16 @@ test('Mark object model', function(assert) {
 	div.pop();  item = div.pop();
 	assert.equal(item, undefined, "undefiend after pop");
 	
-	// insert API
+	// splice API
 	div = Mark.parse('{div {br} {p}}');
-	assert.equal(Mark.stringify(div.insert('test')), '{div "test" {br} {p}}', "Mark insert text");
-	assert.equal(Mark.stringify(div.insert(['test', Mark.parse('{br}')], 2)), '{div "test" {br} "test" {br} {p}}', "Mark insert items");
+	assert.equal(Mark.stringify(div.splice(0, 0, 'test')), '{div "test" {br} {p}}', "Mark insert text");
+	assert.equal(Mark.stringify(div.splice(2, 0, 'child', Mark.parse('{hr}'))), '{div "test" {br} "child" {hr} {p}}', "Mark insert items");
+	assert.equal(Mark.stringify(div.splice(0, 0, 'merge', '-')), '{div "merge-test" {br} "child" {hr} {p}}', "Mark merge inserted items");
+	assert.equal(Mark.stringify(div.splice(1, 1)), '{div "merge-testchild" {hr} {p}}', "Mark merge inserted items");
 	
-	// remove API
-	div = Mark.parse('{div "text" {br} {p}}');  div.remove(1);
-	assert.equal(Mark.stringify(div), '{div "text" {p}}', "Mark remove() test");
-	assert.equal(div.length(), 2, "div length after delete should be 2");
+	div = Mark.parse('{div "text" {br} {p}}');  div.splice(1, 1);
+	assert.equal(Mark.stringify(div), '{div "text" {p}}', "Mark remove item");
+	assert.equal(div.length(), 2, "div length after removing should be 2");
 	
 	// source API
 	div = Mark.parse('{div width:10 "text"}');

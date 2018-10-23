@@ -22,6 +22,44 @@ var MARK = (function() {
 	if (!$ctrs.constructor.name) { // IE11 does not set constructor.name to 'Object'
 		$ctrs.constructor.name = 'Object';
 	}
+
+	function push(val) {
+		let len = this[$length];
+		let t = typeof val;
+		if (t === 'string') {
+			if (!val.length) return; // skip empty text '', ""
+			let prevType = len ? (typeof this[len - 1]):null;
+			if (prevType === 'string') { 
+				len--;  val = this[len] + val;  // merge text nodes
+			}
+		}
+		else if (t === 'object') {
+			if (val === null) return; // skip null value
+			else if (val instanceof Array) { // expanded it inline
+				for (let v of val) { push.call(this, v); }
+				return;
+			}
+			// else, Mark object or pragma
+			val[$parent] = this;  // set $parent
+		}
+		else if (t === 'undefined') {
+			return;
+		}
+		else { // other primitive values are converted to string
+			val = val.toString(); // convert to string, as Mark only accept text and Mark object as content
+			let prevType = len ? (typeof this[len - 1]):null;
+			if (prevType === 'string') {
+				len--;  val = this[len] + val;  // merge text nodes
+			}
+		}
+		Object.defineProperty(this, len, {value:val, writable:true, configurable:true}); // make content non-enumerable
+		this[$length] = len + 1;
+		// additional params
+		for (let i=1; i<arguments.length; i++) {
+			push.call(this, arguments[i]);
+		}
+		return this;  // for call chaining
+	}
 	
 	// Mark.prototype and Mark object constructor
 	function Mark(typeName, props, contents) {
@@ -57,45 +95,8 @@ var MARK = (function() {
 		}
 		
 		// 4. copy contents if any
-		let len = 0;
-		if (contents) { 
-			let prevType = null;
-			function addContents(items) {
-				for (let val of items) {
-					let t = typeof val;
-					if (t === 'string') {
-						if (!val.length) continue; // skip empty text '', ""
-						if (prevType === 'string') { 
-							len--;  val = obj[len] + val;  // merge text nodes
-						}
-					}
-					else if (t === 'object') {
-						if (val === null) continue; // skip null value
-						else if (val instanceof Array) { // expanded it inline
-							addContents(val);  continue;
-						}
-						// else, Mark object or pragma
-						val[$parent] = obj;  // set $parent
-					}
-					else if (t === 'undefined') {
-						continue;
-					}
-					else { // other primitive values are converted to string
-						// val might be null
-						val = val.toString(); // convert to string, as Mark only accept text and Mark object as content
-						if (prevType === 'string') {
-							len--;  val = obj[len] + val;  // merge text nodes
-						}
-					}
-					Object.defineProperty(obj, len, {value:val, writable:true, configurable:true}); // make content non-enumerable
-					prevType = t;  len++;
-				}
-			}
-			// contents can be an array or just single value
-			addContents(Array.isArray(contents) ? contents : [contents]);
-		}
-		// set $length
-		obj[$length] = len;
+		obj[$length] = 0;
+		if (contents) { push.call(obj, contents); }
 		return obj;
 	};
 		
@@ -230,7 +231,7 @@ var MARK = (function() {
 	}	
 	// load mark.mutate APIs
 	try {
-		require('./lib/mark.mutate.js')(Mark, $length);
+		require('./lib/mark.mutate.js')(Mark, push, $length);
 	} catch (e) {
 		console.trace("No Mark Mutate API", e.message);
 	}
