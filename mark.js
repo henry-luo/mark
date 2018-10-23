@@ -571,9 +571,9 @@ MARK.parse = (function() {
 	isSuffix = function(suffix) {
 		let len = suffix.length;
 		for (let i=0; i<len; i++) {
-			if (text[at+i] !== suffix[i]) { at += i+1;  return false; }
+			if (text[at+i] !== suffix[i]) { return false; }
 		}
-		if (isNameStart(text[at+len])) { at += len+1;  return false; }
+		if (isNameStart(text[at+len])) { return false; }
 		ch = text[at+len];  at += len + 1;  
 		return true;
 	},
@@ -586,7 +586,7 @@ MARK.parse = (function() {
 		case 'I':  if (isSuffix('nfinity')) { return Infinity; }  break;
 		case 'N':  if (isSuffix('aN')) { return NaN; }
 		}
-		error(UNEXPECT_CHAR + renderChar(text.charAt(at-1)));
+		return identifier(); // treated as string
 	},
 	
 	pragma = function() {

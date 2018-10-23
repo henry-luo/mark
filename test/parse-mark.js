@@ -2,9 +2,15 @@
 const Mark = require('./../mark.js');
 
 test('Parse Mark object', function(assert) {
+	// test literal values
+	assert.equal(Mark.parse("Infinity"), Infinity, "Infinite value");
+	assert.equal(Mark.parse("true"), true, "Infinite value");
+	assert.equal(Mark.parse("word"), "word", "Unquoted identifier as string value");
+	
 	// test array
 	assert.deepEqual(Mark.parse("[1 true 'text']"), [1, true, 'text'], "Comma is optional in Mark array");
 	assert.deepEqual(Mark.parse("[1 true, 'text']"), [1, true, 'text'], "Comma is optional in Mark array");
+	assert.deepEqual(Mark.parse("[1 true yellow]"), [1, true, 'yellow'], "Unquoted identifier as string value in Mark array");
 	
 	// test name
 	assert.equal(Mark.parse('{obj}').constructor.name, 'obj', "Mark object constructor.name should be 'obj'");
@@ -34,6 +40,7 @@ test('Parse Mark object', function(assert) {
 	assert.deepEqual(Mark.parse("{form id:'test-form', buttons:[{kind:'back'}, 'save', {action:'submit', class:'btn btn-warning'}] }").buttons, 
 		[{kind:'back'}, 'save', {action:'submit', class:'btn btn-warning'}] , "form buttons with array of data");
 	assert.deepEqual(Object.keys(Mark.parse("{obj map:1, every:2, constructor:3}")), ["map", "every", "constructor"], "properties should not conflict with Mark API functions");
+	assert.equal(Mark('{div align:left}').align, 'left', "Identifier as literal string value");
 	
 	// test content model
 	assert.equal(Mark.parse('{obj}').length(), 0, "Object {obj}.length should be 0");

@@ -8,7 +8,7 @@ test('Mark parse error handling ', function(assert) {
 	
 	assert.throws(function () { Mark.parse('{div'); }, /Unexpected end of input/, "Missing closing bracket");
 	assert.throws(function () { Mark.parse('{div "text"'); }, /Unexpected end of input/, "Missing closing bracket");
-	assert.throws(function () { Mark.parse('Infinte'); }, /Unexpected character/, "Unexpected word for number");
+	assert.throws(function () { Mark.parse('Infinte!'); }, /Expect end of input/, "Unexpected character");
 	assert.throws(function () { Mark.parse('{div "123":123}'); }, /Numeric key not allowed as Mark property name/, "Number not allowed as key");
 	
 	assert.throws(function () { Mark.parse('[1,,2]'); }, /Missing array element/, "Missing array element");
