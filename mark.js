@@ -282,7 +282,7 @@ MARK.isName = function(key) {
 	return true;
 }
 	
-let base64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+const base64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 // parse() is only defined on the static Mark API
 MARK.parse = (function() {
@@ -338,8 +338,7 @@ MARK.parse = (function() {
 			error("Expected '" + c + "' instead of " + renderChar(ch));
 		}
 		// Get the next character. When there are no more characters, return the empty string.
-		ch = text.charAt(at);
-		at++;
+		ch = text.charAt(at);  at++;
 		if (ch === '\n' || ch === '\r' && text[at] !== '\n') {
 			lineNumber++;  columnStart = at;
 		}
@@ -507,8 +506,7 @@ MARK.parse = (function() {
 		do {
 			next();
 			if (ch === '\n' || ch === '\r') {
-				next();
-				return;
+				next();  return;
 			}
 		} while (ch);
 	},
@@ -525,14 +523,13 @@ MARK.parse = (function() {
 		do {
 			next();
 			while (ch === '*') {
-				next('*');
-				if (ch === '/') {
-					next('/');
-					return;
-				}
+				next();
+				if (ch === '/') { next();  return; }
+			}
+			if (ch === '/' && text[at] === '*') { // nested block comment
+				next();  blockComment();
 			}
 		} while (ch);
-
 		error("Unterminated block comment");
 	},
 
