@@ -5,7 +5,7 @@
 [![codecov](https://codecov.io/gh/henry-luo/mark/branch/master/graph/badge.svg)](https://codecov.io/gh/henry-luo/mark)
 [![Analytics](https://ga-beacon.appspot.com/UA-114747922-1/readme.md)](https://github.com/henry-luo/mark)
 
-*Objective Markup Notation*, abbreviated as Mark Notation or just **Mark**, is a new unified notation for both object and markup data. The notation is a superset of what can be represented by JSON, HTML and XML, but overcomes many limitations these popular data formats, yet still having a very clean syntax and simple data model.
+**Mark Notation** or simply **Mark**, is a new unified notation for both object and markup data. The notation is a superset of what can be represented by JSON, HTML and XML, but overcomes many limitations of these popular data formats, yet still having a very clean syntax and simple data model.
 
 - It has **clean syntax** with **fully-type** data model *(like JSON or even better)*
 - It is **generic** and **extensible** *(like XML or even better)*
@@ -45,19 +45,19 @@ For example, a HTML registration form:
 Could be represented in Mark as:
 
 ```text
-{form                                   // object type-name 'form'
-  (!--comment)                          // Mark pragma, like HTML comment
+{form                                   // object with type-name 'form'
+  (?--comment?)                         // Mark pragma, like HTML comment
   {div class:"form-group"               // nested Mark object
-    {label for:"email"                  // object with property 'for'
+    {label for:email                    // property 'for' and its value, both unquoted
       "Email address:"                  // text needs to be quoted
     }
-    {input type:"email" id:"email"}     // object without any contents
+    {input type:email id:email}         // object without any contents
   }
-  {div class:"form-group"
-    {label for:"pwd" "Password"}
-    {input type:"password" id:"pwd"}    // comma is optional 
+  {div class:form-group
+    {label for:pwd "Password"}
+    {input type:password id:pwd}        // comma is optional 
   }
-  {button class:['btn' 'btn-info']      // property with complex values
+  {button class:['btn' btn-info]        // property with complex values
     'Submit'                            // text quoted with single quote
   }
 }
@@ -77,9 +77,9 @@ Each Mark object has 3 facets of data:
 
 Mark utilizes a novel feature in JavaScript that a plain JS object is actually *array-like*, it can contain both named properties and indexed properties.
 
-So each Mark object is mapped to just **one** plain JavaScript object, which is more compact and efficient comparing to other JSON-based DOM models (e.g. [JsonML](http://www.jsonml.org/), [virtual-dom](https://github.com/Matt-Esch/virtual-dom), [MicroXML](https://dvcs.w3.org/hg/microxml/raw-file/tip/spec/microxml.html)), and more intuitive to used in JS.
+So each Mark object is mapped to just **one** plain JavaScript object, which is more compact and efficient comparing to other JSON-based DOM models (e.g. [JsonML](http://www.jsonml.org/), [virtual-dom](https://github.com/Matt-Esch/virtual-dom), [MicroXML](https://dvcs.w3.org/hg/microxml/raw-file/tip/spec/microxml.html)), and is more intuitive to used under JS.
 
-Roughly speaking, data models of JSON, XML/HTML are subsets of Mark data model, and Mark data model is a subset of JS data model.
+Roughly speaking, data models of JSON, XML, HTML are subsets of Mark data model, and Mark data model is a subset of JS data model.
 
 <div align="center">
 <img src='https://mark.js.org/data-model.png' width='300'>
@@ -94,8 +94,8 @@ Mark is a superset of JSON. It extends JSON notation with a type-name, and a lis
 Comparing to JSON, Mark has the following advantages:
 
 - It has a type-name, which is important in identifying what the data represents; whereas JSON is actually an anonymous object, missing the type name.
-- It can have nested content objects, which is common in all markup formats, and thus allows Mark to convenient represent document-oriented data, which is awkward for JSON.
-- It incorporates some syntax enhancements to JSON (e.g. allowing comments, property name without quotes, optional trailing comma or between properties and array values), and makes the format more friendly for human.
+- It has built-in mixed-content support, which is common in all markup formats, and thus allows Mark to convenient represent document-oriented data, which is awkward for JSON.
+- It incorporates some syntax enhancements to JSON ~(e.g. allowing comments, property name and value without quotes, optional trailing comma or between properties and array values)~, thus making the format more friendly for human.
 
 Some disadvantages of Mark, comparing to JSON would be:
 
@@ -107,10 +107,10 @@ Some disadvantages of Mark, comparing to JSON would be:
 Comparing to HTML, Mark has the following advantages:
 
 - Mark is a generic data format, whereas HTML is a specialized format for web content.
-- It does not have whitespace ambiguity, as the text objects need to be quoted explicitly. Thus Mark can be minified or prettified without worrying about changing the underlying content.
+- It does not have whitespace ambiguity, as the text objects are quoted explicitly. Thus Mark can be minified or prettified without worrying about changing the underlying content.
 - Its properties can have complex values, like JSON, not just quoted string values as in HTML.
 - It has a very clean syntax, whereas HTML5 parsing can be challenging even with HTML5 spec.
-- Its objects are always properly closed; whereas HTML self-closing tag syntax is non-extensible and error-prone.
+- It is always properly closed; whereas HTML self-closing tag syntax is non-extensible and error-prone.
 - The DOM produced under Mark model, is just a hierarchy of POJO objects, which can be easily processed using the built-in JS functions or 3rd party libraries, making Mark an ideal candidate for virtual DOM and other application usages.
 
 ## Mark vs. XML
@@ -123,9 +123,9 @@ Comparing to XML, Mark has the following advantages:
 
 ## Mark vs. S-expressions
 
-S-expression from Lisp gave rise to novel ideas like high-order composition, self-hosting program. The clean and flexible syntax of Mark make it ideal for many such applications (e.g. [Mark Template](https://github.com/henry-luo/mark-template), a new JS template engine using Mark for its template syntax).
+S-expression from Lisp gave rise to novel ideas like high-order composition, self-hosting program. The clean and flexible syntax of Mark make it ideal for many such applications (e.g. [Mark Template](https://github.com/henry-luo/mark-template), a new JS template engine using Mark for its template syntax), just like s-expression.
 
-The advantage of Mark over S-expressions is that it takes a more modern, JS-first approach in its design, and can be more conveniently used in web and node.js environments.
+The advantage of Mark over S-expressions is that it takes a more modern, JS-first approach in its design, and can be more readily used in web and node.js environments.
 
 ## mark.js
 
@@ -162,7 +162,7 @@ console.log("Greeting from Mark: " + Mark.stringify(obj));
 </script>
 ```
 
-Note: /dist/mark.js has bundled mark.mutate.js, mark.convert.js and mark.selector.js and all dependencies with it, and is meant to run in browser. The entire script is about 14K after gzip. It supports latest browsers, including Chrome, Safari, Firefox, Edge.
+Note: /dist/mark.js has bundled all sub-modules and all dependencies with it, and is meant to run in browser. The entire script is about 14K after gzip. It supports latest browsers, including Chrome, Safari, Firefox, Edge.
 
 *If you just want the core functional API, without the sub-modules, you can also use mark.core.js, which is only 7K after gzip. You can also refer to the package.json to create your own custom bundle with the sub-modules you need.* 
 

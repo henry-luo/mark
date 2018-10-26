@@ -6,21 +6,15 @@ eol ::= LF | CRLF | CR          /* End-of-line */
 
 eof ::= EOF           			/* End-of-input */
 
-/*--------------------------------------------------------*/
-
+/*-- comment ------------------------------------------------------*/
 comment ::= sl_comment | ml_comment
 
-sl_comment ::= begin_sl_comment char_no_eol* (eol | eof)
+sl_comment ::= '//' char_no_eol* (eol | eof)
 
-ml_comment ::= begin_ml_comment (char_no_star | ('*' char_no_slash))* end_ml_comment
+/* multi-line comment can be nested */
+ml_comment ::= '/*' (ml_comment | char_no_star | ('*' char_no_slash))* '*/'
 
-begin_sl_comment ::= '//'
-
-begin_ml_comment ::= '/*'
-
-end_ml_comment   ::= '*/'
-
-char ::= [#x00-#x10FFFF] /* Any Unicode character */
+char ::= [#x00-#x10FFFF] /* any Unicode character */
 
 char_no_eol ::= [#x00-#x09] | [#x0B-#x0C] | [#x0E-#x10FFFF] /* Character except LF, CR */
 
@@ -28,20 +22,18 @@ char_no_star ::= [#x00-#x29] | [#x2B-#x10FFFF] /* Character except star * */
 
 char_no_slash ::= [#x20-#x2E] | [#x30-#x10FFFF] /* Character except slash / */
 
-/*-- whitespace ------------------------------------------------------*/
+/*-- whitespace --------------------------------------------------*/
 ws_char ::= SP |        /* Space */
         TAB |           /* Horizontal tab */
         eol				/* Line ending */
 ws ::= (ws_char | comment)*
 
-/*--------------------------------------------------------*/
-
+/*-- primitive values --------------------------------------------*/
 null  ::= 'null'
 
 boolean  ::= 'true' | 'false'
 
 /*-- number ------------------------------------------------------*/
-
 number ::= ('+' | '-')? (nan | inf | dec)
 
 nan ::= 'NaN'
@@ -56,7 +48,7 @@ int ::= '0' | ([1-9] digit*)
 
 digit ::= [0-9]
 
-/*-- binary data ------------------------------------------------------*/
+/*-- binary data -------------------------------------------------*/
 binary ::=  base64_binary | ascii85_binary
 
 base64_binary ::= '{:' ([0-9a-zA-Z] | '+' | '/' | ws_char)* '='? '='? '}' /* 2 optional padding characters */
@@ -64,8 +56,7 @@ base64_binary ::= '{:' ([0-9a-zA-Z] | '+' | '/' | ws_char)* '='? '='? '}' /* 2 o
 ascii85_binary ::= '{:~' ([#x21-u] | 'z' | ws_char)* '~}'
 
 /*-- string ------------------------------------------------------*/
-
-string ::= s_string | d_string | t_string
+string ::= s_string | d_string | t_string | identifier
 
 d_string ::= '"' (char | "'")* '"'
 
@@ -74,7 +65,7 @@ s_string ::= "'" (char | '"')* "'"
 /* tripple quoted string */
 t_string ::= ("'''" triple_single "'''") | ('"""' triple_double '"""')
 
-tchar ::= [#x00-#x21] | [#x23-#x26] | [#x28-#x10FFFF] /* Characters except " and ' */
+tchar ::= [#x00-#x21] | [#x23-#x26] | [#x28-#x10FFFF] /* chars except " and ' */
 
 triple_single ::= (tchar | '"' | ("'" tchar) | ("''" tchar))* "'"? "'"? /* chars without tripple single quote */
 
@@ -82,7 +73,7 @@ triple_double ::= (tchar | "'" | ('"' tchar) | ('""' tchar))* '"'? '"'? /* chars
 
 char ::= unescaped | escaped
 
-unescaped ::= [#x00-#x21] | [#x23-#x26] | [#x28-#x5B] | [#x5D-#x10FFFF]  /* Characters except ", ', \ */
+unescaped ::= [#x00-#x21] | [#x23-#x26] | [#x28-#x5B] | [#x5D-#x10FFFF]  /* chars except ", ', \ */
    
 escaped ::= '\' (
    "'" |			/* this is needed as we allows single quote string */
@@ -101,8 +92,18 @@ unicode ::= 'u' hex hex hex hex
 
 hex ::= [0-9a-fA-F]
 
-/*-- array ------------------------------------------------------*/
+/*-- Mark pragma -----------------------------------------------*/
+mark_pragma ::= general_pragma | paired_pragma
 
+general_pragma ::= '(?' (char_no_qmark | ('?' char_no_bracket))* '?)' 
+
+paired_pragma ::= '(' (char_no_bracket | paired_pragma)* ')' 
+
+char_no_qmark ::= [#x00-#x3E] | [#x40-#x10FFFF]  /* chars except ? */
+
+char_no_bracket ::= [#x00-#x27] | [#x2A-#x10FFFF] /* chars except ( ) */
+
+/*-- array ------------------------------------------------------*/
 array ::= begin_array (value value_separator?)* end_array
 
 begin_array     ::= ws '[' ws
@@ -111,8 +112,7 @@ end_array       ::= ws ']' ws
 
 value_separator ::= ws ',' ws
 
-/*-- JSON object ------------------------------------------------------*/
-
+/*-- JSON object ------------------------------------------------*/
 json_object ::= begin_object properties end_object
 
 begin_object ::= ws '{' ws
@@ -133,8 +133,7 @@ begin_identifier ::= [a-zA-Z] | '_' | '$'
 
 continue_identifier ::= begin_identifier | digit | '-' | '.'
 
-/*-- Mark object ------------------------------------------------------*/
-
+/*-- Mark object -----------------------------------------------*/
 /* Note: Mark property key cannot be numeric - this constraint cannot be directly expressed in BNF notation */ 
 mark_object ::= begin_object type_name properties contents end_object
 
@@ -144,12 +143,7 @@ contents ::= (text | binary | json_object | mark_object | mark_pragma | ws)*
 
 text ::= (string ws)+   /* Mark text can be multiple consecutive strings */
 
-mark_pragma ::= '(' (char_no_bracket | mark_pragma)* ')'
-
-char_no_bracket ::= [#x00-#x27] | [#x2A-#x10FFFF] /* Characters except ( ) */
-
-/*-- root ------------------------------------------------------*/
-
+/*-- Mark root ------------------------------------------------------*/
 value ::= null | boolean | number | string | binary | array | json_object | mark_object | mark_pragma
 
 Mark ::= ws value ws

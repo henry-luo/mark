@@ -39,13 +39,13 @@ begin_identifier ::= [a-zA-Z] | '_' | '$'
 continue_identifier ::= begin_identifier | digit | '-' | '.'
 ```
 
-- Property keys can be unquoted if they’re valid identifiers.  JS reserved keywords (like `default`) are valid unquoted keys in Mark. However, it is recommended that you avoid using JS keywords, or JS and Mark object prototype function names as property keys, as they could cause confusion, inconvenience and even errors (as the underlying functions are overridden).
-- Comparing to JSON5 and JS identifiers, Mark identifier allows dash '-' and dot '.' in it. These two special characters added as they are commonly used in markup formats, like HTML, CSS, XML.
-- Property keys can also be single or double quoted.
+- Property key and value can be unquoted if they’re valid identifiers.  JS reserved keywords (like `default`) are valid unquoted keys in Mark. However, it is recommended that you avoid using JS keywords, or JS and Mark object prototype function names as property keys, as they could cause confusion, inconvenience and even errors (as the underlying functions are overridden).
+- Comparing to JS identifier, Mark identifier allows dash '-' and dot '.' in it. These two special characters are added as they are commonly used in markup formats, like HTML, CSS, XML.
+- Property keys and values can be single, double or triple quoted.
 - Property keys can be any string **except a number**, which is reserved for Mark object contents. (This restriction does not apply to JSON properties.)
 - Property keys are **case-sensitive**.
 - Property keys **must be unique** (for both Mark and JSON object).
-- Comma between properties are optional, and last property can have trailing comma.
+- Comma between properties is optional, and last property can have trailing comma.
 
 ### 1.2 Contents
 
@@ -58,17 +58,23 @@ contents ::= (text | binary | json_object | mark_object | mark_pragma)*
 
 ## 2. Mark Pragma
 
-Mark pragma is a sequence of characters enclosed in brackets `( ... )`. It can contain embedded brackets, as long as they are balanced, and embedded brackets are treated as part of the pragma content.
+Mark pragma is a sequence of characters enclosed in brackets `( ... )`. It has two syntax forms.
+
+The general form is quoted in `(? ... ?)`, and the pair form is quoted in `( ... )`. Paired form can contain embedded brackets, as long as they are balanced.
+
+Outer brackets are delimiters, whereas embedded brackets are part of the pragma content.
 
 ```BNF
-mark_pragma ::= '(' (char_no_bracket | mark_pragma)* ')'
+mark_pragma ::= general_pragma | paired_pragma
+general_pragma ::= '(?' (char_no_qmark | ('?' char_no_bracket))* '?)' 
+paired_pragma ::= '(' (char_no_bracket | mark_pragma)* ')' 
 ```
 
-It can be used for markup content like comments in HTML and processing instructions in XML.
+It can be used for content like comments in HTML and processing instructions in XML, and embedded expressions in templates.
 
 ## 3. Other Syntax Extensions to JSON
 
-Other syntax extensions made to JSON are pretty much just syntax sugars. Most of them are inherited from [JSON5](http://json5.org/).
+Other syntax extensions made to JSON are pretty much just syntax sugars, some inspired by [JSON5](http://json5.org/).
 
 ### 3.1 Unique property keys
 
@@ -84,7 +90,7 @@ Other syntax extensions made to JSON are pretty much just syntax sugars. Most of
 - Strings can split across multiple lines.
 - String can also be triple-quoted with single or double quote character, similar to Python or Scala.
   - The quoted sequence of characters is arbitrary, except that it may contain three or more consecutive quote characters only at the very end. Escape sequences are not interpreted.
-- Unlike JSON string, control characters, like Tab and Line Feed, are allowed in Mark string. Actually, all Unicode characters are allowed in Mark string, just like JS string. Only ", ' and \\ need to be escaped.
+- Unlike JSON string, control characters, like Tab and Line Feed, are allowed in Mark string. Actually, all Unicode characters are allowed in Mark string, just like JS string. Only double-quote ("),  single-quote (') and back-slash (\\) need to be escaped.
 
 ### 3.4 Numbers
 
@@ -92,7 +98,7 @@ Other syntax extensions made to JSON are pretty much just syntax sugars. Most of
 - Numbers can include `Infinity`, `-Infinity`,  `NaN`, and `-NaN`.
 - Numbers can begin with an explicit plus sign.
 
-### 3.5 Binary Object
+### 3.5 Binary Value
 
 - Binary data can be encoded as a sequence of characters delimited by '`{:`' and '`}`'. 
 - It can encoded in either [base64](https://en.wikipedia.org/wiki/Base64) or [ascii85](https://en.wikipedia.org/wiki/Ascii85) *(Adobe version)* encoding.
@@ -108,12 +114,13 @@ ascii85_binary ::= '{:~' ([#x21-u] | 'z' | ws_char)* '~}'
 
 ### 3.6 Comments
 
-- Both inline (single-line) and block (multi-line) comments are allowed, similar to those in JS.
+- Both inline (single-line)  `//...` and block (multi-line) comments `/* ... */` are allowed in Mark, similar to those in JS.
+- One difference is that, Mark block comment can be nested, whereas JS block comment cannot be nested.
 
 ## 4. Full Grammar Specification
 
 The formal grammar specification in BNF is [here](mark.bnf).
 
-Following the JSON convention, a [railroad diagram](https://mark.js.org/mark-grammar.html) of the entire grammar is also provided to help you visualize the grammar. You can click on the grammar terms to navigate around. Below is just a small portion of it.
+Following the JSON convention, a [railroad diagram](https://mark.js.org/mark-grammar.html) of the entire grammar is also provided to help you visualize the grammar. You can click on the grammar terms to navigate around. Below is a snapshot of the top-level of the grammar.
 
 <img src='mark-railway-diagram.png' width="600px">
