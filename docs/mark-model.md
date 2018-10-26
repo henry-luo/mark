@@ -116,8 +116,7 @@ The mutative API functions define on a Mark object are:
 - `set(key, value)`: if the `key` is numeric, then it sets the indexed content item of the Mark object; otherwise, it sets a named property of the Mark object. 
 - `push(item, ...)`: pushes item(s) at the end of the contents of current Mark object. However, unlike JS `Array.prototype.push`, which returns the new array length, this function returns the current this object, so that the function call can be chained.
 - `pop()`: pop an item from the end of contents.
-- `insert(item, index)`: inserts the given item(s) at the given `index`. If `index` is omitted, it defaults to 0.
-- `remove(index)`: removes the content item at the given `index`.
+- `splice(index, cnt, item, ...)`: remove `cnt` of items starting at the `index`, and then insert given item(s), similar to `Array.splice(...)`.
 
 ### 3.3 Converter API
 
