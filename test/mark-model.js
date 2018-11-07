@@ -158,5 +158,8 @@ test('Mark pragma model', function(assert) {
 	assert.equal(pragma.parent(), undefined, "get pragma parent");
 	assert.equal(pragma.valueOf() === pragma, true, "valueOf pragma should return itself");
 	assert.equal(pragma.toString(), "[object Pragma]", "pragma toString() should return [object Pragma]");
+	
+	pragma.set("new value");
+	assert.equal(pragma.pragma(), "new value", "pragma set content");
 	assert.end();
 });

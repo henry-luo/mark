@@ -117,10 +117,6 @@ var MARK = (function() {
 		parent: function(pa) {
 			return this[$parent];
 		},
-		// get pragma content
-		pragma: function(value) {
-			return this[$pragma];
-		},
 
 		// filter: like Array.prototype.filter
 		filter: function(func, thisArg) {
@@ -224,18 +220,6 @@ var MARK = (function() {
 		Object.defineProperty(Mark.prototype, a, {value:api[a], writable:true, configurable:true});  
 		// no longer set the APIs on static MARK object, as 'length' is non-writable in node, and non-configurable in IE11
 	}
-	// load mark.selector APIs
-	try {
-		require('./lib/mark.selector.js')(Mark);
-	} catch (e) {
-		console.trace("No Mark Selector API", e.message);
-	}	
-	// load mark.mutate APIs
-	try {
-		require('./lib/mark.mutate.js')(Mark, push, $length);
-	} catch (e) {
-		console.trace("No Mark Mutate API", e.message);
-	}
 	
 	// define additional APIs on Mark prototype
 	// content iterator
@@ -249,7 +233,7 @@ var MARK = (function() {
 		let con = $ctrs[$pragma];
 		if (!con) {
 			con = Object.create(null);
-			Object.defineProperty(con, 'pragma', {value:api.pragma});
+			Object.defineProperty(con, 'pragma', {value: function() { return this[$pragma]; }});  // get pragma content
 			Object.defineProperty(con, 'parent', {value:api.parent});
 			Object.defineProperty(con, 'valueOf', {value:Object.valueOf});
 			Object.defineProperty(con, 'toString', {value:function() { return '[object Pragma]'; }});
@@ -260,6 +244,17 @@ var MARK = (function() {
 		return obj;
 	}
 	
+	// load additional APIs
+	try { // mark.selector APIs
+		require('./lib/mark.selector.js')(Mark);
+	} catch (e) {
+		console.trace("No Mark Selector API", e.message);
+	} 
+	try { // mark.mutate APIs
+		require('./lib/mark.mutate.js')(Mark, push, $length, $pragma);
+	} catch (e) {
+		console.trace("No Mark Mutate API", e.message);
+	}	
 	return Mark;
 })();
 

@@ -36,7 +36,7 @@ Mark pragma constructor:
 
 The constructed pragma is a special JS object. It's does not have a constructor, like other normal JS objects. `typeof pragmaObj === 'object'`, however `pragmaObj.constructor` is `undefined`. It has the following API functions:
 
-- `pragmaObj.pragma(value)`: when parameter `value` is not supplied, it returns the content string stored in the pragma; when the parameter `value` is supplied, it sets the content in the pragma, and returns the pragma itself.
+- `pragmaObj.pragma()`: returns the content string stored in the pragma; 
 - `pragmaObj.parent()`: returns the parent object of the pragma.
 - `pragmaObj.valueOf()`: inherited from `Object.prototype.valueOf`, and just return the pragma itself.
 - `pragmaObj.toString()`: returns `"[object Pragma]"`.
@@ -72,7 +72,6 @@ Mark object constructor:
   - `type_name`: a string. It must not start with '{'.
   - `properties`: a JSON object containing name-value pairs. Numeric property keys are ignored.
   - `contents`: an array of content objects. Null values are skipped, primitive values are converted into strings, arrays will be flattened, and consecutive strings will be merged into one.
-  - `parent`: ~~for constructing a hierarchical DOM. If you intent to navigate the result data model using CSS selector, then you should supply this parameter.~~ You no longer need to pass this around.
 
 The constructed Mark object is just a simple POJO. So basically:
 
@@ -111,12 +110,16 @@ Mark does not support `reviver` function defined in `JSON.parse()`, and `replace
 
 Mutative API functions are now separated into its own sub-module `mark.mutate.js`, which allows this part to be easily excluded from the package, if Mark is used in a pure functional manner.
 
-The mutative API functions define on a Mark object are:
+The mutative API functions defined on a Mark object are:
 
 - `set(key, value)`: if the `key` is numeric, then it sets the indexed content item of the Mark object; otherwise, it sets a named property of the Mark object. 
 - `push(item, ...)`: pushes item(s) at the end of the contents of current Mark object. However, unlike JS `Array.prototype.push`, which returns the new array length, this function returns the current this object, so that the function call can be chained.
 - `pop()`: pop an item from the end of contents.
 - `splice(index, cnt, item, ...)`: remove `cnt` of items starting at the `index`, and then insert given item(s), similar to `Array.splice(...)`.
+
+The mutative API function defined on a Mark pragma:
+
+- `set(value)`: sets the content in the pragma, and returns the pragma itself.
 
 ### 3.3 Converter API
 
