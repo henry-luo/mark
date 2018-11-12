@@ -180,9 +180,10 @@ Note: /dist/mark.js has bundled all sub-modules and all dependencies with it, an
   - [Mark conversion example](https://plnkr.co/edit/cMSCW3?p=preview)
 
 
-## Extensions and Applications of Mark
+## Tools, Extensions and Applications of Mark
 
 - [Mark Template](https://github.com/henry-luo/mark-template): a JS template engine inspired by JSX and XSLT, using Mark for the template syntax.
+- [Mark VSC Extension](https://marketplace.visualstudio.com/items?itemName=henryluo.mark-vsce): Mark Notation support for Visual Studio Code.
 
 ## Credits
 
