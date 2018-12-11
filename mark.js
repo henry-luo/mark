@@ -861,8 +861,7 @@ MARK.parse = (function() {
 // Mark stringify will not quote keys where appropriate
 MARK.stringify = function(obj, options) {
 	"use strict";
-	
-	var indentStep, indentStrs, space, omitComma;
+	let indentStep, indentStrs, space; // omitComma;
 	
     function indent(num, noNewLine) {
 		if (num >= indentStrs.length) { // expand the cached indent strs
@@ -875,7 +874,7 @@ MARK.stringify = function(obj, options) {
 	
 	// option handling
 	if (options)  {
-		omitComma = options.omitComma;
+		// omitComma = options.omitComma;
 		space = options.space;
 		indentStrs = [''];
 		if (space) {
@@ -984,7 +983,7 @@ MARK.stringify = function(obj, options) {
                             buffer += res;
                         }
                         if (i < value.length-1) {
-                            buffer += omitComma ? ' ':',';
+                            buffer += ' '; // omitComma ? ' ':',';
                         } else if (indentStep) {
                             buffer += "\n";
                         }
@@ -1072,7 +1071,8 @@ MARK.stringify = function(obj, options) {
 						let res = _stringify(value[prop]);
 						if (res !== undefined) {                           
 							let key = MARK.isName(prop) ? prop : escapeString(prop);
-							buffer += (hasAttr ? (omitComma ? ' ':', '):(nonEmpty ? ' ':''))+ key +":"+ res;
+							buffer += (hasAttr ? ' ' // (omitComma ? ' ':', ')
+								:(nonEmpty ? ' ':''))+ key +":"+ res;
 							hasAttr = true;  nonEmpty = true;
 						}
                     }
