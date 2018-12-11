@@ -104,92 +104,32 @@ var MARK = (function() {
 		
 	// Mark object API functions
 	var api = {
-		// object 'properties': just use JS Object.keys(), Object.values(), Object.entries() to work with the properties	
+		// object 'properties': just use JS Object.keys(), Object.values(), Object.entries() to work with the properties
+		
+		// return the content items
 		contents: function() { 
 			let list = [];
 			for (let c of this) { list.push(c); }
 			return list;
 		},
-		// get contents length
-		// length: function() {
-		//	return this[$length];
-		// },
+		
 		// get parent
 		parent: function(pa) {
 			return this[$parent];
 		},
 
-		// filter: like Array.prototype.filter
-		filter: function(func, thisArg) {
-			if (!(typeof func === 'function' && this)) throw new TypeError();
-			const obj = Object(this);
-			let res = [], i = 0;
-			for (const n of obj) {
-				if (func.call(thisArg || obj, n, i, obj)) { res.push(n); }
-				i++;
-			}
-			return res;
-		},
-		
-		// map: like Array.prototype.map
-		map: function(func, thisArg) {
-			if (!(typeof func === 'function' && this)) throw new TypeError();
-			const obj = Object(this);
-			let res = [], i = 0;
-			for (const n of obj) {
-				res[i] = func.call(thisArg || obj, n, i, obj);
-				i++;
-			}
-			return res;
-		},
-		
-		// reduce: like Array.prototype.reduce
-		reduce: function(func) {
-			if (!(typeof func === 'function' && this)) throw new TypeError();
-			let obj = Object(this), len = obj[$length], k = 0, value;
-			if (arguments.length == 2) { value = arguments[1]; } 
-			else {
-				if (k >= len) { throw new TypeError('Reduce of empty contents with no initial value'); }
-				value = obj[k++];
-			}
-			for (; k < len; k++) {
-				value = func(value, obj[k], k, obj);
-			}
-			return value;		
-		},
-		
-		// every: like Array.prototype.every
-		every: function(func, thisArg) {
-			if (!(typeof func === 'function' && this)) throw new TypeError();
-			let i = 0, obj = Object(this);
-			for (const n of obj) {
-				var result = func.call(thisArg || obj, n, i, obj);
-				if (!result) { return false; }
-				i++;
-			}
-			return true;
-		},
-		
-		// some: like Array.prototype.some
-		some: function(func, thisArg) {
-			if (!(typeof func === 'function' && this)) throw new TypeError();
-			let i = 0, obj = Object(this);
-			for (const n of obj) {
-				if (func.call(thisArg || obj, n, i, obj)) { return true; }
-				i++;
-			}
-			return false;
-		},
-		
-		// each: like Array.prototype.forEach
-		each: function(func, thisArg) {
-			if (!(typeof func === 'function' && this)) throw new TypeError();
-			let i = 0, obj = Object(this);
-			for (const n of obj) {
-				func.call(thisArg || obj, n, i, obj);
-				i++;
-			}
-		},
+		// as Mark is array-like, we can simply inherit all functional methods from Array.prototype
+		filter: Array.prototype.filter,
+		map: Array.prototype.map,
+		reduce: Array.prototype.reduce,
+		every: Array.prototype.every,
+		some: Array.prototype.some,
+		each: Array.prototype.forEach,
+		forEach: Array.prototype.forEach,
+		includes: Array.prototype.includes,
+		indexOf: Array.prototype.indexOf,
+		lastIndexOf: Array.prototype.lastIndexOf,
+		slice: Array.prototype.slice,
 		
 		// conversion APIs
 		source: function(options) {

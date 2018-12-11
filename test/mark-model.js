@@ -84,6 +84,18 @@ test('Mark object model', function(assert) {
 	// each
 	let types = [];  div.each(n => types.push(typeof n));
 	assert.deepEqual(types, ["string", "object", "string", "object", "object"], "Mark each API");
+	types = [];  div.forEach(n => types.push(typeof n));
+	assert.deepEqual(types, ["string", "object", "string", "object", "object"], "Mark forEach API");
+	// includes
+	assert.equal(div.includes("more"), true, "Mark includes API");
+	assert.equal(div.includes("test"), false, "Mark includes API");
+	// indexOf
+	assert.equal(div.indexOf("more"), 2, "Mark indexOf API");
+	// lastIndexOf
+	assert.equal(div.lastIndexOf("more"), 2, "Mark lastIndexOf API");
+	// slice
+	let items = [div[1], "more"];
+	assert.deepEqual(div.slice(1,3), items, "Mark slice API");
 	
 	// direct content assignment - not advisable
 	var div = Mark.parse('{div "text"}');
