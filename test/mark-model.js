@@ -36,12 +36,16 @@ test('Mark object model', function(assert) {
 
 	// properties API
 	assert.deepEqual(Object.keys(Mark.parse('{div}')), [], "Mark object {div} keys should be empty");
-	assert.deepEqual(Object.keys(Mark.parse('{div class:"test"}')), ['class'], "Mark object {div class:'test'} keys should be ['class']");
+	div = Mark.parse('{div class:"test"}');
+	assert.deepEqual(Object.keys(div), ['class'], "Mark object {div class:'test'} keys should be ['class']");
+	div.length = '12px';
+	assert.equal(div.length, '12px', "Mark length property set to 12px");
+	assert.deepEqual(Object.keys(div), ['class','length'], "Mark object keys should be ['class','length']");
 	
 	// length prop and length API
 	div = Mark.parse('{div length:12, width:20 "text"}');
 	assert.equal(div.length, 12, "length property of Mark object should be 12");
-	assert.equal(Mark.prototype.length.call(div), 1, "length of Mark object should be 1");
+	assert.equal(Mark.lengthOf(div), 1, "content length of Mark object should be 1");
 	assert.equal(div.contents().length, 1, "length of Mark object contents should be 1");
 	assert.looseEqual(Object.keys(div), ['length','width'], "Mark object keys() should be ['length', 'width']");
 	
@@ -96,12 +100,12 @@ test('Mark object model', function(assert) {
 		'<?xml version="1.0" encoding="UTF-8"?><div><p>text</p></div>', "Mark replaceWith API");
 		
 	// push API
-	assert.equal(Mark.parse('{div}').push("text").length(), 1, "push text into Mark object");
+	assert.equal(Mark.parse('{div}').push("text").length, 1, "push text into Mark object");
 	var div = Mark.parse('{div}');  
-	assert.equal(div.length(), 0, "length should be 0 before push");
+	assert.equal(div.length, 0, "length should be 0 before push");
 	div.push(Mark.parse('{br}'));
 	assert.equal(Mark.stringify(div), "{div {br}}", "push {br} into Mark object {div}");
-	assert.equal(div.length(), 1, "length should be 1 after push");
+	assert.equal(div.length, 1, "length should be 1 after push");
 	assert.deepEqual(Object.keys(div), [], "length should not be enumerable after push");
 	div.push(Mark('p'), Mark('hr'));
 	assert.equal(Mark.stringify(div), "{div {br} {p} {hr}}", "push {p} {hr} into Mark object {div}");
@@ -109,13 +113,13 @@ test('Mark object model', function(assert) {
 	assert.equal(Mark.stringify(div), "{div {br} {p} {hr}}", "push null into Mark object {div}");
 	div.push([['text']]); // nested array
 	assert.equal(Mark.stringify(div), '{div {br} {p} {hr} "text"}', "push nested array into Mark object {div}");
-	assert.equal(div.length(), 4, "div legnth should be 4");
+	assert.equal(div.length, 4, "div legnth should be 4");
 	
 	// pop API
 	div = Mark.parse('{div "text" {br}}');  var item = div.pop();
 	assert.equal(Mark.stringify(item), '{br}', "popped item from Mark object should be {br}");
 	assert.equal(Mark.stringify(div), '{div "text"}', "pop from Mark object");
-	assert.equal(div.length(), 1, "length should be 1 after pop");
+	assert.equal(div.length, 1, "length should be 1 after pop");
 	assert.deepEqual(Object.keys(div), [], "length should not be enumerable after pop");
 	div.pop();  item = div.pop();
 	assert.equal(item, undefined, "undefiend after pop");
@@ -129,7 +133,7 @@ test('Mark object model', function(assert) {
 	
 	div = Mark.parse('{div "text" {br} {p}}');  div.splice(1, 1);
 	assert.equal(Mark.stringify(div), '{div "text" {p}}', "Mark remove item");
-	assert.equal(div.length(), 2, "div length after removing should be 2");
+	assert.equal(div.length, 2, "div length after removing should be 2");
 	
 	// source API
 	div = Mark.parse('{div width:10 "text"}');

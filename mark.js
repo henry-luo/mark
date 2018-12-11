@@ -10,9 +10,10 @@
 
 // symbols used internally
 const $length = Symbol.for('Mark.length'), // for content length
+	_length = Symbol.for('Mark.length-property'), 
 	$parent = Symbol.for('Mark.parent'), // for parent object
 	$pragma = Symbol.for('Mark.pragma'), // for pragma value
-	$paired = Symbol.for('Mark.pragmaPaired');
+	$paired = Symbol.for('Mark.pragma-paired');
 	
 let $convert = null,  // Mark Convert API
 	$ctrs = {};	// cached constructors for the Mark objects
@@ -110,9 +111,9 @@ var MARK = (function() {
 			return list;
 		},
 		// get contents length
-		length: function() {
-			return this[$length];
-		},
+		// length: function() {
+		//	return this[$length];
+		// },
 		// get parent
 		parent: function(pa) {
 			return this[$parent];
@@ -222,10 +223,27 @@ var MARK = (function() {
 	}
 	
 	// define additional APIs on Mark prototype
+	// length getter
+	let desc = {
+		set:function(value) {
+			this[_length] = value;
+			// also need to change length to enumerable
+			let enumDesc = Object.assign({}, desc);  enumDesc.enumerable = true;
+			Object.defineProperty(this, 'length', enumDesc);
+		}, 
+		get:function() { return this[_length] !== undefined ? this[_length]:this[$length]; }, 
+		configurable:true
+	};
+	Object.defineProperty(Mark.prototype, 'length', desc);  
 	// content iterator
 	Mark.prototype[Symbol.iterator] = function*() {
 		let length = this[$length];
 		for (let i = 0; i < length; i++) { yield this[i]; }
+	}
+	
+	// static Mark lengthOf function
+	Mark.lengthOf = function(obj) {
+		return obj[$length] !== undefined ? obj[$length]:obj.length;
 	}
 	
 	// Mark pragma constructor

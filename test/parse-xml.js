@@ -20,7 +20,7 @@ test('Parse XML', function(assert) {
 	var src = loadXml();
 	var obj = Mark.parse(src, {format:'xml', ignoreSpace:true});  // console.log('parsed xml', Mark.stringify(obj));
 	assert.equal(obj.constructor.name, 'catalog', 'Parse xml');
-	assert.equal(obj.length(), 12, 'Parse xml');
+	assert.equal(obj.length, 12, 'Parse xml');
 	assert.equal(obj[0].constructor.name, 'book', 'Parse xml');
 	var xml = obj.xml();
 	assert.equal(xml.replace(/ |\r|\n/g, ''), src.replace(/ |\r|\n/g, ''), 'Mark to xml');
