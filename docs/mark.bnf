@@ -95,7 +95,7 @@ hex ::= [0-9a-fA-F]
 /*-- Mark pragma -----------------------------------------------*/
 mark_pragma ::= general_pragma | paired_pragma
 
-general_pragma ::= '(?' (char_no_qmark | ('?' char_no_bracket))* '?)' 
+general_pragma ::= '(?' (char_no_qmark | '??')* '?)' 
 
 paired_pragma ::= '(' (char_no_bracket | paired_pragma)* ')' 
 

@@ -61,6 +61,7 @@ test('Parse Mark object', function(assert) {
 	
 	// test Mark pragma
 	assert.equal(Mark.parse('(?-- comment ?)').pragma(), "-- comment ", "Mark pragma as root");
+	assert.equal(Mark.parse('(? comment with ?? escape ?)').pragma(), " comment with ? escape ", "Mark pragma with escape");
 	assert.equal(Mark.parse('(!-- comment --)').pragma(), "!-- comment --", "Mark pragma as root");
 	assert.equal(Mark.parse('(!-- comment --)').constructor, undefined, "Mark pragma");
 	assert.equal(Mark.parse('(!-- comment with embedded (...) \\ --)').pragma(), "!-- comment with embedded (...) \\ --", "Mark pragma with embedded ()");

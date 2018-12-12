@@ -46,7 +46,7 @@ Could be represented in Mark as:
 
 ```text
 {form                                   // object with type-name 'form'
-  (?--comment?)                         // Mark pragma, like HTML comment
+  (?comment?)                           // Mark pragma, like HTML comment
   {div class:"form-group"               // nested Mark object
     {label for:email                    // property 'for' and its value, both unquoted
       "Email address:"                  // text needs to be quoted
@@ -162,11 +162,9 @@ console.log("Greeting from Mark: " + Mark.stringify(obj));
 </script>
 ```
 
-Note: /dist/mark.js has bundled all sub-modules and all dependencies with it, and is meant to run in browser. The entire script is about 14K after gzip. It supports latest browsers, including Chrome, Safari, Firefox, Edge.
+Note: /dist/mark.js has bundled all sub-modules and all dependencies with it, and is meant to run in browser. The entire script is about 14K after gzip. It supports latest browsers, including Chrome, Safari, Firefox, Edge. (*Legacy browser IE is not supported.*)
 
-*If you just want the core functional API, without the sub-modules, you can also use mark.core.js, which is only 7K after gzip. You can also refer to the package.json to create your own custom bundle with the sub-modules you need.* 
-
-*If you need to support legacy browsers, like IE11, which do not have proper ES6 support, you need to use /dist/mark.es5.js. IE < 11 are not supported.*
+*If you just want the core functional API, without the sub-modules, you can also use mark.core.js, which is only 7K after gzip. You can also refer to the package.json to create your own custom bundle with the sub-modules you need.*
 
 ## Documentation
 

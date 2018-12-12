@@ -103,7 +103,8 @@ var MARK = (function() {
 	};
 		
 	// Mark object API functions
-	var api = {
+	let ap = Array.prototype;
+	let api = {
 		// object 'properties': just use JS Object.keys(), Object.values(), Object.entries() to work with the properties
 		
 		// return the content items
@@ -119,17 +120,17 @@ var MARK = (function() {
 		},
 
 		// as Mark is array-like, we can simply inherit all functional methods from Array.prototype
-		filter: Array.prototype.filter,
-		map: Array.prototype.map,
-		reduce: Array.prototype.reduce,
-		every: Array.prototype.every,
-		some: Array.prototype.some,
-		each: Array.prototype.forEach,
-		forEach: Array.prototype.forEach,
-		includes: Array.prototype.includes,
-		indexOf: Array.prototype.indexOf,
-		lastIndexOf: Array.prototype.lastIndexOf,
-		slice: Array.prototype.slice,
+		filter: ap.filter,
+		map: ap.map,
+		reduce: ap.reduce,
+		every: ap.every,
+		some: ap.some,
+		each: ap.forEach,
+		forEach: ap.forEach,
+		includes: ap.includes,
+		indexOf: ap.indexOf,
+		lastIndexOf: ap.lastIndexOf,
+		slice: ap.slice,
 		
 		// conversion APIs
 		source: function(options) {
@@ -543,18 +544,27 @@ MARK.parse = (function() {
 	pragma = function() {
 		let prag = '', level = 0;
 		next();  // skip starting '('
-		if (ch === '?') { 
+		if (ch === '?') { // normal pragma
 			next();  // skip '?'
 			while (ch) {
-				if (ch === '?' && text[at] === ')') {
-					// end of pragma
-					at++;  next();  // skip ending ')'
-					return MARK.pragma(prag);
+				if (ch === '?') {
+					if (text[at] === ')') {
+						// end of pragma
+						at++;  next();  // skip ending ')'
+						return MARK.pragma(prag);
+					}
+					else if (text[at] === '?') { // escape for '?'
+						at++;
+					}
+					else {
+						error("'?' should be escaped in Mark pragma");
+					}
 				}
 				// else - normal char
 				prag += ch;  next();
 			}
-		} else {
+		} 
+		else { // paired pragma
 			while (ch) {
 				if (ch === ')') {
 					if (level) { level--; } // embedded (...)
@@ -1053,8 +1063,7 @@ MARK.stringify = function(obj, options) {
                     buffer = "{";
                     var nonEmpty = false;
 					if (!value.constructor) { // assume Mark pragma
-						// todo: should escape '{','}' in $pragma
-						return value[$pragma] ?  (value[$paired] ? '('+ value[$pragma] +')' : '(?'+ value[$pragma] +'?)') : 'null'/* unknown object */;
+						return value[$pragma] ?  (value[$paired] ? '('+ value[$pragma] +')' : '(?'+ value[$pragma].replace(/\?/g, '??') +'?)') : '(??)';
 					}
 					// Mark or JSON object
 					objStack.push(value);
@@ -1096,7 +1105,7 @@ MARK.stringify = function(obj, options) {
 					}
 					
                     objStack.pop();
-                    if (nonEmpty ) {
+                    if (nonEmpty) {
                         // buffer = buffer.substring(0, buffer.length-1) + indent(objStack.length) + "}";
 						if (length && indentStep) { buffer += indent(objStack.length); }
 						buffer += "}";

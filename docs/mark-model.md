@@ -81,27 +81,35 @@ The constructed Mark object is just a simple POJO. So basically:
 
 Besides the above POJO behaviors, there are some additional prototype functions defined to work with the data model:
 
-- `length()`: returns the number of content items stored in the Mark object.
-- `contents()`: returns the list of content items stored in the Mark object.
-- `parent()`: returns the parent object of current Mark object.
-- `source(options)`: shorthand for stringifying the Mark object.
-- `text()`: returns a string, which is the concatenation of all descendant text content items.
-- `filter(callback, thisArg)`: similar to JS `Array.prototype.filter` that iterates through the content items.
-- `map(callback, thisArg)`: similar to JS `Array.prototype.map` that iterates through the content items.
-- `reduce(callback)`: similar to JS `Array.prototype.reduce` that iterates through the content items.
-- `every(callback, thisArg)`: similar to JS `Array.prototype.every` that iterates through the content items.
-- `some(callback, thisArg)`: similar to JS `Array.prototype.some` that iterates through the content items.
-- `each(callback, thisArg)`: similar to JS `Array.prototype.forEach` that iterates through the content items.
+- `.length`: when `length` property is not defined on the object, it returns the number of content items stored in the Mark object; otherwise, it returns the value of the `length` property. You can use `Mark.lengthOf()` to get the content length, when `length` property is defined on the object.
+- `.contents()`: returns the list of content items stored in the Mark object.
+- `.parent()`: returns the parent object of current Mark object.
+- `.source(options)`: shorthand for stringifying current Mark object.
+- `.text()`: returns a string, which is the concatenation of all descendant text content items.
 
-When these API functions are overridden by properties of same name, you can still call them from the `Mark.prototype`, e.g.`Mark.prototype.length.call(markObj)`.
+As Mark object is array-like, most functional JS code that works with array-like data, can be work with Mark object without change. The following API functions are directly mapped to those from `Array.prototype`.
+
+- `.filter(callback, thisArg)`: mapped to JS `Array.prototype.filter`.
+- `.map(callback, thisArg)`: mapped to JS `Array.prototype.map`.
+- `.reduce(callback)`: mapped to JS `Array.prototype.reduce`.
+- `.every(callback, thisArg)`: mapped to JS `Array.prototype.every`.
+- `.some(callback, thisArg)`: mapped to JS `Array.prototype.some`.
+- `.each(callback, thisArg)`: mapped to JS `Array.prototype.forEach`.
+- `.forEach(callback, thisArg)`: mapped to JS `Array.prototype.forEach`.
+- `.includes(searchElement, fromIndex)`: mapped to JS `Array.prototype.includes`.
+- `.indexOf(searchElement, fromIndex)`: mapped to JS `Array.prototype.indexOf`.
+- `.lastIndexOf(callback, thisArg)`: mapped to JS `Array.prototype.lastIndexOf`.
+- `.slice(begin, end)`: mapped to JS `Array.prototype.slice`.
+
+When these API functions are overridden by properties of same name, you can still call them from the `Mark.prototype`, e.g.`Mark.prototype.contents.call(markObj)`.
 
 ### 3.2 Static API
 
 There are a few important API functions defined on the static Mark object:
 
+- `Mark.lengthOf(markObj)`: returns the content length of a Mark object.
 - `Mark.parse('string', options)`: parses a string into Mark object. It takes an optional parameter `options`.
 - `Mark.stringify(markObj, options)`: serialize the Mark object back into string. It takes an optional parameter `options`.
-  - `options.omitComma`: tells whether comma between properties and array items should be omitted in the output. Default: `false`.
   - `options.space`: may be used to control spacing in the final string. If it is a number, successive levels in the stringification will each be indented by this many space characters (up to 10). If it is a string, successive levels will be indented by this string (or the first 10 characters of it).
 
 Mark does not support `reviver` function defined in `JSON.parse()`, and `replacer` function defined in `JSON.stringify()`. They are not structured nor secure way to serialize and deserialize custom data types.
@@ -112,23 +120,23 @@ Mutative API functions are now separated into its own sub-module `mark.mutate.js
 
 The mutative API functions defined on a Mark object are:
 
-- `set(key, value)`: if the `key` is numeric, then it sets the indexed content item of the Mark object; otherwise, it sets a named property of the Mark object. 
-- `push(item, ...)`: pushes item(s) at the end of the contents of current Mark object. However, unlike JS `Array.prototype.push`, which returns the new array length, this function returns the current this object, so that the function call can be chained.
-- `pop()`: pop an item from the end of contents.
-- `splice(index, cnt, item, ...)`: remove `cnt` of items starting at the `index`, and then insert given item(s), similar to `Array.splice(...)`.
+- `.set(key, value)`: if the `key` is numeric, then it sets the indexed content item of the Mark object; otherwise, it sets a named property of the Mark object. 
+- `.push(item, ...)`: pushes item(s) at the end of the contents of current Mark object. However, unlike JS `Array.prototype.push`, which returns the new array length, this function returns the current this object, so that the function call can be chained.
+- `.pop()`: pop an item from the end of contents.
+- `.splice(index, cnt, item, ...)`: remove `cnt` of items starting at the `index`, and then insert given item(s), similar to `Array.splice(...)`.
 
 The mutative API function defined on a Mark pragma:
 
-- `set(value)`: sets the content in the pragma, and returns the pragma itself.
+- `.set(value)`: sets the content in the pragma, and returns the pragma itself.
 
-### 3.3 Converter API
+### 3.4 Converter API
 
 These are additional prototype functions implemented in `mark.converter.js`, for mapping Mark into other formats:
 
 - `markObj.html(options)`: serializes the Mark object into HTML. `options` parameter is same as that of `Mark.stringify()`.
 - `markObj.xml(options)`: serializes the Mark object into XML.  `options` parameter is same as that of `Mark.stringify()`.
 
-### 3.4 Selector API
+### 3.5 Selector API
 
 These are additional prototype functions implemented in `mark.selector.js`, for processing the constructed data model using special selectors, like CSS selector:
 

@@ -25,7 +25,7 @@ Comparing to a JSON object, a Mark object has two extensions:
 - A **type name**, which corresponds to class name or type name of an object. In JavaScript, that is `obj.constructor.name`. In HTML and XML, that's the element name.
 - Optional list of **content** values following the named properties, which corresponds to child nodes in markup documents like HTML and XML.
 
-### 1.1 Properties
+### 1.1 Object Properties
 
 ```BNF
 properties ::= (property ','?)*
@@ -47,7 +47,7 @@ continue_identifier ::= begin_identifier | digit | '-' | '.'
 - Property keys **must be unique** (for both Mark and JSON object).
 - Comma between properties is optional, and last property can have trailing comma.
 
-### 1.2 Contents
+### 1.2 Object Contents
 
 ```BNF
 contents ::= (text | binary | json_object | mark_object | mark_pragma)*
@@ -58,15 +58,15 @@ contents ::= (text | binary | json_object | mark_object | mark_pragma)*
 
 ## 2. Mark Pragma
 
-Mark pragma is a sequence of characters enclosed in brackets `( ... )`. It has two syntax forms.
+Mark pragma is a sequence of characters enclosed in brackets `( ... )`. It has two syntax forms. The general form is quoted in `(? ... ?)`, and the pair form is quoted in `( ... )`. 
 
-The general form is quoted in `(? ... ?)`, and the pair form is quoted in `( ... )`. Paired form can contain embedded brackets, as long as they are balanced.
+In the general form, character `?` needs to be escaped with double `??`. 
 
-Outer brackets are delimiters, whereas embedded brackets are part of the pragma content.
+In paired form, no character needs to be escaped. It can contain embedded brackets, as long as they are balanced. Outer brackets are delimiters, whereas embedded brackets are part of the pragma content.
 
 ```BNF
 mark_pragma ::= general_pragma | paired_pragma
-general_pragma ::= '(?' (char_no_qmark | ('?' char_no_bracket))* '?)' 
+general_pragma ::= '(?' (char_no_qmark | '??')* '?)' 
 paired_pragma ::= '(' (char_no_bracket | mark_pragma)* ')' 
 ```
 

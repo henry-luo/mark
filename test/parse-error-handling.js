@@ -22,6 +22,9 @@ test('Mark parse error handling ', function(assert) {
 	// Mark constructor
 	assert.throws(function () { Mark(123); }, /Type name should be a string/, "Type name should be a string");
 	
+	// pragma escape
+	assert.throws(function () { Mark.parse('(? pragma unescaped? ?)'); }, /'\?' should be escaped in Mark pragma/, "'?' should be escaped");
+	
 	try {
 		Mark.parse('{obj \n p:true 123}');
 	} catch (e) {
