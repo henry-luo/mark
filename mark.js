@@ -71,9 +71,17 @@ var MARK = (function() {
 		}
 		
 		// 1. prepare the constructor
+		if (typeof typeName !== 'string') {
+			if (this instanceof Mark) { // called through new operator
+				this[$length] = 0;
+				// no need to do further construction
+				// props, contents are not supported at the moment
+				return;
+			}
+			throw "Type name should be a string";
+		}
 		let con = $ctrs[typeName];
 		if (!con) {
-			if (typeof typeName !== 'string') { throw "Type name should be a string"; }
 			con = $ctrs[typeName] = function(){};
 			// con.prototype.constructor is set to con by JS
 			// sets the type name
