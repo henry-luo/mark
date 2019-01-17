@@ -68,7 +68,7 @@ test('Mark object model', function(assert) {
 	assert.equal(JSON.stringify(div_contents), '["text"]', "Mark object div contents should be ['text']");
 	assert.equal(arrayEqual(div_contents, ["text"]), true, "Mark object div contents should be ['text']");
 		
-	// filter
+	// filter // length:0 
 	div = Mark.parse('{div "text" {br} "more" {b "bold"} (!-- comment --)}');
 	assert.deepEqual(div.filter(n => typeof n === 'string'), ["text", "more"], "Mark filter API");
 	// map
@@ -97,7 +97,7 @@ test('Mark object model', function(assert) {
 	let items = [div[1], "more"];
 	assert.deepEqual(div.slice(1,3), items, "Mark slice API");
 	
-	// direct content assignment - not advisable
+	// direct content assignment - not advisable, as content is not normalized
 	var div = Mark.parse('{div "text"}');
 	div[0] = Mark('br');
 	assert.equal(Mark.stringify(div), '{div {br}}', "Set Mark content");
