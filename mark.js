@@ -36,16 +36,16 @@ var MARK = (function() {
 			}
 		}
 		else if (t === 'object') {
-			if (val === null) return; // skip null value
+			if (val === null) return this; // skip null value
 			else if (val instanceof Array) { // expanded it inline
 				for (let v of val) { push.call(this, v); }
-				return;
+				return this;
 			}
 			// else, Mark object or pragma
 			val[$parent] = this;  // set $parent
 		}
 		else if (t === 'undefined') {
-			return;
+			return this;
 		}
 		else { // other primitive values are converted to string
 			val = val.toString(); // convert to string, as Mark only accept text and Mark object as content
