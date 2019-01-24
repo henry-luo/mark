@@ -192,7 +192,7 @@ var MARK = (function() {
 	
 	// static Mark lengthOf function
 	Mark.lengthOf = function(obj) {
-		return obj[$length] !== undefined ? obj[$length]:obj.length;
+		return obj == null ? null : (obj[$length] !== undefined ? obj[$length]:obj.length);
 	}
 	
 	// Mark pragma constructor
