@@ -179,3 +179,20 @@ test('Mark pragma model', function(assert) {
 	assert.equal(pragma.pragma(), "new value", "pragma set content");
 	assert.end();
 });
+
+test('Mark extended by class', function(assert) {
+	class SubMark extends Mark {
+		constructor() {
+			super();
+			this.prop = 123;
+		}
+	}
+	let obj = new SubMark();
+	assert.equal(obj instanceof SubMark && obj instanceof Mark && obj.constructor.name === "SubMark" && obj.prop === 123, true, "Mark extended by class");
+	
+	// special case new Mark()
+	obj = new Mark();
+	assert.equal(obj instanceof Mark && obj.constructor.name === "Mark", true, "new Mark() is valid");
+	
+	assert.end();
+});
