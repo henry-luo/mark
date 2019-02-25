@@ -14,7 +14,7 @@ sl_comment ::= '//' char_no_eol* (eol | eof)
 /* multi-line comment can be nested */
 ml_comment ::= '/*' (ml_comment | char_no_star | ('*' char_no_slash))* '*/'
 
-char ::= [#x00-#x10FFFF] /* any Unicode character */
+/* char ::= [#x00-#x10FFFF]  any Unicode character */
 
 char_no_eol ::= [#x00-#x09] | [#x0B-#x0C] | [#x0E-#x10FFFF] /* Character except LF, CR */
 
