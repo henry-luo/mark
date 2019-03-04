@@ -67,7 +67,8 @@ test('Mark object model', function(assert) {
 	assert.equal(Array.isArray(div_contents), true, "Mark object div contents isArray() should be true");
 	assert.equal(JSON.stringify(div_contents), '["text"]', "Mark object div contents should be ['text']");
 	assert.equal(arrayEqual(div_contents, ["text"]), true, "Mark object div contents should be ['text']");
-		
+	
+	// array-like APIs without 'length' property
 	// filter // length:0 
 	div = Mark.parse('{div "text" {br} "more" {b "bold"} (!-- comment --)}');
 	assert.deepEqual(div.filter(n => typeof n === 'string'), ["text", "more"], "Mark filter API");
@@ -84,6 +85,7 @@ test('Mark object model', function(assert) {
 	// each
 	let types = [];  div.each(n => types.push(typeof n));
 	assert.deepEqual(types, ["string", "object", "string", "object", "object"], "Mark each API");
+	// forEach
 	types = [];  div.forEach(n => types.push(typeof n));
 	assert.deepEqual(types, ["string", "object", "string", "object", "object"], "Mark forEach API");
 	// includes
@@ -96,6 +98,37 @@ test('Mark object model', function(assert) {
 	// slice
 	let items = [div[1], "more"];
 	assert.deepEqual(div.slice(1,3), items, "Mark slice API");
+	
+	// array-like APIs with 'length' property set
+	// filter 
+	div = Mark.parse('{div length:0 "text" {br} "more" {b "bold"} (!-- comment --)}');
+	assert.deepEqual(div.filter(n => typeof n === 'string'), ["text", "more"], "Mark filter API");
+	// map
+	assert.deepEqual(div.map(n => typeof n), ["string", "object", "string", "object", "object"], "Mark map API");
+	// reduce
+	assert.equal(div.reduce((result, n, i) => result + (i?', ':'') + (typeof n), 'type: '), "type: string, object, string, object, object", "Mark reduce API");
+	// every
+	assert.equal(div.every(n => typeof n != 'number'), true, "Mark every API");
+	assert.equal(div.every(n => typeof n != 'object'), false, "Mark every API");
+	// some
+	assert.equal(div.some(n => n.constructor && n.constructor.name == 'b'), true, "Mark some API");
+	assert.equal(div.some(n => n.constructor && n.constructor.name == 'div'), false, "Mark some API");
+	// each
+	types = [];  div.each(n => types.push(typeof n));
+	assert.deepEqual(types, ["string", "object", "string", "object", "object"], "Mark each API");
+	// forEach
+	types = [];  div.forEach(n => types.push(typeof n));
+	assert.deepEqual(types, ["string", "object", "string", "object", "object"], "Mark forEach API");
+	// includes
+	assert.equal(div.includes("more"), true, "Mark includes API");
+	assert.equal(div.includes("test"), false, "Mark includes API");
+	// indexOf
+	assert.equal(div.indexOf("more"), 2, "Mark indexOf API");
+	// lastIndexOf
+	assert.equal(div.lastIndexOf("more"), 2, "Mark lastIndexOf API");
+	// slice
+	items = [div[1], "more"];
+	assert.deepEqual(div.slice(1,3), items, "Mark slice API");	
 	
 	// direct content assignment - not advisable, as content is not normalized
 	var div = Mark.parse('{div "text"}');

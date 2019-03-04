@@ -100,16 +100,16 @@ Other syntax extensions made to JSON are pretty much just syntax sugars, some in
 
 ### 3.5 Binary Value
 
-- Binary data can be encoded as a sequence of characters delimited by '`{:`' and '`}`'. 
+- Binary data can be encoded as a sequence of characters delimited by `[#]` and `]`. 
 - It can encoded in either [base64](https://en.wikipedia.org/wiki/Base64) or [ascii85](https://en.wikipedia.org/wiki/Ascii85) *(Adobe version)* encoding.
 - Whitespaces are allowed between the encoded characters and are ignored by the parser. 
 
 ```BNF
 binary ::=  base64_binary | ascii85_binary
 
-base64_binary ::= '{:' ([0-9a-zA-Z] | '+' | '/' | ws_char)* '='? '='? '}'
+base64_binary ::= '[#' ([0-9a-zA-Z] | '+' | '/' | ws_char)* '='? '='? ']'
 
-ascii85_binary ::= '{:~' ([#x21-u] | 'z' | ws_char)* '~}'
+ascii85_binary ::= '[#~' ([#x21-u] | 'z' | ws_char)* '~]'
 ```
 
 ### 3.6 Comments

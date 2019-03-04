@@ -10,21 +10,20 @@
 
 // symbols used internally
 const $length = Symbol.for('Mark.length'), // for content length
-	_length = Symbol.for('Mark.length-property'), 
+	_length = Symbol.for('Mark.length-property'), // for property length
 	$parent = Symbol.for('Mark.parent'), // for parent object
 	$pragma = Symbol.for('Mark.pragma'), // for pragma value
 	$paired = Symbol.for('Mark.pragma-paired');
 	
 let $convert = null,  // Mark Convert API
 	$ctrs = {};	// cached constructors for the Mark objects
+// patch IE11
+if (!$ctrs.constructor.name) { // IE11 does not set constructor.name to 'Object'
+	$ctrs.constructor.name = 'Object';
+}
 
 // MARK is the static Mark API, it is different from the Mark.prototype that Mark object extends
 var MARK = (function() {
-	// patch IE11
-	if (!$ctrs.constructor.name) { // IE11 does not set constructor.name to 'Object'
-		$ctrs.constructor.name = 'Object';
-	}
-
 	function push(val) {
 		let len = this[$length];
 		let t = typeof val;
@@ -111,7 +110,6 @@ var MARK = (function() {
 	};
 		
 	// Mark object API functions
-	let ap = Array.prototype;
 	let api = {
 		// object 'properties': just use JS Object.keys(), Object.values(), Object.entries() to work with the properties
 		
@@ -127,19 +125,6 @@ var MARK = (function() {
 			return this[$parent];
 		},
 
-		// as Mark is array-like, we can simply inherit all functional methods from Array.prototype
-		filter: ap.filter,
-		map: ap.map,
-		reduce: ap.reduce,
-		every: ap.every,
-		some: ap.some,
-		each: ap.forEach,
-		forEach: ap.forEach,
-		includes: ap.includes,
-		indexOf: ap.indexOf,
-		lastIndexOf: ap.lastIndexOf,
-		slice: ap.slice,
-		
 		// conversion APIs
 		source: function(options) {
 			return MARK.stringify(this, options);
@@ -164,6 +149,14 @@ var MARK = (function() {
 			return MARK.stringify(this, opt);
 		},		
 	}
+	// setup array-like APIs
+	let ap = Array.prototype;
+	function wrapped(obj) { return Object.create(obj, {length:{value:obj[$length]}}); }	
+	for (let f of [ap.filter, ap.map, ap.reduce, ap.every, ap.some, ap.forEach, ap.includes, ap.indexOf, ap.lastIndexOf, ap.slice]) {
+		api[f.name] = function() { return f.apply(this[_length] !== null ? wrapped(this):this, arguments); }
+	}
+	api['each'] = api.forEach; // alias
+	
 	// set the APIs
 	for (let a in api) {
 		// API functions are non-enumerable
