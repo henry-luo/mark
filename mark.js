@@ -66,7 +66,7 @@ var MARK = (function() {
 	// Mark.prototype and Mark object constructor
 	function Mark(typeName, props, contents) {
 		// handle special shorthand
-		if (arguments.length === 1 && typeName[0] === '{') { 
+		if (arguments.length === 1 && (typeName[0] === '{' || typeName[0] === '[')) { 
 			return MARK.parse(typeName); 
 		}
 		
@@ -632,14 +632,14 @@ MARK.parse = (function() {
 	lookup85[32] = lookup85[9] = lookup85[13] = lookup85[10] = 85;
 	
 	let binary = function() {
-		at++;  // skip the starting '{:'
+		at++;  // skip the starting '[#'
 		if (text[at] === '~') { // base85
 			at++;  // skip '~'
 			// code based on https://github.com/noseglid/base85/blob/master/lib/base85.js
-			let end = text.indexOf('~}', at);  // scan binary end
+			let end = text.indexOf('~]', at);  // scan binary end
 			if (end < 0) { error("Missing ascii85 end delimiter"); }
 			
-			// first run decodes into base85 int values, and skip the spaces
+			// first run collects base85 chars, and skip the spaces
 			let p = 0, base = new Uint8Array(new ArrayBuffer(end - at + 3));  // 3 extra bytes of padding
 			while (at < end) {
 				let code = lookup85[text.charCodeAt(at)];  // console.log('bin: ', text[at], code);
@@ -648,7 +648,7 @@ MARK.parse = (function() {
 				// else skip spaces
 				at++;
 			}
-			at = end+2;  next();  // skip '~}'			
+			at = end+2;  next();  // skip '~]'			
 			// check length
 			if (p % 5 == 1) { error("Invalid ascii85 stream length"); }
 		
@@ -678,7 +678,7 @@ MARK.parse = (function() {
 		}
 		else { // base64
 			// code based on https://github.com/niklasvh/base64-arraybuffer
-			let end = text.indexOf('}', at), bufEnd = end, pad = 0;  // scan binary end
+			let end = text.indexOf(']', at), bufEnd = end, pad = 0;  // scan binary end
 			if (end < 0) { error("Missing base64 end delimiter"); }
 			// strip optional padding
 			if (text[bufEnd-1] === '=') { // 1st padding
@@ -689,7 +689,7 @@ MARK.parse = (function() {
 			}
 			// console.log('binary char length: ', bufEnd - at);
 
-			// first run decodes into base64 int values, and skip the spaces
+			// first run collects base64 chars, and skip the spaces
 			let base = new Uint8Array(new ArrayBuffer(bufEnd - at)), p = 0;
 			while (at < bufEnd) {
 				let code = lookup64[text.charCodeAt(at)];  // console.log('bin: ', text[at], code);
@@ -698,7 +698,7 @@ MARK.parse = (function() {
 				// else skip spaces
 				at++;
 			}
-			at = end+1;  next();  // skip '}'
+			at = end+1;  next();  // skip ']'
 			// check length
 			if (pad && (p + pad) % 4 != 0 || !pad && p % 4 == 1) { error("Invalid base64 stream length"); }
 
@@ -739,8 +739,8 @@ MARK.parse = (function() {
 		},
 		parseContent = function() {
 			while (ch) {
-				if (ch === '{' || ch === '(') { // child object
-					let child = (ch === '(') ? pragma(obj) : (text[at] === ':' ? binary(obj):object(obj));  
+				if (ch === '{' || ch === '(' || ch === '[' && text[at] === '#') { // child object
+					let child = (ch === '(') ? pragma(obj) : (ch === '[' ? binary(obj):object(obj));  
 					Object.defineProperty(obj, index, {value:child, writable:true, configurable:true}); // make content non-enumerable
 					// all 4 types: Mark object, JSON object, Mark pragma, Mark binary store reference to parent 
 					child[$parent] = obj;  index++;  
@@ -770,11 +770,11 @@ MARK.parse = (function() {
 				return obj;   // could be empty object
 			}
 			// scan the key
-			if (ch === '{' || ch === '(') { // child object or pragma
+			if (ch === '{' || ch === '(' || ch === '[') { // child object, pragma or binary
 				if (extended) {
 					parseContent();  return obj;
 				}
-				error(UNEXPECT_CHAR + "'{'");
+				error(UNEXPECT_CHAR + "'"+ ch +"'");
 			}
 			if (ch === '"' || ch === "'") { // quoted key
 				var str = string();  white();
@@ -836,17 +836,17 @@ MARK.parse = (function() {
         white();
         switch (ch) {
         case '{':
-            return (text[at] === ':') ? binary() : object();
+            return object();
         case '[':
-            return array();
-        case '"':
-        case "'":
+			return (text[at] === '#') ? binary() : array();
+        case '"': 
+		case "'":
             return string();
 		case '(':
 			return pragma();
-        case '-':
-        case '+':
-        case '.':
+        case '-': 
+		case '+': 
+		case '.':
             return number();
         default:
             return ch >= '0' && ch <= '9' ? number() : word();
@@ -1015,7 +1015,7 @@ MARK.stringify = function(obj, options) {
 				else if (value instanceof ArrayBuffer) { // binary
 					if (value.encoding === 'a85') { // base85
 						let bytes = new DataView(value), fullLen = value.byteLength, len = fullLen - (fullLen % 4), chars = new Array(5);
-						buffer = '{:~';
+						buffer = '[#~';
 						// bulk of encoding
 						let i = 0;
 						for (; i < len; i+=4) {
@@ -1046,11 +1046,11 @@ MARK.stringify = function(obj, options) {
 							// reverse the bytes and remove padding bytes
 							buffer += (chars[4] + chars[3] + chars[2] + chars[1] + chars[0]).substr(0, 5 - padding);
 						}
-						buffer += '~}';					
+						buffer += '~]';					
 					} 
 					else { // base64
 						let bytes = new Uint8Array(value), i, fullLen = bytes.length, len = fullLen - (fullLen % 3);
-						buffer = '{:';
+						buffer = '[#';
 						// bulk of encoding
 						for (i = 0; i < len; i+=3) {
 							buffer += base64[bytes[i] >> 2];
@@ -1063,7 +1063,7 @@ MARK.stringify = function(obj, options) {
 							buffer += base64[bytes[i] >> 2] + base64[((bytes[i] & 3) << 4) | (bytes[i + 1] >> 4)] +
 								(fullLen % 3 === 2 ? base64[(bytes[i + 1] & 15) << 2] : "=") + "=";
 						}
-						buffer += '}';
+						buffer += ']';
 					}
 				}
 				else { // pragma or object
@@ -1108,7 +1108,7 @@ MARK.stringify = function(obj, options) {
 								if (indentStep) buffer += indent(objStack.length);
 								buffer += _stringify(item);
 							}
-							else { console.log("unknown object", item); }
+							else { console.log("Unknown object", item); }
 						}
 					}
 					

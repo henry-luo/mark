@@ -37,14 +37,14 @@ test('Mark parse error handling ', function(assert) {
 	}
 	
 	// Mark binary
-	assert.throws(function () { Mark.parse('{:abc'); }, /Missing base64 end delimiter/, "Based64 character error");
-	assert.throws(function () { Mark.parse('{:abc-}'); }, /Invalid base64 character/, "Based64 character error");
-	assert.throws(function () { Mark.parse('{:abcd=}'); }, /Invalid base64 stream length/, "Based64 length error");	
-	assert.throws(function () { Mark.parse('{:abcde}'); }, /Invalid base64 stream length/, "Based64 length error");	
+	assert.throws(function () { Mark.parse('[#abc'); }, /Missing base64 end delimiter/, "Based64 character error");
+	assert.throws(function () { Mark.parse('[#abc-]'); }, /Invalid base64 character/, "Based64 character error");
+	assert.throws(function () { Mark.parse('[#abcd=]'); }, /Invalid base64 stream length/, "Based64 length error");	
+	assert.throws(function () { Mark.parse('[#abcde]'); }, /Invalid base64 stream length/, "Based64 length error");	
 	
-	assert.throws(function () { Mark.parse('{:~abc}'); }, /Missing ascii85 end delimiter/, "Based64 character error");
-	assert.throws(function () { Mark.parse('{:~abcv~}'); }, /Invalid ascii85 character/, "Based64 character error");
-	assert.throws(function () { Mark.parse('{:~abcdef~}'); }, /Invalid ascii85 stream length/, "Based64 length error");	
+	assert.throws(function () { Mark.parse('[#~abc]'); }, /Missing ascii85 end delimiter/, "Based64 character error");
+	assert.throws(function () { Mark.parse('[#~abcv~]'); }, /Invalid ascii85 character/, "Based64 character error");
+	assert.throws(function () { Mark.parse('[#~abcdef~]'); }, /Invalid ascii85 stream length/, "Based64 length error");	
 
 	assert.end();
 });
