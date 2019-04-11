@@ -164,7 +164,8 @@ var MARK = (function() {
 		// no longer set the APIs on static MARK object, as 'length' is non-writable in node, and non-configurable in IE11
 	}
 	
-	// define additional APIs on Mark prototype
+	// additional APIs on Mark prototype
+	
 	// length getter
 	let desc = {
 		set:function(value) {
@@ -176,7 +177,8 @@ var MARK = (function() {
 		get:function() { return this[_length] !== undefined ? this[_length]:this[$length]; }, 
 		configurable:true
 	};
-	Object.defineProperty(Mark.prototype, 'length', desc);  
+	Object.defineProperty(Mark.prototype, 'length', desc);
+	
 	// content iterator
 	Mark.prototype[Symbol.iterator] = function*() {
 		let length = this[$length];
