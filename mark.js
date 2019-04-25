@@ -15,8 +15,10 @@ const $length = Symbol.for('Mark.length'), // for content length
 	$pragma = Symbol.for('Mark.pragma'), // for pragma value
 	$paired = Symbol.for('Mark.pragma-paired');
 	
+const ws = [' ', '\t', '\r', '\n'];
 let $convert = null,  // Mark Convert API
 	$ctrs = {};	// cached constructors for the Mark objects
+
 // patch IE11
 if (!$ctrs.constructor.name) { // IE11 does not set constructor.name to 'Object'
 	$ctrs.constructor.name = 'Object';
@@ -65,7 +67,7 @@ var MARK = (function() {
 	// Mark.prototype and Mark object constructor
 	function Mark(typeName, props, contents) {
 		// handle special shorthand
-		if (arguments.length === 1 && (typeName[0] === '{' || typeName[0] === '[')) { 
+		if (arguments.length === 1 && (typeName[0] === '{' || typeName[0] === '[' || ws.indexOf(typeName[0]) >= 0)) { 
 			return MARK.parse(typeName); 
 		}
 		
@@ -268,7 +270,6 @@ MARK.parse = (function() {
 		r:    '\r',
 		t:    '\t'
 	},
-	ws = [' ', '\t', '\r', '\n'],
         
     renderChar = function(chr) {
 		return chr === '' ? 'EOF' : "'" + chr + "'";

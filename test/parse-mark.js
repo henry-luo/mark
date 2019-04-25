@@ -93,6 +93,8 @@ test('Parse Mark object', function(assert) {
 	
 	// test shorthand
 	assert.equal(Mark('{div "text"}').constructor.name, "div", "Mark() shorthand");
+	assert.equal(Mark(' {div "text"}').constructor.name, "div", "Mark() shorthand starting with space");
+	assert.deepEqual(Mark('[123, "text"]'), [123, "text"], "Mark() shorthand starting with []");
 	
 	assert.end();
 });
