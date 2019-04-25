@@ -215,7 +215,7 @@ var MARK = (function() {
 		console.trace("No Mark Selector API", e.message);
 	} 
 	try { // mark.mutate APIs
-		require('./lib/mark.mutate.js')(Mark, push, $length, $pragma);
+		require('./lib/mark.mutate.js')(Mark, push);
 	} catch (e) {
 		console.trace("No Mark Mutate API", e.message);
 	}	
