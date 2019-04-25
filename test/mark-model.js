@@ -131,7 +131,7 @@ test('Mark object model', function(assert) {
 	assert.deepEqual(div.slice(1,3), items, "Mark slice API");	
 	
 	// direct content assignment - not advisable, as content is not normalized
-	var div = Mark.parse('{div "text"}');
+	div = Mark.parse('{div "text"}');
 	div[0] = Mark('br');
 	assert.equal(Mark.stringify(div), '{div {br}}', "Set Mark content");
 	assert.looseEqual(allInKeys(div), [], "Set Mark content");
@@ -139,14 +139,10 @@ test('Mark object model', function(assert) {
 	// set property
 	div.set('width', '10px');
 	assert.equal(div.width, '10px', "Set width to 10px");
-	
-	// replaceWith
-	assert.equal(div.replaceWith(Mark.parse('<?xml version="1.0" encoding="UTF-8"?><div><p>text</p></div>', {format:'xml'})).xml(),
-		'<?xml version="1.0" encoding="UTF-8"?><div><p>text</p></div>', "Mark replaceWith API");
 		
 	// push API
 	assert.equal(Mark.parse('{div}').push("text").length, 1, "push text into Mark object");
-	var div = Mark.parse('{div}');  
+	div = Mark.parse('{div}');  
 	assert.equal(div.length, 0, "length should be 0 before push");
 	div.push(Mark.parse('{br}'));
 	assert.equal(Mark.stringify(div), "{div {br}}", "push {br} into Mark object {div}");
@@ -175,6 +171,17 @@ test('Mark object model', function(assert) {
 	assert.equal(Mark.stringify(div.splice(2, 0, 'child', Mark.parse('{hr}'))), '{div "test" {br} "child" {hr} {p}}', "Mark insert items");
 	assert.equal(Mark.stringify(div.splice(0, 0, 'merge', '-')), '{div "merge-test" {br} "child" {hr} {p}}', "Mark merge inserted items");
 	assert.equal(Mark.stringify(div.splice(1, 1)), '{div "merge-testchild" {hr} {p}}', "Mark merge inserted items");
+	
+	div = Mark.parse('{div "text" {br} "after"}');
+	var ret = div.splice(1, 1);
+	assert.equal(Mark.stringify(ret), '{div "textafter"}', "Mark merge inserted items");
+	assert.equal(ret[1] === undefined, true,  "Trailing items after splice should be undefined");
+	
+	div = Mark.parse('{div "text" {p}}');
+	assert.equal(Mark.stringify(div.splice(1, 1, "after", [123, Mark('{hr}')])), '{div "textafter123" {hr}}', "Mark splice merge inserted items");
+
+	div = Mark.parse('{div "text" {p}}');
+	assert.equal(Mark.stringify(div.splice(3, 4, "after")), '{div "text" {p} "after"}', "Splice handling out of range index");
 	
 	div = Mark.parse('{div "text" {br} {p}}');  div.splice(1, 1);
 	assert.equal(Mark.stringify(div), '{div "text" {p}}', "Mark remove item");
