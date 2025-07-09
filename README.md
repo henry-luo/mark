@@ -171,18 +171,12 @@ Note: /dist/mark.js has bundled all sub-modules and all dependencies with it, an
 - [Syntax specification](https://mark.js.org/mark-syntax.html)
 - [Data model and API specification](https://mark.js.org/mark-model.html)
 - [FAQ](https://mark.js.org/faq.html)
-- Discussion about Mark at [Hacker News](https://news.ycombinator.com/item?id=16308581)
-- Examples:
-  - You can take a look at all the [test scripts](https://github.com/henry-luo/mark/tree/master/test), which also serve as basic demonstration of API usage.
-  - [Mark HTML example](https://plnkr.co/edit/DCgNxf?p=preview)
-  - [Mark conversion example](https://plnkr.co/edit/cMSCW3?p=preview)
-
+- Discussion about Mark beta release at [Hacker News](https://news.ycombinator.com/item?id=16308581)
 
 ## Tools, Extensions and Applications of Mark
 
-- [Mark Template](https://github.com/henry-luo/mark-template): a JS template engine inspired by JSX and XSLT, using Mark for the template syntax.
 - [Mark VSC Extension](https://marketplace.visualstudio.com/items?itemName=henryluo.mark-vsce): Mark Notation support for Visual Studio Code.
 
 ## Credits
 
-Thanks to the following platforms or services that support the open source development of Mark: NPM, GitHub, [Travis CI](https://travis-ci.org/), [Codecov](https://codecov.io/), [BrowserStack](https://www.browserstack.com), [jsDelivr](https://www.jsdelivr.com/), [Plunker](https://plnkr.co/), [JS.org](https://js.org/).
+Thanks to the following platforms or services that support the open source development of Mark: NPM, GitHub, [Travis CI](https://travis-ci.org/), [Codecov](https://codecov.io/), [JS.org](https://js.org/).
