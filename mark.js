@@ -616,18 +616,27 @@ MARK.parse = (function() {
 
 	// Parse an array
 	array = function() {
-		var array = [];
-		next();  // skip the starting '['
+		let array = [];
+		let delim = ch === '[' ? ']' : ')';  console.log('array delim: ', delim);
+		next();  // skip the starting '[' or '('
 		white();
-		if (ch === ']') { next();  return array; }  // empty array
+		if (ch === delim) { // empty array/list
+			next();  return delim === '(' ? null:array; 
+		}  
 		while (ch) {
 			// ES5 allows omitted elements in arrays, e.g. [,] and [,null]. JSON and Mark don't allow this.
 			array.push(value());
 			if (ch === ',') {
 				next();  white();
 			}
-			else if (ch === ']') { // end of array
-				next();  return array;
+			else if (ch === delim) { // end of array/list
+				next();
+				if (delim === ')') { // list
+					if (array.length === 0) { return null; } // empty list
+					else if (array.length === 1) { return array[0]; } // single item list
+					array.isList = true;  // mark as list
+				}
+				return array;
 			}
 			else {
 				error(UNEXPECT_CHAR + renderChar(ch));
@@ -756,11 +765,20 @@ MARK.parse = (function() {
 		},
 		parseContent = function() {
 			while (ch) {
-				if (ch === '<' || ch === '{' || ch === '(' || ch === '[') { // child object
+				if (ch === '<' || ch === '{') { // child object
 					let child = object(obj);
 					Object.defineProperty(obj, index, {value:child, writable:true, configurable:true}); // make content non-enumerable
 					// all 4 container types store reference to parent 
 					child[$parent] = obj;  index++;  
+				}
+				else if (ch === '(' || ch === '[') { // child object
+					let child = array();
+					if (child) {
+						Object.defineProperty(obj, index, {value:child, writable:true, configurable:true}); // make content non-enumerable
+						if (typeof child === 'object') child[$parent] = obj;
+						// else could be symbol, number, etc.
+						index++;
+					}
 				}
 				else if (ch === '"') { // text node
 					let str = string();
@@ -867,16 +885,17 @@ MARK.parse = (function() {
 		// a scalar value (string, symbol, number, datetime, binary, etc.), or a word.
         white();
         switch (ch) {
-        case '{':  case '<':
+        case '{':  
+		case '<':
             return object();
         case '[':
 			return array();
+		case '(':
+			return list();			
         case '"':
 			return string();
 		case "'":
             return symbol();
-		case '(':
-			return list();
         case '-':  case '+':  case '.':
             return number();
         default:
@@ -1020,9 +1039,9 @@ MARK.stringify = function(obj, options) {
                 if (value === null) { // null value
                     return "null";
                 } 
-				else if (Array.isArray(value)) { // array
+				else if (Array.isArray(value)) { // array or list
                     checkForCircular(value);  // console.log('print array', value);
-                    buffer = "[";
+                    buffer = value.isList ? "(" : "[";
                     objStack.push(value);
 
                     for (var i = 0; i < value.length; i++) {
@@ -1044,7 +1063,7 @@ MARK.stringify = function(obj, options) {
                     if (value.length && indentStep) {
                         buffer += indent(objStack.length, true);
                     }
-                    buffer += "]";
+                    buffer += value.isList ? ")" : "]";
                 }
 				else if (value instanceof ArrayBuffer) { // binary
 					buffer = "b'";
