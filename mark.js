@@ -16,13 +16,13 @@ const ws = [' ', '\t', '\r', '\n'];
 let $convert = null,  // Mark Convert API
 	$ctrs = {};	// cached constructors for the Mark objects
 
-// patch IE11
-if (!$ctrs.constructor.name) { // IE11 does not set constructor.name to 'Object'
+if (!$ctrs.constructor.name) { 
+	// patch IE11, as it does not set constructor.name to 'Object'
 	$ctrs.constructor.name = 'Object';
 }
 
 // MARK is the static Mark API, it is different from the Mark.prototype that Mark object extends
-var MARK = (function() {
+let MARK = (function() {
 	function push(val) {
 		let len = this[$length];
 		let t = typeof val;
@@ -542,139 +542,62 @@ MARK.parse = (function() {
 		error("Expected 3-digit number");
 	},
 
-	// todo: store time, date, datetime format
 	datetime = function() {
-		// Parse datetime in format: t'[YYYY[-MM[-DD]]] [hh[:mm[:ss[.sss]]]][Z|+/-HHMM]'
+		// Parse datetime in format: t'[YYYY[-MM[-DD]]][T|t|spaces][h|hh[:mm[:ss[.sss]]]][Z|+/-HHMM]'
 		// Supports: time only, date only, or date-time combinations
+		// Date-time separators: T, t, or spaces (but not mixed)
+		// Time formats: HH, HH.HHH, HH:MM, HH:MM:SS, HH:MM:SS.sss with optional timezone
 		at++;  next(); // skip the starting "t'"
 		
-		// Find the closing quote
+		// Find the closing quote and extract datetime string
 		let start = at - 1;
 		let end = text.indexOf("'", start);
 		if (end < 0) { error("Missing closing quote for datetime"); }
+		let dtStr = text.slice(start, end).trim();
 		
-		// Match regex directly on the text slice
-		let dtRegex = /^(?:(-?)(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?(?:\s+)?)?(?:(\d{1,2})(?:\.(\d{1,3}))?(?:[:.](\d{1,2})(?:\.(\d{1,3}))?(?:[:.](\d{1,2})(?:\.(\d{1,3}))?)?)?)?([zZ]|[+-]\d{2}:?\d{2})?$/;
-		
-		let match = text.slice(start, end).trim().match(dtRegex);
-		if (!match) {
-			error("Invalid datetime format: " + text.slice(start, end).trim());
-		}
-		
-		let [, yearSign, yearStr, monthStr, dayStr, hourStr, hourFracStr, minuteStr, minuteFracStr, 
-			secondStr, millisecondStr, timezonePart] = match;
-		let year = null, month = null, day = null, hour = null, minute = null, 
-			second = null, millisecond = null, timezone = null;
-		
-		// Parse date components directly from capture groups
-		if (yearStr) {
-			year = parseInt(yearStr) * (yearSign === '-' ? -1 : 1);
-			month = monthStr ? parseInt(monthStr) : null;
-			day = dayStr ? parseInt(dayStr) : null;
-		}
-		
-		// Parse time components directly from capture groups
-		if (hourStr) {
-			hour = parseInt(hourStr);
-			
-			// Handle fractional hours: HH.HHH
-			if (hourFracStr && !minuteStr) {
-				let fracHour = parseInt(hourFracStr.padEnd(3, '0')) / 1000;
-				minute = Math.floor(fracHour * 60);
-				second = Math.floor((fracHour * 60 - minute) * 60);
-				millisecond = Math.floor(((fracHour * 60 - minute) * 60 - second) * 1000);
-			} else {
-				// Regular minute parsing
-				minute = minuteStr ? parseInt(minuteStr) : null;
-				
-				// Handle fractional minutes: HH:MM.MMM
-				if (minuteFracStr && !secondStr) {
-					let fracMin = parseInt(minuteFracStr.padEnd(3, '0')) / 1000;
-					second = Math.floor(fracMin * 60);
-					millisecond = Math.floor((fracMin * 60 - second) * 1000);
-				} else {
-					// Regular second parsing
-					second = secondStr ? parseInt(secondStr) : null;
-					if (millisecondStr) {
-						// Handle fractional seconds - pad to 3 digits
-						let fracStr = millisecondStr;
-						while (fracStr.length < 3) fracStr += '0';
-						millisecond = parseInt(fracStr.substring(0, 3));
-					}
-				}
-			}
-		}
-		
-		// Parse timezone directly from capture group
-		if (timezonePart) {
-			if (timezonePart === 'Z' || timezonePart === 'z') {
-				timezone = 'Z';
-			} else {
-				// Format timezone from captured value: +/-HHMM or +/-HH:MM to +/-HH:MM
-				let sign = timezonePart[0]; // + or -
-				let digits = timezonePart.slice(1).replace(':', ''); // Remove any existing colon
-				if (digits.length === 4) {
-					timezone = sign + digits.slice(0, 2) + ':' + digits.slice(2, 4);
-				}
-			}
+		// Detect if this is date-only (no time component) or time-only (no date component)
+		let dateOnly = /^\d{4}(?:-\d{2}(?:-\d{2})?)?$/.test(dtStr);
+		let timeOnly = /^\d{2}(?:[:.]\d{2}(?:[:.]\d{2}(?:\.\d{3})?)?)?(?:[zZ]|[+-]\d{2}:?\d{2})?$/.test(dtStr) && !dateOnly;
+
+		let dtRegex = /^(?:\d{4}(?:-\d{2}(?:-\d{2})?)?(?:(?:[Tt]|\s+)\d{2}(?:[:.]\d{2}(?:[:.]\d{2}(?:\.\d{3})?)?)?(?:[zZ]|[+-]\d{2}:?\d{2})?)?|\d{2}(?:[:.]\d{2}(?:[:.]\d{2}(?:\.\d{3})?)?)?(?:[zZ]|[+-]\d{2}:?\d{2})?)$/;
+		if (!dtRegex.test(dtStr)) {
+			error("Invalid datetime format: " + dtStr);
 		}
 		
 		// Advance parser position past the datetime string
 		at = end + 1;
 		next(); // skip closing quote
 		
+		// Normalize the datetime string for JavaScript Date constructor
+		let normalizedStr = dtStr;
+		// ensure 'T' separator for date-time (replace spaces/t with 'T' if present)
+		normalizedStr = normalizedStr.replace(/(\d{4}-\d{2}-\d{2})(?:[Tt]|\s+)(\d{2})/, '$1T$2');
+		// handle time-only single hour with optional timezone
+		normalizedStr = normalizedStr.replace(/^(\d{2})([zZ]|[+-]\d{2}:?\d{2})?$/, (match, hour, tz) => {
+			// convert HH to HH:00
+			return hour + ':00' + (tz || '');
+		});
+		// handle datetime with single hour and optional timezone
+		normalizedStr = normalizedStr.replace(/T(\d{2})([zZ]|[+-]\d{2}:?\d{2})?$/, (match, hour, tz) => {
+			return 'T' + hour + ':00' + (tz || '');
+		});
+		// normalize timezone format: +/-HHMM to +/-HH:MM (if not already formatted)
+		normalizedStr = normalizedStr.replace(/([+-])(\d{2})(\d{2})$/, '$1$2:$3');
+		
+		// handle time-only format by adding default date
+		if (timeOnly) {
+			// fix the date to '2000-01-01'
+			normalizedStr = '2000-01-01' + 'T' + normalizedStr;
+		}
+		
 		// Create Date object
 		try {
-			let dateObj;
-			if (year !== null) {
-				// Full date or date-time
-				let isoStr = year.toString().padStart(4, '0');
-				if (month !== null) {
-					isoStr += '-' + month.toString().padStart(2, '0');
-					if (day !== null) {
-						isoStr += '-' + day.toString().padStart(2, '0');
-					} else {
-						isoStr += '-01';
-					}
-				} else {
-					isoStr += '-01-01';
-				}
-				
-				if (hour !== null) {
-					isoStr += 'T' + hour.toString().padStart(2, '0');
-					isoStr += ':' + (minute || 0).toString().padStart(2, '0');
-					isoStr += ':' + (second || 0).toString().padStart(2, '0');
-					if (millisecond !== null) {
-						isoStr += '.' + millisecond.toString().padStart(3, '0');
-					}
-					if (timezone) {
-						isoStr += timezone;
-					}
-				}
-				dateObj = new Date(isoStr);
-			} else if (hour !== null) {
-				// Time only - use today's date
-				let today = new Date();
-				let isoStr = today.getFullYear() + '-' + 
-					(today.getMonth() + 1).toString().padStart(2, '0') + '-' + 
-					today.getDate().toString().padStart(2, '0') + 'T' +
-					hour.toString().padStart(2, '0') + ':' +
-					(minute || 0).toString().padStart(2, '0') + ':' +
-					(second || 0).toString().padStart(2, '0');
-				if (millisecond !== null) {
-					isoStr += '.' + millisecond.toString().padStart(3, '0');
-				}
-				if (timezone) {
-					isoStr += timezone;
-				}
-				dateObj = new Date(isoStr);
-			} else {
-				error("Invalid datetime format");
-			}
-			
+			let dateObj = new Date(normalizedStr);
 			if (isNaN(dateObj.getTime())) {
-				error("Invalid datetime value");
+				error("Invalid datetime value: " + dtStr);
 			}
+			dateObj.timeOnly = timeOnly;
+			dateObj.dateOnly = dateOnly;
 			return dateObj;
 		} catch (e) {
 			error("Invalid datetime: " + e.message);
@@ -1143,7 +1066,15 @@ MARK.stringify = function(obj, options) {
 					buffer += "'";
 				}
 				else if (value instanceof Date) { // datetime
-					buffer = "t'" + value.toISOString().replace('T',' ') + "'";
+					if (value.timeOnly) {
+						buffer = "t'" + value.toTimeString().split(' ')[0] + "'";
+					}
+					else if (value.dateOnly) {
+						buffer = "t'" + value.toISOString().split('T')[0] + "'";
+					}
+					else{
+						buffer = "t'" + value.toISOString().replace('T',' ') + "'";
+					}
 				}
 				else { // map or element
                     checkForCircular(value);
