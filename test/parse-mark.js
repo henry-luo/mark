@@ -4,7 +4,7 @@ const Mark = require('./../mark.js');
 test('Parse Mark object', function(assert) {
 	// test literal values
 	assert.equal(Mark.parse("Infinity"), Infinity, "Infinite value");
-	assert.equal(Mark.parse("true"), true, "Infinite value");
+	assert.equal(Mark.parse("true"), true, "True value");
 	assert.equal(Mark.parse("word"), "word", "Unquoted identifier as string value");
 	
 	// test array

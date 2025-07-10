@@ -11,9 +11,7 @@
 // symbols used internally
 const $length = Symbol.for('Mark.length'), // for content length
 	_length = Symbol.for('Mark.length-property'), // for property length
-	$parent = Symbol.for('Mark.parent'), // for parent object
-	$pragma = Symbol.for('Mark.pragma'), // for pragma value
-	$paired = Symbol.for('Mark.pragma-paired');
+	$parent = Symbol.for('Mark.parent'); // for parent object
 	
 const ws = [' ', '\t', '\r', '\n'];
 let $convert = null,  // Mark Convert API
@@ -36,13 +34,13 @@ var MARK = (function() {
 				len--;  val = this[len] + val;  // merge text nodes
 			}
 		}
-		else if (t === 'object') {
+		else if (t === 'object') { // map or element
 			if (val === null) return this; // skip null value
 			else if (val instanceof Array) { // expanded it inline
 				for (let v of val) { push.call(this, v); }
 				return this;
 			}
-			// else, Mark object or pragma
+			// else, Mark object
 			val[$parent] = this;  // set $parent
 		}
 		else if (t === 'undefined') {
@@ -66,8 +64,9 @@ var MARK = (function() {
 	
 	// Mark.prototype and Mark object constructor
 	function Mark(typeName, props, contents) {
-		// handle special shorthand
-		if (arguments.length === 1 && (typeName[0] === '{' || typeName[0] === '[' || ws.indexOf(typeName[0]) >= 0)) { 
+		// special shorthand for constructing Mark from source
+		let char = typeName[0];
+		if (arguments.length === 1 && (char === '<' || char === '{' || char === '[' || char === '(')) { 
 			return MARK.parse(typeName); 
 		}
 		
@@ -166,7 +165,7 @@ var MARK = (function() {
 		// no longer set the APIs on static MARK object, as 'length' is non-writable in node, and non-configurable in IE11
 	}
 	
-	// additional APIs on Mark prototype
+	// Additional APIs on Mark prototype
 	
 	// length getter
 	let desc = {
@@ -190,22 +189,6 @@ var MARK = (function() {
 	// static Mark lengthOf function
 	Mark.lengthOf = function(obj) {
 		return obj == null ? null : (obj[$length] !== undefined ? obj[$length]:obj.length);
-	}
-	
-	// Mark pragma constructor
-	Mark.pragma = function(pragma) {
-		let con = $ctrs[$pragma];
-		if (!con) {
-			con = Object.create(null);
-			Object.defineProperty(con, 'pragma', {value: function() { return this[$pragma]; }});  // get pragma content
-			Object.defineProperty(con, 'parent', {value:api.parent});
-			Object.defineProperty(con, 'valueOf', {value:Object.valueOf});
-			Object.defineProperty(con, 'toString', {value:function() { return '[object Pragma]'; }});
-			$ctrs[$pragma] = con;
-		}
-		let obj = Object.create(con);
-		obj[$pragma] = pragma;  // pragma conent stored as Symbol
-		return obj;
 	}
 	
 	// load additional APIs
@@ -283,7 +266,7 @@ MARK.parse = (function() {
 		var error = new SyntaxError(msg);
 		// beginning of message suffix to agree with that provided by Gecko - see https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/JSON/parse
 		error.at = at;
-		// These two property names have been chosen to agree with the ones in Gecko, the only popular
+		// these two property names have been chosen to agree with the ones in Gecko, the only popular
 		// environment which seems to supply this info on JSON.parse
 		error.lineNumber = lineNumber;
 		error.columnNumber = columnNumber;
@@ -291,11 +274,11 @@ MARK.parse = (function() {
 	},
 
 	next = function (c) {
-		// If a c parameter is provided, verify that it matches the current character.
+		// if a c parameter is provided, verify that it matches the current character.
 		if (c && c !== ch) {
 			error("Expected '" + c + "' instead of " + renderChar(ch));
 		}
-		// Get the next character. When there are no more characters, return the empty string.
+		// get the next character. When there are no more characters, return the empty string.
 		ch = text.charAt(at);  at++;
 		if (ch === '\n' || ch === '\r' && text[at] !== '\n') {
 			lineNumber++;  columnStart = at;
@@ -305,7 +288,7 @@ MARK.parse = (function() {
 
 	// Parse an identifier.
 	identifier = function () {
-		// To keep it simple, Mark identifiers do not support Unicode "letters", as in JS; if needed, use quoted syntax
+		// to keep it simple, Mark identifiers do not support Unicode "letters", as in JS; if needed, use quoted syntax
 		var key = ch;
 
 		// identifiers must start with a letter, _ or $.
@@ -340,10 +323,10 @@ MARK.parse = (function() {
 		}
 
 		// support for NaN
-		if (ch === 'N' ) {
+		if (ch === 'n' ) {
 			number = word();
 			if (!isNaN(number)) {
-			error('expected word to be NaN');
+				error('expected word to be NaN');
 			}
 			// ignore sign as -NaN also is NaN
 			return number;
@@ -453,6 +436,8 @@ MARK.parse = (function() {
 		error("Bad string");
 	},
 
+	symbol = string,
+
 	// Parse an inline comment
 	inlineComment = function () {
 		// Skip an inline comment, assuming this is one. The current character should
@@ -539,54 +524,12 @@ MARK.parse = (function() {
 		case 't':  if (isSuffix('rue')) { return true; }  break;
 		case 'f':  if (isSuffix('alse')) { return false; }  break;
 		case 'n':  if (isSuffix('ull')) { return null; }  break;
-		case 'I':  if (isSuffix('nfinity')) { return Infinity; }  break;
-		case 'N':  if (isSuffix('aN')) { return NaN; }
+		case 'i':  if (isSuffix('nf')) { return Infinity; }  break;
+		case 'n':  if (isSuffix('an')) { return NaN; }
 		}
 		return identifier(); // treated as string
 	},
 	
-	pragma = function() {
-		let prag = '', level = 0;
-		next();  // skip starting '('
-		if (ch === '?') { // normal pragma
-			next();  // skip '?'
-			while (ch) {
-				if (ch === '?') {
-					if (text[at] === ')') {
-						// end of pragma
-						at++;  next();  // skip ending ')'
-						return MARK.pragma(prag);
-					}
-					else if (text[at] === '?') { // escape for '?'
-						at++;
-					}
-					else {
-						error("'?' should be escaped in Mark pragma");
-					}
-				}
-				// else - normal char
-				prag += ch;  next();
-			}
-		} 
-		else { // paired pragma
-			while (ch) {
-				if (ch === ')') {
-					if (level) { level--; } // embedded (...)
-					else { // end of pragma
-						next();  // skip ending ')'
-						let p = MARK.pragma(prag);
-						p[$paired] = true; 
-						return p;
-					}
-				}
-				else if (ch === '(') { level++; } // store as normal char
-				// else - normal char
-				prag += ch;  next();
-			}
-		}
-		error(UNEXPECT_END);
-	},
-
 	value,  // Place holder for the value function.
 
 	// Parse an array
@@ -595,23 +538,23 @@ MARK.parse = (function() {
 		
 		next();  // skip the starting '['
 		white();
+		if (ch === ']') { next();  return array; }  // empty array
 		while (ch) {
-			if (ch === ']') {
-				next();
-				return array;   // Potentially empty array
-			}
 			// ES5 allows omitted elements in arrays, e.g. [,] and [,null]. JSON and Mark don't allow this.
+			array.push(value());
 			if (ch === ',') {
-				error("Missing array element");
-			} else {
-				array.push(value());
+				next();  white();
 			}
-			white();
-			
-			// comma is optional in Mark
-			if (ch === ',') { next();  white(); }
+			else if (ch === ']') { // end of array
+				next();  return array;
+			}
+			else {
+				error(UNEXPECT_CHAR + renderChar(ch));
+			}
 		}
-	};
+	},
+
+	list = array;
 
 	// Parse binary value
 	// Use a lookup table to find the index.
@@ -716,11 +659,11 @@ MARK.parse = (function() {
 		}
 	};
 
-	// Parse an object, pragma or binary
-	let object = function() {
+	// Parse an element
+	let element = function() {
 		let obj = {}, 
 			key = null, 		// property key
-			extended = false, 	// whether the is extended Mark object or legacy JSON object
+			extended = false, 	// whether the is extended Mark element or legacy JSON/map object
 			index = 0;
 		
 		let putText = function(text) {
@@ -735,10 +678,10 @@ MARK.parse = (function() {
 		},
 		parseContent = function() {
 			while (ch) {
-				if (ch === '{' || ch === '(' || ch === '[' && text[at] === '#') { // child object
-					let child = (ch === '(') ? pragma(obj) : (ch === '[' ? binary(obj):object(obj));  
+				if (ch === '<' || ch === '{' || ch === '(' || ch === '[') { // child object
+					let child = element(obj);
 					Object.defineProperty(obj, index, {value:child, writable:true, configurable:true}); // make content non-enumerable
-					// all 4 types: Mark object, JSON object, Mark pragma, Mark binary store reference to parent 
+					// all 4 types: Mark object, JSON object, Mark binary store reference to parent 
 					child[$parent] = obj;  index++;  
 				}
 				else if (ch === '"' || ch === "'") { // text node
@@ -746,7 +689,7 @@ MARK.parse = (function() {
 					// only output non empty text
 					if (str) putText(str);
 				}
-				else if (ch === '}') { 
+				else if (ch === '>') { 
 					next();  obj[$length] = index;
 					return;
 				}
@@ -758,15 +701,15 @@ MARK.parse = (function() {
 			error(UNEXPECT_END);		
 		};
 		
-		next();  white();  // skip the starting '{'
+		next();  white();  // skip the starting '<'
 		while (ch) {
-			if (ch === '}') { // end of the object
+			if (ch === '>') { // end of the element
 				next();  
 				if (extended) { obj[$length] = index; }
 				return obj;   // could be empty object
 			}
 			// scan the key
-			if (ch === '{' || ch === '(' || ch === '[') { // child object, pragma or binary
+			if (ch === '<' || ch === '{' || ch === '(' || ch === '[') { // child object
 				if (extended) {
 					parseContent();  return obj;
 				}
@@ -826,30 +769,32 @@ MARK.parse = (function() {
 		error(UNEXPECT_END);
 	};
 
-	// Parse a JSON value. 
+	// Parse a Mark value. 
 	value = function() {
-		// A JSON value could be an object, an array, a string, a number, or a word.
+		// A Mark value could be an element, a map, an array, a list, 
+		// a scalar value (string, symbol, number, datetime, binary, etc.), or a word.
         white();
         switch (ch) {
         case '{':
-            return object();
+            return map();
         case '[':
-			return (text[at] === '#') ? binary() : array();
-        case '"': 
+			return array();
+		case '<':
+            return element();
+        case '"':
+			return string();
 		case "'":
-            return string();
+            return symbol();
 		case '(':
-			return pragma();
-        case '-': 
-		case '+': 
-		case '.':
+			return list();
+        case '-':  case '+':  case '.':
             return number();
         default:
             return ch >= '0' && ch <= '9' ? number() : word();
         }
     };
 
-	// Return the enclosed parse function. It will have access to all of the above functions and variables.
+	// return the enclosed parse function. It will have access to all of the above functions and variables.
     return function(source, options) {
 		// initialize the contextual variables
         at = 0;  lineNumber = 1;  columnStart = at;  ch = ' ';
@@ -1062,13 +1007,10 @@ MARK.stringify = function(obj, options) {
 						buffer += ']';
 					}
 				}
-				else { // pragma or object
+				else { // object
                     checkForCircular(value);  // console.log('print obj', value);
                     buffer = "{";
                     var nonEmpty = false;
-					if (!value.constructor) { // assume Mark pragma
-						return value[$pragma] ?  (value[$paired] ? '('+ value[$pragma] +')' : '(?'+ value[$pragma].replace(/\?/g, '??') +'?)') : '(??)';
-					}
 					// Mark or JSON object
 					objStack.push(value);
 					// print object type-name, if any
