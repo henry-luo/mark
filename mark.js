@@ -1,7 +1,6 @@
-﻿// mark.js
-// Objective Markup Notation. See README.md for details.
+﻿// Markup Notation. See README.md for details.
 //
-// This file is based directly of JSON5 at:
+// Mark parser is based on JSON5 at:
 // https://github.com/json5/json5/blob/master/lib/json5.js
 // which is further based of Douglas Crockford's json_parse.js:
 // https://github.com/douglascrockford/JSON-js/blob/master/json_parse.js
@@ -192,16 +191,16 @@ var MARK = (function() {
 	}
 	
 	// load additional APIs
-	try { // mark.selector APIs
-		require('./lib/mark.selector.js')(Mark);
-	} catch (e) {
-		console.trace("No Mark Selector API", e.message);
-	} 
-	try { // mark.mutate APIs
-		require('./lib/mark.mutate.js')(Mark, push);
-	} catch (e) {
-		console.trace("No Mark Mutate API", e.message);
-	}	
+	// try { // mark.selector APIs
+	// 	require('./lib/mark.selector.js')(Mark);
+	// } catch (e) {
+	// 	console.trace("No Mark Selector API", e.message);
+	// } 
+	// try { // mark.mutate APIs
+	// 	require('./lib/mark.mutate.js')(Mark, push);
+	// } catch (e) {
+	// 	console.trace("No Mark Mutate API", e.message);
+	// }	
 	return Mark;
 })();
 
@@ -314,10 +313,10 @@ MARK.parse = (function() {
 		}
 
 		// support for Infinity (could tweak to allow other words):
-		if (ch === 'I') {
+		if (ch === 'i') {
 			number = word();
-			if (typeof number !== 'number' || isNaN(number)) {
-				error('Unexpected word for number');
+			if (typeof number !== 'number') {
+				error('Unexpected number');
 			}
 			return (sign === '-') ? -number : number;
 		}
@@ -326,7 +325,7 @@ MARK.parse = (function() {
 		if (ch === 'n' ) {
 			number = word();
 			if (!isNaN(number)) {
-				error('expected word to be NaN');
+				error("Expected 'nan'");
 			}
 			// ignore sign as -NaN also is NaN
 			return number;
@@ -518,14 +517,17 @@ MARK.parse = (function() {
 		ch = text[at+len];  at += len + 1;  
 		return true;
 	},
+	
 	// Parse true, false, null, Infinity, NaN
 	word = function() {
 		switch (ch) {
 		case 't':  if (isSuffix('rue')) { return true; }  break;
 		case 'f':  if (isSuffix('alse')) { return false; }  break;
-		case 'n':  if (isSuffix('ull')) { return null; }  break;
 		case 'i':  if (isSuffix('nf')) { return Infinity; }  break;
-		case 'n':  if (isSuffix('an')) { return NaN; }
+		case 'n':  
+			if (isSuffix('ull')) { return null; }
+			if (isSuffix('an')) { return NaN; }
+			break;
 		}
 		return identifier(); // treated as string
 	},
@@ -659,11 +661,11 @@ MARK.parse = (function() {
 		}
 	};
 
-	// Parse an element
-	let element = function() {
+	// Parse an element or map
+	let object = function() {
 		let obj = {}, 
 			key = null, 		// property key
-			extended = false, 	// whether the is extended Mark element or legacy JSON/map object
+			extended = false, 	// whether it is extended Mark element or JSON/map
 			index = 0;
 		
 		let putText = function(text) {
@@ -679,7 +681,7 @@ MARK.parse = (function() {
 		parseContent = function() {
 			while (ch) {
 				if (ch === '<' || ch === '{' || ch === '(' || ch === '[') { // child object
-					let child = element(obj);
+					let child = object(obj);
 					Object.defineProperty(obj, index, {value:child, writable:true, configurable:true}); // make content non-enumerable
 					// all 4 types: Mark object, JSON object, Mark binary store reference to parent 
 					child[$parent] = obj;  index++;  
@@ -701,14 +703,21 @@ MARK.parse = (function() {
 			error(UNEXPECT_END);		
 		};
 		
-		next();  white();  // skip the starting '<'
+		if (ch === '<') {  // Mark element
+			next();  white();
+			let ident = identifier();  white();
+			obj = MARK(ident, null, null);
+			extended = true;
+		}
+		else {  // map
+			next();  white();  // skip the starting '{'
+		}
 		while (ch) {
-			if (ch === '>') { // end of the element
+			if (extended && ch === '>' || !extended && ch === '}') { // end of the element/map
 				next();  
 				if (extended) { obj[$length] = index; }
 				return obj;   // could be empty object
 			}
-			// scan the key
 			if (ch === '<' || ch === '{' || ch === '(' || ch === '[') { // child object
 				if (extended) {
 					parseContent();  return obj;
@@ -742,12 +751,7 @@ MARK.parse = (function() {
 				if (ch == ':') { // property value
 					key = ident;
 				} else {
-					if (!extended) { // start of Mark object
-						obj = MARK(ident, null, null);
-						extended = true;  // key = ident;
-						continue;
-					}
-					error(UNEXPECT_CHAR + renderChar(ch));
+					// symbol
 				}
 			}
 			
@@ -775,12 +779,10 @@ MARK.parse = (function() {
 		// a scalar value (string, symbol, number, datetime, binary, etc.), or a word.
         white();
         switch (ch) {
-        case '{':
-            return map();
+        case '{':  case '<':
+            return object();
         case '[':
 			return array();
-		case '<':
-            return element();
         case '"':
 			return string();
 		case "'":
@@ -915,9 +917,8 @@ MARK.stringify = function(obj, options) {
                 return value.toString();
 
             case "number":
-                if (isNaN(value) || !isFinite(value)) {
-                    return "null";
-                }
+                if (isNaN(value)) { return "nan"; }
+				else if (!isFinite(value)) { return value > 0 ? "inf" : "-inf"; }
                 return value.toString();
 
             case "string":
@@ -942,7 +943,7 @@ MARK.stringify = function(obj, options) {
                             buffer += res;
                         }
                         if (i < value.length-1) {
-                            buffer += ' '; // omitComma ? ' ':',';
+                            buffer += ', ';
                         } else if (indentStep) {
                             buffer += "\n";
                         }
@@ -954,70 +955,36 @@ MARK.stringify = function(obj, options) {
                     buffer += "]";
                 }
 				else if (value instanceof ArrayBuffer) { // binary
-					if (value.encoding === 'a85') { // base85
-						let bytes = new DataView(value), fullLen = value.byteLength, len = fullLen - (fullLen % 4), chars = new Array(5);
-						buffer = '[#~';
-						// bulk of encoding
-						let i = 0;
-						for (; i < len; i+=4) {
-							let num = bytes.getUint32(i);  // big endian
-							// encode into 5 bytes
-							if (num) {
-								for (let j = 0; j < 5; ++j) {
-									chars[j] = String.fromCodePoint(num % 85 + 33);
-									num = Math.floor(num / 85);
-								}
-								buffer += chars[4] + chars[3] + chars[2] + chars[1] + chars[0];  // need to reverse the bytes
-							} else { // special case zero
-								buffer += 'z';
-							}
-						}
-						// trailing bytes and padding
-						let padding = 4 - fullLen % 4, num;
-						if (padding) {
-							switch (padding) {
-							case 1:  num = ((bytes.getUint16(i)<<8) + bytes.getUint8(i+2))<<8;  break;
-							case 2:  num = bytes.getUint16(i) << 16;  break;
-							case 3:  num = bytes.getUint8(i) << 24;
-							}
-							for (let j = 0; j < 5; ++j) {
-								chars[j] = String.fromCodePoint(num % 85 + 33);
-								num = Math.floor(num / 85);
-							}
-							// reverse the bytes and remove padding bytes
-							buffer += (chars[4] + chars[3] + chars[2] + chars[1] + chars[0]).substr(0, 5 - padding);
-						}
-						buffer += '~]';					
-					} 
-					else { // base64
-						let bytes = new Uint8Array(value), i, fullLen = bytes.length, len = fullLen - (fullLen % 3);
-						buffer = '[#';
-						// bulk of encoding
-						for (i = 0; i < len; i+=3) {
-							buffer += base64[bytes[i] >> 2];
-							buffer += base64[((bytes[i] & 3) << 4) | (bytes[i + 1] >> 4)];
-							buffer += base64[((bytes[i + 1] & 15) << 2) | (bytes[i + 2] >> 6)];
-							buffer += base64[bytes[i + 2] & 63];
-						}
-						// trailing bytes and padding
-						if (fullLen % 3) {
-							buffer += base64[bytes[i] >> 2] + base64[((bytes[i] & 3) << 4) | (bytes[i + 1] >> 4)] +
-								(fullLen % 3 === 2 ? base64[(bytes[i + 1] & 15) << 2] : "=") + "=";
-						}
-						buffer += ']';
+					// base64
+					let bytes = new Uint8Array(value), i, fullLen = bytes.length, len = fullLen - (fullLen % 3);
+					buffer = '[#';
+					// bulk of encoding
+					for (i = 0; i < len; i+=3) {
+						buffer += base64[bytes[i] >> 2];
+						buffer += base64[((bytes[i] & 3) << 4) | (bytes[i + 1] >> 4)];
+						buffer += base64[((bytes[i + 1] & 15) << 2) | (bytes[i + 2] >> 6)];
+						buffer += base64[bytes[i + 2] & 63];
 					}
+					// trailing bytes and padding
+					if (fullLen % 3) {
+						buffer += base64[bytes[i] >> 2] + base64[((bytes[i] & 3) << 4) | (bytes[i + 1] >> 4)] +
+							(fullLen % 3 === 2 ? base64[(bytes[i + 1] & 15) << 2] : "=") + "=";
+					}
+					buffer += ']';
 				}
-				else { // object
+				else { // map or element
                     checkForCircular(value);  // console.log('print obj', value);
-                    buffer = "{";
-                    var nonEmpty = false;
+                    let nonEmpty = false, isElement = false;
 					// Mark or JSON object
 					objStack.push(value);
 					// print object type-name, if any
-					if (value.constructor.name !== 'Object' || value instanceof MARK) { 
-						buffer += value.constructor.name;  nonEmpty = true;
+					if (value.constructor.name !== 'Object' || value instanceof MARK) { // element
+						buffer = '<' + value.constructor.name;  
+						isElement = true;  nonEmpty = true;
 					} 
-					// else JSON
+					else { // map
+						buffer = '{';
+					}
 
 					// print object attributes
 					let hasAttr = false;
@@ -1026,8 +993,7 @@ MARK.stringify = function(obj, options) {
 						let res = _stringify(value[prop]);
 						if (res !== undefined) {                           
 							let key = MARK.isName(prop) ? prop : escapeString(prop);
-							buffer += (hasAttr ? ' ' // (omitComma ? ' ':', ')
-								:(nonEmpty ? ' ':''))+ key +":"+ res;
+							buffer += (hasAttr ? ', ' : (nonEmpty ? ' ' : '')) + key + ":" + res;
 							hasAttr = true;  nonEmpty = true;
 						}
                     }
@@ -1052,12 +1018,9 @@ MARK.stringify = function(obj, options) {
 					
                     objStack.pop();
                     if (nonEmpty) {
-                        // buffer = buffer.substring(0, buffer.length-1) + indent(objStack.length) + "}";
 						if (length && indentStep) { buffer += indent(objStack.length); }
-						buffer += "}";
-                    } else {
-                        buffer = '{}';
                     }
+					buffer += isElement ? '>' : '}';
                 }
                 return buffer;
             default:
