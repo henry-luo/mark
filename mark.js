@@ -510,6 +510,7 @@ MARK.parse = (function() {
 	// Parse true, false, null, Infinity, NaN
 	word = function() {
 		switch (ch) {
+		case 'b':  if (text[at] == "'") { return binary(); }  break;  // binary value
 		case 't':  if (isSuffix('rue')) { return true; }  break;
 		case 'f':  if (isSuffix('alse')) { return false; }  break;
 		case 'i':  if (isSuffix('nf')) { return Infinity; }  break;
@@ -549,66 +550,63 @@ MARK.parse = (function() {
 
 	// Parse binary value
 	// Use a lookup table to find the index.
-	let lookup64 = new Uint8Array(128), lookup85 = new Uint8Array(128);
-	if (lookup64.fill) { lookup64.fill(65); lookup85.fill(86); } // '65' denotes invalid value
+	let lookup64 = new Uint8Array(128);
+	if (lookup64.fill) { lookup64.fill(65); } // '65' denotes invalid value
 	else { // patch for IE11
-		for (var i = 0; i < 128; i++) { lookup64[i] = 65;  lookup85[i] = 86; } 
+		for (var i = 0; i < 128; i++) { lookup64[i] = 65; }
 	}
 	for (var i = 0; i < 64; i++) { lookup64[base64.charCodeAt(i)] = i; }
 	// ' ', \t', '\r', '\n' spaces also allowed in base64 stream
 	lookup64[32] = lookup64[9] = lookup64[13] = lookup64[10] = 64;
-	for (var i = 0; i < 128; i++) { if (33 <= i && i <= 117) lookup85[i] = i - 33; }
-	// ' ', \t', '\r', '\n' spaces also allowed in base85 stream
-	lookup85[32] = lookup85[9] = lookup85[13] = lookup85[10] = 85;
 	
 	let binary = function() {
-		at++;  // skip the starting '[#'
-		if (text[at] === '~') { // base85
-			at++;  // skip '~'
-			// code based on https://github.com/noseglid/base85/blob/master/lib/base85.js
-			let end = text.indexOf('~]', at);  // scan binary end
-			if (end < 0) { error("Missing ascii85 end delimiter"); }
-			
-			// first run collects base85 chars, and skip the spaces
-			let p = 0, base = new Uint8Array(new ArrayBuffer(end - at + 3));  // 3 extra bytes of padding
-			while (at < end) {
-				let code = lookup85[text.charCodeAt(at)];  // console.log('bin: ', text[at], code);
-				if (code > 85) { error("Invalid ascii85 character"); }
-				if (code < 85) { base[p++] = code; }
-				// else skip spaces
+		at++;  // skip the starting "b'"
+		if (text[at] !== '\\') { error("Expect '\\'"); }
+		at++;
+		if (text[at] === 'x') {  // hex
+			// parse hex string into ArrayBuffer
+			at++;  // skip 'x'
+			let end = text.indexOf("'", at), bufEnd = end;  // scan binary end
+			if (end < 0) { error("Missing hex end delimiter"); }
+			// first run collects hex chars, and skip the spaces
+			let hex = new Uint8Array(new ArrayBuffer(bufEnd - at)), p = 0;	
+			while (at < bufEnd) {
+				let code = text.charCodeAt(at);
+				if (code === 32 || code === 9 || code === 13 || code === 10) { // skip spaces
+					at++;  continue;
+				}
+				if (code >= 48 && code <= 57) { // '0' - '9'
+					hex[p++] = code - 48;
+				} else if (code >= 65 && code <= 70) { // 'A' - 'F'
+					hex[p++] = code - 55;
+				} else if (code >= 97 && code <= 102) { // 'a' - 'f'
+					hex[p++] = code - 87;
+				} else {
+					error("Invalid hex character: " + renderChar(text[at]));
+				}
 				at++;
 			}
-			at = end+2;  next();  // skip '~]'			
+			at = end + 1;  next();  // skip "'"
 			// check length
-			if (p % 5 == 1) { error("Invalid ascii85 stream length"); }
-		
+			if (p % 2 !== 0) { error("Invalid hex stream length"); }
+			// console.log('binary char length: ', p);	
 			// second run decodes into actual binary data
-			let dataLength = p, padding = (dataLength % 5 === 0) ? 0 : 5 - dataLength % 5,
-				buffer = new ArrayBuffer(4 * Math.ceil(dataLength / 5) - padding), 
-				bytes = new DataView(buffer), trail = buffer.byteLength - 4;
-			base[p] = base[p+1] = base[p+2] = 84;  // 3 extra bytes of padding
-			// console.log('base85 byte length: ', buffer.byteLength);
-			for (let i = 0, p = 0; i < dataLength; i += 5, p+=4) {
-				let num = (((base[i] * 85 + base[i+1]) * 85 + base[i+2]) * 85 + base[i+3]) * 85 + base[i+4];
-				// console.log("set byte to val:", p, num, String.fromCodePoint(num >> 24), String.fromCodePoint((num >> 16) & 0xff),
-				//	String.fromCodePoint((num >> 8) & 0xff), String.fromCodePoint(num & 0xff));
-				// write the uint32 value
-				if (p <= trail) { // bulk of bytes
-					bytes.setUint32(p, num); // big endian
-				} else { // trailing bytes
-					switch (padding) {
-					case 1:  bytes.setUint8(p+2, (num >> 8) & 0xff);  // fall through
-					case 2:  bytes.setUint16(p, num >> 16);  break;
-					case 3:  bytes.setUint8(p, num >> 24);
-					}
-				}
-			}			
-			buffer.encoding = 'a85';
-			return buffer;			
+			let len = p / 2, code1, code2,
+				buffer = new ArrayBuffer(len), bytes = new Uint8Array(buffer);
+			// console.log('binary length: ', len);
+			for (let i = 0, p = 0; p < len; i += 2) {
+				code1 = hex[i];  code2 = hex[i+1];
+				if (code1 > 15 || code2 > 15) { error("Invalid hex character"); }
+				bytes[p++] = (code1 << 4) | code2;
+			}
+			// console.log('binary decoded length:', p);
+			buffer.encoding = 'hex';  // set encoding for the buffer
+			return buffer;
 		}
-		else { // base64
+		else if (text[at] === '6' && text[at+1] === "4") { // base64
+			at += 2;  // skip '64'
 			// code based on https://github.com/niklasvh/base64-arraybuffer
-			let end = text.indexOf(']', at), bufEnd = end, pad = 0;  // scan binary end
+			let end = text.indexOf("'", at), bufEnd = end, pad = 0;  // scan binary end
 			if (end < 0) { error("Missing base64 end delimiter"); }
 			// strip optional padding
 			if (text[bufEnd-1] === '=') { // 1st padding
@@ -628,7 +626,7 @@ MARK.parse = (function() {
 				// else skip spaces
 				at++;
 			}
-			at = end+1;  next();  // skip ']'
+			at = end+1;  next();  // skip "'"
 			// check length
 			if (pad && (p + pad) % 4 != 0 || !pad && p % 4 == 1) { error("Invalid base64 stream length"); }
 
@@ -960,22 +958,31 @@ MARK.stringify = function(obj, options) {
                     buffer += "]";
                 }
 				else if (value instanceof ArrayBuffer) { // binary
-					// base64
-					let bytes = new Uint8Array(value), i, fullLen = bytes.length, len = fullLen - (fullLen % 3);
-					buffer = '[#';
-					// bulk of encoding
-					for (i = 0; i < len; i+=3) {
-						buffer += base64[bytes[i] >> 2];
-						buffer += base64[((bytes[i] & 3) << 4) | (bytes[i + 1] >> 4)];
-						buffer += base64[((bytes[i + 1] & 15) << 2) | (bytes[i + 2] >> 6)];
-						buffer += base64[bytes[i + 2] & 63];
+					buffer = "b'";
+					if (value.encoding === 'hex') { // hex
+						buffer += "\\x";
+						let bytes = new Uint8Array(value), i, len = bytes.length;
+						for (i = 0; i < len; i++) {
+							// convert each byte to hex
+							buffer += (bytes[i] >> 4).toString(16) + (bytes[i] & 15).toString(16);
+						}
+					} else { // base64
+						buffer += "\\64";
+						let bytes = new Uint8Array(value), i, fullLen = bytes.length, len = fullLen - (fullLen % 3);
+						// bulk of encoding
+						for (i = 0; i < len; i+=3) {
+							buffer += base64[bytes[i] >> 2];
+							buffer += base64[((bytes[i] & 3) << 4) | (bytes[i + 1] >> 4)];
+							buffer += base64[((bytes[i + 1] & 15) << 2) | (bytes[i + 2] >> 6)];
+							buffer += base64[bytes[i + 2] & 63];
+						}
+						// trailing bytes and padding
+						if (fullLen % 3) {
+							buffer += base64[bytes[i] >> 2] + base64[((bytes[i] & 3) << 4) | (bytes[i + 1] >> 4)] +
+								(fullLen % 3 === 2 ? base64[(bytes[i + 1] & 15) << 2] : "=") + "=";
+						}
 					}
-					// trailing bytes and padding
-					if (fullLen % 3) {
-						buffer += base64[bytes[i] >> 2] + base64[((bytes[i] & 3) << 4) | (bytes[i + 1] >> 4)] +
-							(fullLen % 3 === 2 ? base64[(bytes[i + 1] & 15) << 2] : "=") + "=";
-					}
-					buffer += ']';
+					buffer += "'";
 				}
 				else { // map or element
                     checkForCircular(value);
