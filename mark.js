@@ -372,30 +372,17 @@ MARK.parse = (function() {
 	},
 
 	// Parse a string value.
-	string = function() {			
-		var hex, i, string = '', triple = false,
-			delim,      // double quote or single quote
+	_string = function() {			
+		var hex, i, string = '', 
+			delim, // double quote or single quote
 			uffff;
 
 		// when parsing for string values, we must look for ' or " and \ characters.
 		if (ch === '"' || ch === "'") {
 			delim = ch;
-			if (text[at] === delim && text[at+1] === delim) { // got tripple quote
-				triple = true;  next();  next();
-			}
 			while (next()) {
-				if (ch === delim) {
-					next();
-					if (!triple) { // end of string
-						return string;
-					}
-					else if (ch === delim && text[at] === delim) { // end of tripple quoted text
-						next();  next();  return string;
-					}
-					else {
-						string += delim;
-					}
-					// continue
+				if (ch === delim) { // end of string
+					next();  return string;
 				}
 				if (ch === '\\') { // escape sequence
 					if (triple) { string += '\\'; } // treated as normal char
@@ -422,12 +409,9 @@ MARK.parse = (function() {
 							break;  // bad escape
 						}
 					}
-				} 
-				// else if (ch === '\n') {
-					// control characters like TAB and LF are invalid in JSON, but valid in Mark; 
-					// break;
-				// } 
+				}
 				else { // normal char
+					// control characters like TAB and LF are invalid in JSON, but valid in Mark; 
 					string += ch;
 				}
 			}
@@ -435,7 +419,12 @@ MARK.parse = (function() {
 		error("Bad string");
 	},
 
-	symbol = string,
+	string = _string,
+
+	symbol = function() {
+		let str = _string();
+		return Symbol.for(str);
+	},
 
 	// Parse an inline comment
 	inlineComment = function () {
@@ -683,18 +672,28 @@ MARK.parse = (function() {
 				if (ch === '<' || ch === '{' || ch === '(' || ch === '[') { // child object
 					let child = object(obj);
 					Object.defineProperty(obj, index, {value:child, writable:true, configurable:true}); // make content non-enumerable
-					// all 4 types: Mark object, JSON object, Mark binary store reference to parent 
+					// all 4 container types store reference to parent 
 					child[$parent] = obj;  index++;  
 				}
-				else if (ch === '"' || ch === "'") { // text node
+				else if (ch === '"') { // text node
 					let str = string();
 					// only output non empty text
 					if (str) putText(str);
+				}
+				else if (ch === "'") { // symbol
+					let sym = symbol();
+					// only output non empty symbol
+					if (sym) {
+						// store as non-enumerable
+						Object.defineProperty(obj, index, {value: sym, writable:true, configurable:true}); 
+						index++;
+					}
 				}
 				else if (ch === '>') { 
 					next();  obj[$length] = index;
 					return;
 				}
+				// todo: name, number, etc.
 				else {
 					error(UNEXPECT_CHAR + renderChar(ch));
 				}
@@ -724,37 +723,39 @@ MARK.parse = (function() {
 				}
 				error(UNEXPECT_CHAR + "'"+ ch +"'");
 			}
+
+			let isSymbol = false, str = '';
 			if (ch === '"' || ch === "'") { // quoted key
-				var str = string();  white();
-				if (ch === ':') { // property or JSON object
-					key = str;
-				} else {
-					if (extended) { // already got type name
-						// only output non-empty text
-						if (str) putText(str);
-						parseContent();  return obj;
-					}
-					else if (!key) { // at the starting of the object
-						// create the object
-						obj = MARK(str, null, null);
-						extended = true;  // key = str;
-						continue;							
-					}
-					else { 
-						error(UNEXPECT_CHAR + renderChar(ch));
-					}
-				}
+				isSymbol = ch === "'";
+				str = string();  white();
 			}
 			else { // if (ch==='_' || ch==='$' || 'a'<=ch && ch<='z' || 'A'<=ch && ch<='Z')
 				// Mark unquoted key, which needs to be valid JS identifier.
-				var ident = identifier();  white();
-				if (ch == ':') { // property value
-					key = ident;
-				} else {
-					// symbol
+				str = identifier();  white();
+			}
+			// todo: number
+
+			if (ch === ':') { // property or JSON object
+				key = str;
+			} else {
+				if (extended) { // already got type name
+					// only output non-empty text
+					if (str) {
+						if (isSymbol) {
+							// store as symbol
+							Object.defineProperty(obj, index, {value: Symbol.for(str), writable:true, configurable:true});
+							index++;
+						} else {
+							putText(str);
+						}
+					}
+					parseContent();  return obj;
+				}
+				else { 
+					error(UNEXPECT_CHAR + renderChar(ch));
 				}
 			}
-			
+	
 			// key-value pair
 			next(); // skip ':'
 			var val = value();
@@ -891,16 +892,17 @@ MARK.stringify = function(obj, options) {
         '"' : '\\"',
         '\\': '\\\\'
     };
-    function escapeString(string) {
+    function escapeString(string, isSymbol = false) {
 		// If the string contains no control characters, no quote characters, and no
 		// backslash characters, then we can safely slap some quotes around it.
 		// Otherwise we must also replace the offending characters with safe escape
 		// sequences.
         escapable.lastIndex = 0;
-        return escapable.test(string) ? '"' + string.replace(escapable, function (a) {
+		let delim = isSymbol ? "'" : '"';
+        return escapable.test(string) ? delim + string.replace(escapable, function (a) {
             var c = meta[a];
             return typeof c === 'string' ? c : '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
-        }) + '"' : '"' + string + '"';
+        }) + delim : delim + string + delim;
     }
     // End
 
@@ -923,6 +925,9 @@ MARK.stringify = function(obj, options) {
 
             case "string":
                 return escapeString(value.toString());
+
+			case "symbol":
+				return escapeString(Symbol.keyFor(value), true);
 
             case "object":
                 if (value === null) { // null value
@@ -973,7 +978,7 @@ MARK.stringify = function(obj, options) {
 					buffer += ']';
 				}
 				else { // map or element
-                    checkForCircular(value);  // console.log('print obj', value);
+                    checkForCircular(value);
                     let nonEmpty = false, isElement = false;
 					// Mark or JSON object
 					objStack.push(value);
@@ -992,7 +997,7 @@ MARK.stringify = function(obj, options) {
 						// prop of undefined value is omitted, as Mark and JSON does not support 'undefined' value
 						let res = _stringify(value[prop]);
 						if (res !== undefined) {                           
-							let key = MARK.isName(prop) ? prop : escapeString(prop);
+							let key = MARK.isName(prop) ? prop : escapeString(prop, true);
 							buffer += (hasAttr ? ', ' : (nonEmpty ? ' ' : '')) + key + ":" + res;
 							hasAttr = true;  nonEmpty = true;
 						}
@@ -1004,15 +1009,22 @@ MARK.stringify = function(obj, options) {
 						for (let i = 0; i<length; i++) {
 							buffer += ' ';
 							let item = value[i];
-							if (typeof item === "string") {
+							switch (typeof item) {
+							case "string": 
 								if (indentStep) buffer += indent(objStack.length);
 								buffer += escapeString(item.toString());
-							}
-							else if (typeof item === "object") {
+								break;
+							case "symbol": 
+								if (indentStep) buffer += indent(objStack.length);
+								buffer += escapeString(Symbol.keyFor(item), true);
+								break;
+							case "object":
 								if (indentStep) buffer += indent(objStack.length);
 								buffer += _stringify(item);
+								break;
+							default: 
+								console.log("Unknown object", item);
 							}
-							else { console.log("Unknown object", item); }
 						}
 					}
 					
