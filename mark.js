@@ -510,10 +510,13 @@ MARK.parse = (function() {
 	// Parse true, false, null, Infinity, NaN
 	word = function() {
 		switch (ch) {
-		case 'b':  if (text[at] == "'") { return binary(); }  break;  // binary value
-		case 't':  if (isSuffix('rue')) { return true; }  break;
+		case 'b':  if (text[at] === "'") { return binary(); }  break;  // binary value
 		case 'f':  if (isSuffix('alse')) { return false; }  break;
 		case 'i':  if (isSuffix('nf')) { return Infinity; }  break;
+		case 't':  
+			if (text[at] === "'") { return datetime(); }
+			if (isSuffix('rue')) { return true; }  
+			break;
 		case 'n':  
 			if (isSuffix('ull')) { return null; }
 			if (isSuffix('an')) { return NaN; }
@@ -521,13 +524,168 @@ MARK.parse = (function() {
 		}
 		return identifier(); // treated as string
 	},
+
+	scan2d =  function() {
+		if (ch >= '0' && ch <= '9' && text[at] >= '0' && text[at] <= '9') {
+			let num = ch + text[at];  
+			at++;  next();
+			return parseInt(num);
+		}
+		error("Expected 2-digit number");
+	},
+	scan3d = function() {
+		if (ch >= '0' && ch <= '9' && text[at] >= '0' && text[at] <= '9' && text[at+1] >= '0' && text[at+1] <= '9') {
+			let num = ch + text[at] + text[at+1];  
+			at += 2;  next();
+			return parseInt(num);
+		}
+		error("Expected 3-digit number");
+	},
+
+	// todo: store time, date, datetime format
+	datetime = function() {
+		// Parse datetime in format: t'[YYYY[-MM[-DD]]] [hh[:mm[:ss[.sss]]]][Z|+/-HHMM]'
+		// Supports: time only, date only, or date-time combinations
+		at++;  next(); // skip the starting "t'"
+		
+		// Find the closing quote
+		let start = at - 1;
+		let end = text.indexOf("'", start);
+		if (end < 0) { error("Missing closing quote for datetime"); }
+		
+		// Match regex directly on the text slice
+		let dtRegex = /^(?:(-?)(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?(?:\s+)?)?(?:(\d{1,2})(?:\.(\d{1,3}))?(?:[:.](\d{1,2})(?:\.(\d{1,3}))?(?:[:.](\d{1,2})(?:\.(\d{1,3}))?)?)?)?([zZ]|[+-]\d{2}:?\d{2})?$/;
+		
+		let match = text.slice(start, end).trim().match(dtRegex);
+		if (!match) {
+			error("Invalid datetime format: " + text.slice(start, end).trim());
+		}
+		
+		let [, yearSign, yearStr, monthStr, dayStr, hourStr, hourFracStr, minuteStr, minuteFracStr, 
+			secondStr, millisecondStr, timezonePart] = match;
+		let year = null, month = null, day = null, hour = null, minute = null, 
+			second = null, millisecond = null, timezone = null;
+		
+		// Parse date components directly from capture groups
+		if (yearStr) {
+			year = parseInt(yearStr) * (yearSign === '-' ? -1 : 1);
+			month = monthStr ? parseInt(monthStr) : null;
+			day = dayStr ? parseInt(dayStr) : null;
+		}
+		
+		// Parse time components directly from capture groups
+		if (hourStr) {
+			hour = parseInt(hourStr);
+			
+			// Handle fractional hours: HH.HHH
+			if (hourFracStr && !minuteStr) {
+				let fracHour = parseInt(hourFracStr.padEnd(3, '0')) / 1000;
+				minute = Math.floor(fracHour * 60);
+				second = Math.floor((fracHour * 60 - minute) * 60);
+				millisecond = Math.floor(((fracHour * 60 - minute) * 60 - second) * 1000);
+			} else {
+				// Regular minute parsing
+				minute = minuteStr ? parseInt(minuteStr) : null;
+				
+				// Handle fractional minutes: HH:MM.MMM
+				if (minuteFracStr && !secondStr) {
+					let fracMin = parseInt(minuteFracStr.padEnd(3, '0')) / 1000;
+					second = Math.floor(fracMin * 60);
+					millisecond = Math.floor((fracMin * 60 - second) * 1000);
+				} else {
+					// Regular second parsing
+					second = secondStr ? parseInt(secondStr) : null;
+					if (millisecondStr) {
+						// Handle fractional seconds - pad to 3 digits
+						let fracStr = millisecondStr;
+						while (fracStr.length < 3) fracStr += '0';
+						millisecond = parseInt(fracStr.substring(0, 3));
+					}
+				}
+			}
+		}
+		
+		// Parse timezone directly from capture group
+		if (timezonePart) {
+			if (timezonePart === 'Z' || timezonePart === 'z') {
+				timezone = 'Z';
+			} else {
+				// Format timezone from captured value: +/-HHMM or +/-HH:MM to +/-HH:MM
+				let sign = timezonePart[0]; // + or -
+				let digits = timezonePart.slice(1).replace(':', ''); // Remove any existing colon
+				if (digits.length === 4) {
+					timezone = sign + digits.slice(0, 2) + ':' + digits.slice(2, 4);
+				}
+			}
+		}
+		
+		// Advance parser position past the datetime string
+		at = end + 1;
+		next(); // skip closing quote
+		
+		// Create Date object
+		try {
+			let dateObj;
+			if (year !== null) {
+				// Full date or date-time
+				let isoStr = year.toString().padStart(4, '0');
+				if (month !== null) {
+					isoStr += '-' + month.toString().padStart(2, '0');
+					if (day !== null) {
+						isoStr += '-' + day.toString().padStart(2, '0');
+					} else {
+						isoStr += '-01';
+					}
+				} else {
+					isoStr += '-01-01';
+				}
+				
+				if (hour !== null) {
+					isoStr += 'T' + hour.toString().padStart(2, '0');
+					isoStr += ':' + (minute || 0).toString().padStart(2, '0');
+					isoStr += ':' + (second || 0).toString().padStart(2, '0');
+					if (millisecond !== null) {
+						isoStr += '.' + millisecond.toString().padStart(3, '0');
+					}
+					if (timezone) {
+						isoStr += timezone;
+					}
+				}
+				dateObj = new Date(isoStr);
+			} else if (hour !== null) {
+				// Time only - use today's date
+				let today = new Date();
+				let isoStr = today.getFullYear() + '-' + 
+					(today.getMonth() + 1).toString().padStart(2, '0') + '-' + 
+					today.getDate().toString().padStart(2, '0') + 'T' +
+					hour.toString().padStart(2, '0') + ':' +
+					(minute || 0).toString().padStart(2, '0') + ':' +
+					(second || 0).toString().padStart(2, '0');
+				if (millisecond !== null) {
+					isoStr += '.' + millisecond.toString().padStart(3, '0');
+				}
+				if (timezone) {
+					isoStr += timezone;
+				}
+				dateObj = new Date(isoStr);
+			} else {
+				error("Invalid datetime format");
+			}
+			
+			if (isNaN(dateObj.getTime())) {
+				error("Invalid datetime value");
+			}
+			return dateObj;
+		} catch (e) {
+			error("Invalid datetime: " + e.message);
+		}
+	},
 	
 	value,  // Place holder for the value function.
 
 	// Parse an array
 	array = function() {
 		var array = [];
-		
 		next();  // skip the starting '['
 		white();
 		if (ch === ']') { next();  return array; }  // empty array
@@ -983,6 +1141,9 @@ MARK.stringify = function(obj, options) {
 						}
 					}
 					buffer += "'";
+				}
+				else if (value instanceof Date) { // datetime
+					buffer = "t'" + value.toISOString().replace('T',' ') + "'";
 				}
 				else { // map or element
                     checkForCircular(value);
