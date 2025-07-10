@@ -555,14 +555,22 @@ MARK.parse = (function() {
 		if (end < 0) { error("Missing closing quote for datetime"); }
 		let dtStr = text.slice(start, end).trim();
 		
-		// Detect if this is date-only (no time component) or time-only (no date component)
-		let dateOnly = /^\d{4}(?:-\d{2}(?:-\d{2})?)?$/.test(dtStr);
-		let timeOnly = /^\d{2}(?:[:.]\d{2}(?:[:.]\d{2}(?:\.\d{3})?)?)?(?:[zZ]|[+-]\d{2}:?\d{2})?$/.test(dtStr) && !dateOnly;
-
-		let dtRegex = /^(?:\d{4}(?:-\d{2}(?:-\d{2})?)?(?:(?:[Tt]|\s+)\d{2}(?:[:.]\d{2}(?:[:.]\d{2}(?:\.\d{3})?)?)?)?|\d{2}(?:[:.]\d{2}(?:[:.]\d{2}(?:\.\d{3})?)?)?)(?:[zZ]|[+-]\d{2}:?\d{2})?$/;
-		if (!dtRegex.test(dtStr)) {
+		// Use single regex with capturing groups to detect type and validate format
+		// Factor out common time pattern to avoid duplication  
+		let timePattern = '\\d{2}(?:[:.]\\\d{2}(?:[:.]\\\d{2}(?:\\\.\\\d{3})?)?)?';
+		let dtRegex = new RegExp(`^(?:(\\d{4}(?:-\\d{2}(?:-\\d{2})?)?)(?:(?:[Tt]|\\s+)(${timePattern})?)?|(${timePattern}))(?:[zZ]|[+-]\\d{2}:?\\d{2})?$`);
+		let match = dtRegex.exec(dtStr);
+		if (!match) {
 			error("Invalid datetime format: " + dtStr);
 		}
+		
+		// Determine type from capturing groups
+		let datePart = match[1];           // YYYY[-MM[-DD]] from datetime
+		let datetimeTimePart = match[2];   // time part from datetime (after separator)
+		let timeOnlyPart = match[3];       // time-only part
+		
+		let dateOnly = datePart && !datetimeTimePart && !timeOnlyPart;
+		let timeOnly = !datePart && timeOnlyPart;
 		
 		// Advance parser position past the datetime string
 		at = end + 1;
