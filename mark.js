@@ -794,6 +794,10 @@ MARK.parse = (function() {
 						Object.defineProperty(obj, index, {value: val, writable:true, configurable:true}); 
 						index++;
 					}
+					if (ch === ';' || ch === '\n' || ch === '\r' && text[at] === '\n') {
+						next();  white();
+						parseContent();  return;
+					}
 				}
 				white();
 			}
