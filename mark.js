@@ -483,9 +483,6 @@ MARK.parse = (function() {
 
 	// Parse whitespace and comments.
 	white = function() {
-		// Note that we're detecting comments by only a single / character.
-		// This works since regular expressions are not valid JSON(5), but this will
-		// break if there are other valid values that begin with a / character!
 		while (ch) {
 			if (ch === '/') {
 				comment();
@@ -785,22 +782,18 @@ MARK.parse = (function() {
 					// only output non empty text
 					if (str) putText(str);
 				}
-				else if (ch === "'") { // symbol
-					let sym = symbol();
-					// only output non empty symbol
-					if (sym) {
-						// store as non-enumerable
-						Object.defineProperty(obj, index, {value: sym, writable:true, configurable:true}); 
-						index++;
-					}
-				}
 				else if (ch === '>') { 
 					next();  obj[$length] = index;
 					return;
 				}
-				// todo: name, number, etc.
 				else {
-					error(UNEXPECT_CHAR + renderChar(ch));
+					let val = value();
+					// only output non empty value
+					if (val) {
+						// store as non-enumerable
+						Object.defineProperty(obj, index, {value: val, writable:true, configurable:true}); 
+						index++;
+					}
 				}
 				white();
 			}
@@ -817,16 +810,11 @@ MARK.parse = (function() {
 			next();  white();  // skip the starting '{'
 		}
 		while (ch) {
+			// parse attributes
 			if (extended && ch === '>' || !extended && ch === '}') { // end of the element/map
 				next();  
 				if (extended) { obj[$length] = index; }
 				return obj;   // could be empty object
-			}
-			if (ch === '<' || ch === '{' || ch === '(' || ch === '[') { // child object
-				if (extended) {
-					parseContent();  return obj;
-				}
-				error(UNEXPECT_CHAR + "'"+ ch +"'");
 			}
 
 			let isSymbol = false, str = '';
@@ -834,11 +822,13 @@ MARK.parse = (function() {
 				isSymbol = ch === "'";
 				str = string();  white();
 			}
-			else { // if (ch==='_' || ch==='$' || 'a'<=ch && ch<='z' || 'A'<=ch && ch<='Z')
-				// Mark unquoted key, which needs to be valid JS identifier.
+			else if (isNameStart(ch)) { // unquoted key
 				str = identifier();  white();
 			}
-			// todo: number
+			else {
+				if (extended) { parseContent();  return obj; }
+				error(UNEXPECT_CHAR + renderChar(ch));
+			}
 
 			if (ch === ':') { // property or JSON object
 				key = str;
@@ -870,11 +860,15 @@ MARK.parse = (function() {
 			if (obj[key] && typeof obj[key] !== 'function') {
 				error("Duplicate key not allowed: " + key);
 			}
-			obj[key] = val;  white();
-			// ',' is optional in Mark
+			obj[key] = val;
+			while (ch === ' ' || ch === '\t') { next(); }  // skip spaces, excluding CR or LF
 			if (ch === ',') {
 				next();  white();
-			} 
+			}
+			else if (extended && (ch === ';' || ch === '\n' || ch === '\r' && text[at] === '\n')) { // end of attributes
+				next();  white();
+				parseContent();  return obj; // parse content
+			}
 		}
 		error(UNEXPECT_END);
 	};
@@ -1148,8 +1142,18 @@ MARK.stringify = function(obj, options) {
 								if (indentStep) buffer += indent(objStack.length);
 								buffer += _stringify(item);
 								break;
+							case "number":
+								if (indentStep) buffer += indent(objStack.length);
+								if (isNaN(item)) { buffer += "nan"; }
+								else if (!isFinite(item)) { buffer += item > 0 ? "inf" : "-inf"; }
+								else { buffer += item.toString(); }
+								break;
+							case "boolean":
+								if (indentStep) buffer += indent(objStack.length);
+								buffer += item.toString();
+								break;
 							default: 
-								console.log("Unknown object", item);
+								console.log("Unknown content object", item);
 							}
 						}
 					}
