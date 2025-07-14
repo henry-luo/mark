@@ -379,29 +379,26 @@ MARK.parse = (function() {
 					next();  return string.length ? string:null;
 				}
 				if (ch === '\\') { // escape sequence
-					if (triple) { string += '\\'; } // treated as normal char
-					else { // escape sequence
-						next();
-						if (ch === 'u') { // unicode escape sequence
-							uffff = 0;
-							for (i = 0; i < 4; i += 1) {
-								hex = parseInt(next(), 16);
-								if (!isFinite(hex)) {
-									break;
-								}
-								uffff = uffff * 16 + hex;
+					next();
+					if (ch === 'u') { // unicode escape sequence
+						uffff = 0;
+						for (i = 0; i < 4; i += 1) {
+							hex = parseInt(next(), 16);
+							if (!isFinite(hex)) {
+								break;
 							}
-							string += String.fromCharCode(uffff);
-						} 
-						else if (ch === '\r') { // ignore the line-end, as defined in ES5
-							if (text[at] === '\n') {
-								next();
-							}
-						} else if (typeof escapee[ch] === 'string') {
-							string += escapee[ch];
-						} else { 
-							break;  // bad escape
+							uffff = uffff * 16 + hex;
 						}
+						string += String.fromCharCode(uffff);
+					} 
+					else if (ch === '\r') { // ignore the line-end, as defined in ES5
+						if (text[at] === '\n') {
+							next();
+						}
+					} else if (typeof escapee[ch] === 'string') {
+						string += escapee[ch];
+					} else { 
+						break;  // bad escape
 					}
 				}
 				else { // normal char

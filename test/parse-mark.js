@@ -3,6 +3,7 @@ const Mark = require('./../mark.js');
 
 test('Parse Mark object', function(assert) {
 	// test literal values
+	// assert.equal(Mark.parse("  \t"), null, "Empty string");
 	assert.equal(Mark.parse("inf"), Infinity, "Infinite number");
 	assert.equal(Mark.parse("infinity"), Symbol.for("infinity"), "Infinite string");
 	assert.equal(Mark.parse("-inf"), -Infinity, "Negative infinite number");
@@ -31,54 +32,48 @@ test('Parse Mark object', function(assert) {
 	assert.equal(Mark.parse('<div margin:-10>').margin, -10, "Element margin should be -10");
 	assert.equal(Mark.parse('<div margin:+10>').margin, +10, "Element margin should be +10");
 	assert.equal(Mark.parse("<div style:{'border-width':'10px'}>").style['border-width'], Symbol.for('10px'), 'Element style["border-width"] should be "10px"');
-	// assert.equal(Mark.parse('{div style:{width:"10px"}}').style.width, "10px", 'Object {div style:{width:"10px"}}.style.width should be "10px"');
-	// assert.equal(Mark.parse('{div "class":"large"}').class, "large", 'Object {div "class":"large"}.class should be "large"');
-	// assert.equal(Mark.parse("{div 'class':'large'}").class, "large", 'Object {div "class":"large"}.class should be "large"');
-	// assert.deepEqual(Object.keys(Mark.parse('{obj}')), [], 'Object {obj}.keys() should be empty');
-	// assert.deepEqual(Object.keys(Mark.parse('{div class:"test", style:{color:"red"}}')), ['class','style'], 
-	// 	'Object {div class:"test", style:{color:"red"}} keys should be ["class","style"]');
-	// assert.deepEqual(Mark.parse("{path d:['M', 10, 10, 'H', 90, 'V', 90, 'H', 10, 'L', 10, 10]}").d, ['M', 10, 10, 'H', 90, 'V', 90, 'H', 10, 'L', 10, 10], "Path d with array of data");
-	// assert.deepEqual(Mark.parse("{form id:'test-form', buttons:[{kind:'back'}, 'save', {action:'submit', class:'btn btn-warning'}] }").buttons, 
-	// 	[{kind:'back'}, 'save', {action:'submit', class:'btn btn-warning'}] , "form buttons with array of data");
-	// assert.deepEqual(Object.keys(Mark.parse("{obj map:1, every:2, constructor:3}")), ["map", "every", "constructor"], "properties should not conflict with Mark API functions");
-	// assert.equal(Mark('{div align:left}').align, 'left', "Identifier as literal string value");
+	assert.equal(Mark.parse('<div style:{width:"10px"}>').style.width, "10px", 'Element div.style.width should be "10px"');
+	assert.equal(Mark.parse('<div class:"large">').class, "large", 'Element class should be "large"');
+	assert.deepEqual(Object.keys(Mark.parse('<obj>')), [], 'Element keys() should be empty');
+	assert.deepEqual(Object.keys(Mark.parse('<div class:"test", style:{color:"red"}>')), ['class','style'], 
+	 	'Element keys should be ["class","style"]');
+	assert.deepEqual(Mark.parse("<path d:['M', 10, 10, 'H', 90, 'V', 90, 'H', 10, 'L', 10, 10]>").d, 
+		[Symbol.for('M'), 10, 10, Symbol.for('H'), 90, Symbol.for('V'), 90, Symbol.for('H'), 10, Symbol.for('L'), 10, 10], "Path d with array of data");
+	assert.deepEqual(Mark.parse("<form id:'test-form', buttons:[{kind:'back'}, 'save', {action:'submit', class:'btn btn-warning'}]>").buttons, 
+	 	[{kind: Symbol.for('back')}, Symbol.for('save'), {action: Symbol.for('submit'), class: Symbol.for('btn btn-warning')}], "form buttons with array of data");
+	assert.deepEqual(Object.keys(Mark.parse("<obj map:1, every:2, constructor:3>")), 
+	 	["map", "every", "constructor"], "properties should not conflict with Mark API functions");
+
+	// test content model
+	assert.equal(Mark.parse('<obj>').length, 0, "Element <obj>.length should be 0");
+	assert.equal(Mark.parse('<div "text">').length, 1, 'Element <div "text">.length should be 1');
+	assert.equal(Mark.parse('<div "text" <br>>').length, 2, 'Element <div "text" <br>>.length should be 2');
+	assert.equal(Mark.parse('<div "text">')[0], "text", 'Element <div "text">[0] should be "text"');
+	assert.equal(Mark.parse('<div "text" "" "merged">')[0], "textmerged", 'Element text merged');
+	assert.equal(Mark.parse('<div "">').length, 0, 'Empty text skipped');
+
+	assert.equal(Mark.parse('<div <br>>')[0].constructor.name, "br", 'Element <div <br>>.constructor.name should be "br"');
+
+	// test element in map
+	assert.equal(Mark.parse('{obj:<div "text">}').obj.constructor.name, "div", "Element can be embedded in map");
 	
-	// // test content model
-	// assert.equal(Mark.parse('{obj}').length, 0, "Object {obj}.length should be 0");
-	// assert.equal(Mark.parse('{div "text"}').length, 1, 'Object {div "text"}.length should be 1');
-	// assert.equal(Mark.parse('{div "text" {br}}').length, 2, 'Object {div "text" {br}}.length should be 2');
-	// assert.equal(Mark.parse('{div "text"}')[0], "text", 'Object {div "text"}[0] should be "text"');
-	// assert.equal(Mark.parse('{div "text" "" "merged"}')[0], "textmerged", 'Object text merged');
-	// assert.equal(Mark.parse('{div ""}').length, 0, 'Empty text skipped');
-	
-	// assert.equal(Mark.parse('{div {br}}')[0].constructor.name, "br", 'Object {div {br}}.constructor.name should be "br"');
-		
-	// // test Mark in JSON
-	// assert.equal(Mark.parse('{obj:{div "text"}}').obj.constructor.name, "div", "Mark object can be embedded in JSON");
-	
-	// // test JSON in Mark
-	// assert.equal(Mark.parse('{div {width:1}}')[0].width, 1, "JSON object allowed as Mark content");
-	// assert.equal(Mark.parse('{div {"width":1}}')[0].width, 1, "JSON object allowed as Mark content");
-	
-	// // test multiline text
-	// assert.equal(Mark.parse('{div "string"\n" 2nd line"\n\t\t" and 3rd"}')[0], "string 2nd line and 3rd", "Mark multiline text");
-	// // test text escape
-	// assert.equal(Mark.parse('"\\u002B\\r\\n\\t"'), "+\r\n\t", "Mark text escape");
-	// assert.equal(Mark.parse('"text\\\rcombined\\\r\ntogether"'), "textcombinedtogether", "Mark text combined together");
-	// // test triple quote text
-	// assert.equal(Mark.parse('"""triple "" quote"""'), 'triple "" quote', "Mark string in triple quote");
-	// assert.equal(Mark.parse("'''triple '' quote'''"), "triple '' quote", "Mark string in triple quote");
-	// assert.equal(Mark.parse("'''escape \\u0020'''"), "escape \\u0020", "Unicode escapes are not interpreted in triple quote");
-	// assert.equal(Mark.parse("'''escape \\t'''"), "escape \\t", "Control char escapes are not interpreted in triple quote");
-	
+	// test map in element
+	assert.equal(Mark.parse('<div {width:1}>')[0].width, 1, "map allowed as element content");
+	assert.equal(Mark.parse('<div {"width":1}>')[0].width, 1, "map allowed as element content");
+
+	// test multiline text
+	assert.equal(Mark.parse('<div "string"\n" 2nd line"\n\t\t" and 3rd">')[0], "string 2nd line and 3rd", "Mark multiline text");
+	// test text escape
+	assert.equal(Mark.parse('"\\u002B\\r\\n\\t"'), "+\r\n\t", "Mark text escape");
+	assert.equal(Mark.parse('"text\\\rcombined\\\r\ntogether"'), "textcombinedtogether", "Mark text with escaped line end");
 	// test Unicode support
 	assert.equal(Mark.parse('<div "中文">')[0], "中文", "Mark Unicode support");
 	
-	// // test comment
-	// assert.equal(Mark.parse('{div //comment\n}').constructor.name, "div", "Mark with line comment");
-	// assert.equal(Mark.parse('{div /*comment*/}').constructor.name, "div", "Mark with block comment");
-	// assert.equal(Mark.parse('{div /*comment /*nested*/ */}').constructor.name, "div", "Mark with nested block comment");
-	
+	// test comment
+	assert.equal(Mark.parse('<div //comment\n>').constructor.name, "div", "Mark with line comment");
+	assert.equal(Mark.parse('<div /*comment*/>').constructor.name, "div", "Mark with block comment");
+	assert.equal(Mark.parse('<div /*comment /*nested*/ */>').constructor.name, "div", "Mark with nested block comment");
+
 	// test shorthand
 	assert.equal(Mark('<div "text">').constructor.name, "div", "Mark() shorthand");
 	assert.throws(() => Mark(' <div "text">'), /Invalid Mark type name/, "Mark() shorthand should not start with space");
