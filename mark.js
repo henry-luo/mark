@@ -893,11 +893,16 @@ MARK.parse = (function() {
 		} 
 		// else // parse as Mark
         
-		// start parsing the root value
-        var result = value();
-        white();
-        if (ch) { error("Expect end of input"); }
+		// start parsing the top-level value(s)
+        let result = [];
+		do {
+			white();
+			if (!ch) { break; } // end of input
+			result.push(value());
+		} while (ch);
 		// Mark does not support the legacy JSON reviver function
+		if (result.length === 0) { result = null; } // empty input
+		else if (result.length === 1) { result = result[0]; } // single item input
 		return result;
     };
 }());

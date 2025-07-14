@@ -3,13 +3,14 @@ const Mark = require('./../mark.js');
 
 test('Parse Mark object', function(assert) {
 	// test literal values
-	// assert.equal(Mark.parse("  \t"), null, "Empty string");
+	assert.equal(Mark.parse("  \t"), null, "Empty string");
 	assert.equal(Mark.parse("inf"), Infinity, "Infinite number");
 	assert.equal(Mark.parse("infinity"), Symbol.for("infinity"), "Infinite string");
 	assert.equal(Mark.parse("-inf"), -Infinity, "Negative infinite number");
 	assert.ok(Number.isNaN(Mark.parse("nan")), 'Not a number');
 	assert.equal(Mark.parse("true"), true, "True value");
 	assert.equal(Mark.parse("word"), Symbol.for("word"), "Unquoted identifier as string value");
+	assert.deepEqual(Mark.parse("a 123"), [Symbol.for("a"), 123], "Multiple top-level values");
 	
 	// test array
 	assert.deepEqual(Mark.parse("[1, true, 'text']"), [1, true, Symbol.for('text')], "Mark array");
@@ -92,6 +93,7 @@ function stringArrayBuffer(str) {
 }
 
 function compareArrayBuffers(buffer1, buffer2) {
+	console.log("typeof buffer1:", typeof buffer1, buffer1);
     var len1 = buffer1.byteLength;
     var len2 = buffer2.byteLength;
     var view1 = new Uint8Array(buffer1);
@@ -109,10 +111,10 @@ function compareArrayBuffers(buffer1, buffer2) {
     return true;
 }
 
-// test('Parse Mark binary value', function(assert) {
-// 	// test base64 parsing
-// 	var bin = Mark('[#\n]');
-// 	assert.equal(compareArrayBuffers(bin, new ArrayBuffer(0)), true, "zero-length base64 binary");
+test('Parse Mark binary value', function(assert) {
+ 	// test base64 parsing
+ 	var bin = Mark("b'\\n'");
+ 	// assert.equal(compareArrayBuffers(bin, new ArrayBuffer(0)), true, "zero-length base64 binary");
 // 	assert.equal(bin.byteLength, 0, "zero-length base64 binary");
 // 	bin = Mark('[#QXJ0]');  console.log("byte length:", bin.byteLength);
 // 	assert.equal(compareArrayBuffers(bin, stringArrayBuffer("Art")), true, "Parse base64 of 'Art'");
@@ -136,5 +138,5 @@ function compareArrayBuffers(buffer1, buffer2) {
 // 	assert.equal(compareArrayBuffers(Mark("[#~\n@p\ns7\ntD.3~]"), stringArrayBuffer("canumb")), true, "Parse base85 of 'canumb'");
 // 	assert.equal(compareArrayBuffers(Mark("[#~ @<5pm \rBfIs ~]"), stringArrayBuffer("ascii85")), true, "Parse base85 of 'ascii85'");
 	
-// 	assert.end();
-// });
+ 	assert.end();
+});
