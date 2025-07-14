@@ -23,6 +23,7 @@ if (!$ctrs.constructor.name) {
 
 // MARK is the static Mark API, it is different from the Mark.prototype that Mark object extends
 let MARK = (function() {
+	// for Mark content list
 	function push(val) {
 		let len = this[$length];
 		let t = typeof val;
@@ -35,7 +36,7 @@ let MARK = (function() {
 		}
 		else if (t === 'object') { // map or element
 			if (val === null) return this; // skip null value
-			else if (val instanceof Array) { // expanded it inline
+			else if (val instanceof Array && val.isList) { // spread it inline
 				for (let v of val) { push.call(this, v); }
 				return this;
 			}
@@ -45,12 +46,8 @@ let MARK = (function() {
 		else if (t === 'undefined') {
 			return this;
 		}
-		else { // other primitive values are converted to string
-			val = val.toString(); // convert to string, as Mark only accept text and Mark object as content
-			let prevType = len ? (typeof this[len - 1]):null;
-			if (prevType === 'string') {
-				len--;  val = this[len] + val;  // merge text nodes
-			}
+		else { // other primitive values
+			// keep the value as is
 		}
 		Object.defineProperty(this, len, {value:val, writable:true, configurable:true}); // make content non-enumerable
 		this[$length] = len + 1;
@@ -382,7 +379,7 @@ MARK.parse = (function() {
 			delim = ch;
 			while (next()) {
 				if (ch === delim) { // end of string
-					next();  return string;
+					next();  return string.length ? string:null;
 				}
 				if (ch === '\\') { // escape sequence
 					if (triple) { string += '\\'; } // treated as normal char
@@ -423,7 +420,7 @@ MARK.parse = (function() {
 
 	symbol = function() {
 		let str = _string();
-		return Symbol.for(str);
+		return str ? Symbol.for(str) : null;
 	},
 
 	// Parse an inline comment
@@ -601,7 +598,7 @@ MARK.parse = (function() {
 		next();  // skip the starting '[' or '('
 		white();
 		if (ch === delim) { // empty array/list
-			next();  return delim === '(' ? null:array; 
+			next();  return delim === ')' ? null:array; 
 		}  
 		while (ch) {
 			// ES5 allows omitted elements in arrays, e.g. [,] and [,null]. JSON and Mark don't allow this.
@@ -851,6 +848,7 @@ MARK.parse = (function() {
 			white();
 			if (ch === ',') {
 				next();  white();
+				if (ch === delim) { error(UNEXPECT_CHAR + renderChar(ch)); }
 			}
 			else if (ch === delim) { // end of the element/map
 				next();  
