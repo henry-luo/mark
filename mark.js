@@ -11,7 +11,8 @@
 const $length = Symbol.for('Mark.length'), // for content length
 	_length = Symbol.for('Mark.length-property'), // for property length
 	$parent = Symbol.for('Mark.parent'), // for parent object
-	$isList = Symbol.for('Mark.is-list'); // for list flag
+	$isList = Symbol.for('Mark.is-list'), // for list flag
+	$encoding = Symbol.for('Mark.encoding'); // for encoding type, e.g. 'b64' for base64
 
 const ws = [' ', '\t', '\r', '\n'];
 let $convert = null,  // Mark Convert API
@@ -293,9 +294,8 @@ MARK.parse = (function() {
 			error(UNEXPECT_CHAR + renderChar(ch));
 		}
 		// subsequent characters can contain digits
-		while (next() && (('a' <= ch && ch <= 'z') || ('A' <= ch && ch <= 'Z') || ('0' <= ch && ch <= '9') || ch === '_' || ch === '$' ||
-			// '.' and '-' are commonly used in html and xml names, but not valid JS name chars
-			ch === '.' || ch === '-')) {
+		// ch === '.' // to be supported in Mark 1.1 as namespace
+		while (next() && (('a' <= ch && ch <= 'z') || ('A' <= ch && ch <= 'Z') || ('0' <= ch && ch <= '9') || ch === '_' || ch === '$')) {
 			key += ch;
 		}
 
@@ -304,29 +304,18 @@ MARK.parse = (function() {
 
 	// Parse a number value.
 	number = function () {
-		let number, sign = '', string = '', base = 10;
+		let number, sign = '', string = '';
 
 		if (ch === '-' || ch === '+') {
 			sign = ch;  next(ch);
 		}
 
-		// support for Infinity (could tweak to allow other words):
-		if (ch === 'i') {
+		// support for Infinity and NaN:
+		if (ch === 'i' || ch === 'n') {
 			number = word();
-			if (typeof number !== 'number') {
-				error('Unexpected number');
-			}
+			if (typeof number !== 'number') { error("Invalid number"); }
+			// -NaN is same as NaN
 			return (sign === '-') ? -number : number;
-		}
-
-		// support for NaN
-		if (ch === 'n') {
-			number = word();
-			if (!isNaN(number)) {
-				error("Expected 'nan'");
-			}
-			// ignore sign as -NaN also is NaN
-			return number;
 		}
 
 		if (ch === '0') {
@@ -342,11 +331,12 @@ MARK.parse = (function() {
 					string += ch;
 				}
 			}
-			else if (ch === 'n' || ch === 'N') { // bigint
+			if (string === '') { error("Invalid number"); }
+			if (ch === 'n' || ch === 'N') { // bigint
 				next();  // skip 'n'
 				return BigInt(string);
 			}
-			if (ch === 'e' || ch === 'E') {
+			else if (ch === 'e' || ch === 'E') {
 				string += ch;
 				next();
 				if (ch === '-' || ch === '+') {
@@ -357,7 +347,8 @@ MARK.parse = (function() {
 					string += ch;
 					next();
 				}
-			}			
+			}
+			// else integer or float
 		}
 
 		if (sign === '-') {
@@ -365,12 +356,7 @@ MARK.parse = (function() {
 		} else {
 			number = +string;
 		}
-
-		if (!isFinite(number)) {
-			error("Bad number");
-		} else {
-			return number;
-		}
+		return number;
 	},
 
 	// Parse a string value.
@@ -506,7 +492,7 @@ MARK.parse = (function() {
 		return true;
 	},
 	
-	// Parse true, false, null, Infinity, NaN
+	// Parse true, false, null, inf, nan
 	word = function() {
 		switch (ch) {
 		case 'b':  if (text[at] === "'") { return binary(); }  break;  // binary value
@@ -599,7 +585,7 @@ MARK.parse = (function() {
 	// Parse an array
 	array = function() {
 		let array = [];
-		let delim = ch === '[' ? ']' : ')';  console.log('array delim: ', delim);
+		let delim = ch === '[' ? ']' : ')';
 		next();  // skip the starting '[' or '('
 		white();
 		if (ch === delim) { // empty array/list
@@ -680,7 +666,7 @@ MARK.parse = (function() {
 				bytes[p++] = (code1 << 4) | code2;
 			}
 			// console.log('binary decoded length:', p);
-			buffer.encoding = 'hex';  // set encoding for the buffer
+			buffer[$encoding] = 'hex';  // set encoding for the buffer
 			return buffer;
 		}
 		else if (text[at] === '6' && text[at+1] === "4") { // base64
@@ -695,12 +681,11 @@ MARK.parse = (function() {
 					bufEnd--;  pad = 2;
 				}
 			}
-			// console.log('binary char length: ', bufEnd - at);
 
 			// first run collects base64 chars, and skip the spaces
 			let base = new Uint8Array(new ArrayBuffer(bufEnd - at)), p = 0;
 			while (at < bufEnd) {
-				let code = lookup64[text.charCodeAt(at)];  // console.log('bin: ', text[at], code);
+				let code = lookup64[text.charCodeAt(at)];
 				if (code > 64) { error("Invalid base64 character"); }
 				if (code < 64) { base[p++] = code; }
 				// else skip spaces
@@ -713,7 +698,6 @@ MARK.parse = (function() {
 			// second run decodes into actual binary data
 			let len = Math.floor(p * 0.75), code1, code2, code3, code4,
 				buffer = new ArrayBuffer(len), bytes = new Uint8Array(buffer);
-			// console.log('binary length: ', len);
 			for (let i = 0, p = 0; p < len; i += 4) {
 				code1 = base[i];  code2 = base[i+1];
 				code3 = base[i+2];  code4 = base[i+3];
@@ -722,8 +706,7 @@ MARK.parse = (function() {
 				bytes[p++] = ((code2 & 15) << 4) | (code3 >> 2);
 				bytes[p++] = ((code3 & 3) << 6) | (code4 & 63);
 			}
-			// console.log('binary decoded length:', p);
-			buffer.encoding = 'b64';
+			buffer[$encoding] = 'b64';
 			return buffer;
 		}
 	};
@@ -793,7 +776,7 @@ MARK.parse = (function() {
 		}
 		next();  white();
 		if (extended) { // parse element name
-			let ident = identifier();  white();
+			let ident = ch === "'" ? string(): identifier();  white();
 			obj = MARK(ident, null, null);
 		} else { // map
 			obj = {}; 
@@ -885,9 +868,12 @@ MARK.parse = (function() {
 		case "'":
             return symbol();
         case '-':  case '+':  case '.':
+		case '0':  case '1':  case '2':  case '3': case '4':  
+		case '5':  case '6':  case '7':  case '8':  case '9':
             return number();
         default:
-            return ch >= '0' && ch <= '9' ? number() : word();
+			let w = word();
+            return typeof w === 'string' ? Symbol.for(w) : w;
         }
     };
 
@@ -1058,7 +1044,7 @@ MARK.stringify = function(obj, options) {
                 }
 				else if (value instanceof ArrayBuffer) { // binary
 					buffer = "b'";
-					if (value.encoding === 'hex') { // hex
+					if (value[$encoding] === 'hex') { // hex
 						buffer += "\\x";
 						let bytes = new Uint8Array(value), i, len = bytes.length;
 						for (i = 0; i < len; i++) {
