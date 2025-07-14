@@ -10,8 +10,9 @@
 // symbols used internally
 const $length = Symbol.for('Mark.length'), // for content length
 	_length = Symbol.for('Mark.length-property'), // for property length
-	$parent = Symbol.for('Mark.parent'); // for parent object
-	
+	$parent = Symbol.for('Mark.parent'), // for parent object
+	$isList = Symbol.for('Mark.is-list'); // for list flag
+
 const ws = [' ', '\t', '\r', '\n'];
 let $convert = null,  // Mark Convert API
 	$ctrs = {};	// cached constructors for the Mark objects
@@ -36,7 +37,7 @@ let MARK = (function() {
 		}
 		else if (t === 'object') { // map or element
 			if (val === null) return this; // skip null value
-			else if (val instanceof Array && val.isList) { // spread it inline
+			else if (val instanceof Array && val[$isList]) { // spread it inline
 				for (let v of val) { push.call(this, v); }
 				return this;
 			}
@@ -319,7 +320,7 @@ MARK.parse = (function() {
 		}
 
 		// support for NaN
-		if (ch === 'n' ) {
+		if (ch === 'n') {
 			number = word();
 			if (!isNaN(number)) {
 				error("Expected 'nan'");
@@ -340,6 +341,10 @@ MARK.parse = (function() {
 				while (next() && ch >= '0' && ch <= '9') {
 					string += ch;
 				}
+			}
+			else if (ch === 'n' || ch === 'N') { // bigint
+				next();  // skip 'n'
+				return BigInt(string);
 			}
 			if (ch === 'e' || ch === 'E') {
 				string += ch;
@@ -611,7 +616,7 @@ MARK.parse = (function() {
 				if (delim === ')') { // list
 					if (array.length === 0) { return null; } // empty list
 					else if (array.length === 1) { return array[0]; } // single item list
-					array.isList = true;  // mark as list
+					array[$isList] = true;  // mark as list
 				}
 				return array;
 			}
@@ -1012,6 +1017,9 @@ MARK.stringify = function(obj, options) {
 				else if (!isFinite(value)) { return value > 0 ? "inf" : "-inf"; }
                 return value.toString();
 
+			case "bigint":
+				return value.toString() + 'n';
+
             case "string":
                 return escapeString(value.toString());
 
@@ -1024,7 +1032,7 @@ MARK.stringify = function(obj, options) {
                 } 
 				else if (Array.isArray(value)) { // array or list
                     checkForCircular(value);  // console.log('print array', value);
-                    buffer = value.isList ? "(" : "[";
+                    buffer = value[$isList] ? "(" : "[";
                     objStack.push(value);
 
                     for (var i = 0; i < value.length; i++) {
@@ -1046,7 +1054,7 @@ MARK.stringify = function(obj, options) {
                     if (value.length && indentStep) {
                         buffer += indent(objStack.length, true);
                     }
-                    buffer += value.isList ? ")" : "]";
+                    buffer += value[$isList] ? ")" : "]";
                 }
 				else if (value instanceof ArrayBuffer) { // binary
 					buffer = "b'";
