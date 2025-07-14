@@ -60,19 +60,6 @@ test('Parse Mark object', function(assert) {
 	// assert.equal(Mark.parse('{div {width:1}}')[0].width, 1, "JSON object allowed as Mark content");
 	// assert.equal(Mark.parse('{div {"width":1}}')[0].width, 1, "JSON object allowed as Mark content");
 	
-	// // test Mark pragma
-	// assert.equal(Mark.parse('(?-- comment ?)').pragma(), "-- comment ", "Mark pragma as root");
-	// assert.equal(Mark.parse('(? comment with ?? escape ?)').pragma(), " comment with ? escape ", "Mark pragma with escape");
-	// assert.equal(Mark.parse('(!-- comment --)').pragma(), "!-- comment --", "Mark pragma as root");
-	// assert.equal(Mark.parse('(!-- comment --)').constructor, undefined, "Mark pragma");
-	// assert.equal(Mark.parse('(!-- comment with embedded (...) \\ --)').pragma(), "!-- comment with embedded (...) \\ --", "Mark pragma with embedded ()");
-	// assert.equal(Mark.parse('{div (!-- comment --)}')[0].pragma(), "!-- comment --", "Mark pragma as content");
-	// //let pragma = Mark.parse("{div '100%' 'text'!}");
-	// //assert.equal(pragma.pragma(), "div '100%' 'text'!", "Mark pragma parsing that needs backtracking");
-	// pragma = Mark.parse("{field name:'test', required:(this.context.user.hasRole('admin'))}");
-	// assert.equal(pragma.required.pragma(), "this.context.user.hasRole('admin')", "Mark pragma parsing that needs backtracking");
-	// assert.equal(Mark.parse('(var t = "\r\n")').pragma(), 'var t = "\r\n"', "Mark pragma should preserve JS escape");
-	
 	// // test multiline text
 	// assert.equal(Mark.parse('{div "string"\n" 2nd line"\n\t\t" and 3rd"}')[0], "string 2nd line and 3rd", "Mark multiline text");
 	// // test text escape
@@ -84,18 +71,18 @@ test('Parse Mark object', function(assert) {
 	// assert.equal(Mark.parse("'''escape \\u0020'''"), "escape \\u0020", "Unicode escapes are not interpreted in triple quote");
 	// assert.equal(Mark.parse("'''escape \\t'''"), "escape \\t", "Control char escapes are not interpreted in triple quote");
 	
-	// // test unicode support
-	// assert.equal(Mark.parse('{div "中文"}')[0], "中文", "Mark unicode support");
+	// test Unicode support
+	assert.equal(Mark.parse('<div "中文">')[0], "中文", "Mark Unicode support");
 	
 	// // test comment
 	// assert.equal(Mark.parse('{div //comment\n}').constructor.name, "div", "Mark with line comment");
 	// assert.equal(Mark.parse('{div /*comment*/}').constructor.name, "div", "Mark with block comment");
 	// assert.equal(Mark.parse('{div /*comment /*nested*/ */}').constructor.name, "div", "Mark with nested block comment");
 	
-	// // test shorthand
-	// assert.equal(Mark('{div "text"}').constructor.name, "div", "Mark() shorthand");
-	// assert.equal(Mark(' {div "text"}').constructor.name, "div", "Mark() shorthand starting with space");
-	// assert.deepEqual(Mark('[123, "text"]'), [123, "text"], "Mark() shorthand starting with []");
+	// test shorthand
+	assert.equal(Mark('<div "text">').constructor.name, "div", "Mark() shorthand");
+	assert.throws(() => Mark(' <div "text">'), /Invalid Mark type name/, "Mark() shorthand should not start with space");
+	assert.deepEqual(Mark('[123, "text"]'), [123, "text"], "Mark() shorthand starting with []");
 	
 	assert.end();
 });

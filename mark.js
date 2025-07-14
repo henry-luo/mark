@@ -62,10 +62,15 @@ let MARK = (function() {
 	
 	// Mark.prototype and Mark object constructor
 	function Mark(typeName, props, contents) {
-		// special shorthand for constructing Mark from source
 		let char = typeName[0];
-		if (arguments.length === 1 && (char === '<' || char === '{' || char === '[' || char === '(')) { 
-			return MARK.parse(typeName); 
+		if (arguments.length === 1) {
+			if (char === '<' || char === '{' || char === '[' || char === '(') { 
+				// special shorthand for constructing Mark from source
+				return MARK.parse(typeName); 
+			}
+			else if (!isNameStart(char)) {
+				throw "Invalid Mark type name: " + typeName;
+			}
 		}
 		
 		// 1. prepare the constructor
@@ -76,6 +81,7 @@ let MARK = (function() {
 				// props, contents are not supported at the moment
 				return;
 			}
+			// todo: accept symbol as typeName
 			throw "Type name should be a string";
 		}
 		let con = $ctrs[typeName];
