@@ -38,9 +38,12 @@ let MARK = (function() {
 		}
 		else if (t === 'object') { // map or element
 			if (val === null) return this; // skip null value
-			else if (val instanceof Array && val[$isList]) { // spread it inline
-				for (let v of val) { push.call(this, v); }
-				return this;
+			else if (val instanceof Array) { 
+				if (val[$isList]) { // spread list inline
+					for (let v of val) { push.call(this, v); }
+					return this;
+				}
+				// to consider: normalize the array content
 			}
 			// else, Mark object
 			val[$parent] = this;  // set $parent
@@ -62,8 +65,9 @@ let MARK = (function() {
 	
 	// Mark.prototype and Mark object constructor
 	function Mark(typeName, props, contents) {
-		let char = typeName[0];
+		console.log("Mark typeName:", typeName, ', arguments:', arguments);
 		if (arguments.length === 1) {
+			let char = typeName[0];
 			if (char === '<' || char === '{' || char === '[' || char === '(') { 
 				// special shorthand for constructing Mark from source
 				return MARK.parse(typeName); 
@@ -110,7 +114,10 @@ let MARK = (function() {
 		
 		// 4. copy contents if any
 		obj[$length] = 0;
-		if (contents) { push.call(obj, contents); }
+		if (contents) {
+			if (contents instanceof Array) contents[$isList] = true; // mark as list
+			push.call(obj, contents); 
+		}
 		return obj;
 	};
 		
@@ -130,10 +137,11 @@ let MARK = (function() {
 			return this[$parent];
 		},
 
-		// conversion APIs
+		// convert Mark element to string
 		source: function(options) {
 			return MARK.stringify(this, options);
 		},
+		// convert Mark element to text
 		text : function() {
 			let txt = [];
 			let _text = function(obj) {
@@ -145,16 +153,18 @@ let MARK = (function() {
 			_text(this);
 			return txt.join('');
 		},
+		// convert Mark element to HTML string
 		html: function(options) {
 			let opt = options || {};  opt.format = 'html';
 			return MARK.stringify(this, opt);
 		},
+		// convert Mark element to XML string
 		xml: function(options) {
 			let opt = options || {};  opt.format = 'xml';
 			return MARK.stringify(this, opt);
 		},		
 	}
-	// setup array-like APIs
+	// setup array-like APIs on Mark element prototype
 	let ap = Array.prototype;
 	function wrapped(obj) { return Object.create(obj, {length:{value:obj[$length]}}); }	
 	for (let f of [ap.filter, ap.map, ap.reduce, ap.every, ap.some, ap.forEach, ap.includes, ap.indexOf, ap.lastIndexOf, ap.slice]) {
@@ -163,9 +173,9 @@ let MARK = (function() {
 	api['each'] = api.forEach; // alias
 	
 	// set the APIs
-	for (let a in api) {
+	for (let func in api) {
 		// API functions are non-enumerable
-		Object.defineProperty(Mark.prototype, a, {value:api[a], writable:true, configurable:true});  
+		Object.defineProperty(Mark.prototype, func, {value:api[func], writable:true, configurable:true});  
 		// no longer set the APIs on static MARK object, as 'length' is non-writable in node, and non-configurable in IE11
 	}
 	
@@ -194,18 +204,30 @@ let MARK = (function() {
 	Mark.lengthOf = function(obj) {
 		return obj == null ? null : (obj[$length] !== undefined ? obj[$length]:obj.length);
 	}
-	
+
+	// static Mark parent function
+	Mark.parent = function(obj) {
+		return obj ? obj[Symbol.for('Mark.parent')] : null;
+	}
+
+	// static Mark list constructor
+	Mark.list = function(items) {
+		items[$isList] = true;
+		return items;
+	};
+
 	// load additional APIs
 	// try { // mark.selector APIs
 	// 	require('./lib/mark.selector.js')(Mark);
 	// } catch (e) {
 	// 	console.trace("No Mark Selector API", e.message);
 	// } 
-	// try { // mark.mutate APIs
-	// 	require('./lib/mark.mutate.js')(Mark, push);
-	// } catch (e) {
-	// 	console.trace("No Mark Mutate API", e.message);
-	// }	
+	try { // mark.mutate APIs
+		require('./lib/mark.mutate.js')(Mark, push);
+	} catch (e) {
+		Object.defineProperty(Mark.prototype, 'push', {value:push, writable:true, configurable:true});  
+		console.trace("No Mark Mutate API", e.message);
+	}
 	return Mark;
 })();
 
@@ -712,6 +734,9 @@ MARK.parse = (function() {
 			buffer[$encoding] = 'b64';
 			return buffer;
 		}
+		else {
+			error("Invalid binary value");
+		}
 	};
 
 	// Parse an element or map
@@ -744,7 +769,7 @@ MARK.parse = (function() {
 					if (child) {
 						Object.defineProperty(obj, index, {value:child, writable:true, configurable:true}); // make content non-enumerable
 						if (typeof child === 'object') child[$parent] = obj;
-						// else could be symbol, number, etc.
+						// else could be symbol, number, etc. from list
 						index++;
 					}
 				}

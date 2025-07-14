@@ -113,8 +113,7 @@ function compareArrayBuffers(buffer1, buffer2) {
 
 test('Parse Mark binary value', function(assert) {
  	// test base64 parsing
- 	var bin = Mark("b'\\n'");
- 	// assert.equal(compareArrayBuffers(bin, new ArrayBuffer(0)), true, "zero-length base64 binary");
+ 	assert.throws(() => Mark("b'\\n'"), /Invalid binary/, "empty binary is invalid");
 // 	assert.equal(bin.byteLength, 0, "zero-length base64 binary");
 // 	bin = Mark('[#QXJ0]');  console.log("byte length:", bin.byteLength);
 // 	assert.equal(compareArrayBuffers(bin, stringArrayBuffer("Art")), true, "Parse base64 of 'Art'");
