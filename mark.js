@@ -522,23 +522,6 @@ MARK.parse = (function() {
 		return identifier(); // treated as string
 	},
 
-	scan2d =  function() {
-		if (ch >= '0' && ch <= '9' && text[at] >= '0' && text[at] <= '9') {
-			let num = ch + text[at];  
-			at++;  next();
-			return parseInt(num);
-		}
-		error("Expected 2-digit number");
-	},
-	scan3d = function() {
-		if (ch >= '0' && ch <= '9' && text[at] >= '0' && text[at] <= '9' && text[at+1] >= '0' && text[at+1] <= '9') {
-			let num = ch + text[at] + text[at+1];  
-			at += 2;  next();
-			return parseInt(num);
-		}
-		error("Expected 3-digit number");
-	},
-
 	datetime = function() {
 		// Parse datetime in format: t'[YYYY[-MM[-DD]]][T|t|spaces][h|hh[:mm[:ss[.sss]]]][Z|+/-HHMM]'
 		// Supports: time only, date only, or date-time combinations
@@ -745,7 +728,7 @@ MARK.parse = (function() {
 
 	// Parse an element or map
 	let object = function() {
-		let obj = {}, 
+		let obj, 
 			key = null, 		// property key
 			extended = false, 	// whether it is extended Mark element or JSON/map
 			index = 0;
@@ -780,7 +763,7 @@ MARK.parse = (function() {
 				else if (ch === '"') { // text node
 					let str = string();
 					// only output non empty text
-					if (str) putText(str);
+					if (str) putText(str);  // merge with previous text if any
 				}
 				else if (ch === '>') { 
 					next();  obj[$length] = index;
@@ -792,11 +775,7 @@ MARK.parse = (function() {
 					if (val) {
 						// store as non-enumerable
 						Object.defineProperty(obj, index, {value: val, writable:true, configurable:true}); 
-						index++;
-					}
-					if (ch === ';' || ch === '\n' || ch === '\r' && text[at] === '\n') {
-						next();  white();
-						parseContent();  return;
+						index++;  // not setting $parent
 					}
 				}
 				white();
@@ -804,40 +783,45 @@ MARK.parse = (function() {
 			error(UNEXPECT_END);		
 		};
 		
-		if (ch === '<') {  // Mark element
-			next();  white();
+		let delim = ch === '{' ? '}' : '>';  // determine the end delimiter
+		if (ch === '<') { // Mark element
+			extended = true;  delim = '>';  // end delimiter for Mark element
+		} else { // map
+			delim = '}';
+		}
+		next();  white();
+		if (extended) { // parse element name
 			let ident = identifier();  white();
 			obj = MARK(ident, null, null);
-			extended = true;
+		} else { // map
+			obj = {}; 
 		}
-		else {  // map
-			next();  white();  // skip the starting '{'
+		if (ch === delim) { // end of the element/map
+			next();  
+			if (extended) { obj[$length] = index; }
+			return obj;   // empty object
 		}
+			
+		// parse attributes and content
 		while (ch) {
-			// parse attributes
-			if (extended && ch === '>' || !extended && ch === '}') { // end of the element/map
-				next();  
-				if (extended) { obj[$length] = index; }
-				return obj;   // could be empty object
-			}
-
 			let isSymbol = false, str = '';
 			if (ch === '"' || ch === "'") { // quoted key
 				isSymbol = ch === "'";
-				str = string();  white();
+				str = string();
 			}
 			else if (isNameStart(ch)) { // unquoted key
-				str = identifier();  white();
-			}
+				str = identifier();  isSymbol = true; 
+			}		
 			else {
 				if (extended) { parseContent();  return obj; }
 				error(UNEXPECT_CHAR + renderChar(ch));
 			}
+			white();
 
 			if (ch === ':') { // property or JSON object
-				key = str;
+				key = str;  next(); // skip ':'
 			} else {
-				if (extended) { // already got type name
+				if (extended) { // store the text/symbol
 					// only output non-empty text
 					if (str) {
 						if (isSymbol) {
@@ -845,18 +829,16 @@ MARK.parse = (function() {
 							Object.defineProperty(obj, index, {value: Symbol.for(str), writable:true, configurable:true});
 							index++;
 						} else {
-							putText(str);
+							putText(str);  // merge with previous text if any
 						}
 					}
+					// else skip empty str
 					parseContent();  return obj;
 				}
-				else { 
-					error(UNEXPECT_CHAR + renderChar(ch));
-				}
+				error(UNEXPECT_CHAR + renderChar(ch));
 			}
 	
-			// key-value pair
-			next(); // skip ':'
+			// attr value
 			var val = value();
 			if (extended && !isNaN(key*1)) { // any numeric key is rejected for Mark object
 				error("Numeric key not allowed as Mark property name");
@@ -865,13 +847,18 @@ MARK.parse = (function() {
 				error("Duplicate key not allowed: " + key);
 			}
 			obj[key] = val;
-			while (ch === ' ' || ch === '\t') { next(); }  // skip spaces, excluding CR or LF
+
+			white();
 			if (ch === ',') {
 				next();  white();
 			}
-			else if (extended && (ch === ';' || ch === '\n' || ch === '\r' && text[at] === '\n')) { // end of attributes
-				next();  white();
-				parseContent();  return obj; // parse content
+			else if (ch === delim) { // end of the element/map
+				next();  
+				if (extended) { obj[$length] = index; }
+				return obj;   // could be empty object
+			}
+			else {
+				error(UNEXPECT_CHAR + renderChar(ch));
 			}
 		}
 		error(UNEXPECT_END);
