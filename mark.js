@@ -759,6 +759,7 @@ MARK.parse = (function() {
 		},
 		parseContent = function() {
 			while (ch) {
+				let needLB = false;
 				if (ch === '<' || ch === '{') { // child object
 					let child = object(obj);
 					Object.defineProperty(obj, index, {value:child, writable:true, configurable:true}); // make content non-enumerable
@@ -773,11 +774,13 @@ MARK.parse = (function() {
 						// else could be symbol, number, etc. from list
 						index++;
 					}
+					needLB = true;
 				}
 				else if (ch === '"') { // text node
 					let str = string();
 					// only output non empty text
 					if (str) putText(str);  // merge with previous text if any
+					needLB = false;
 				}
 				else if (ch === '>') { 
 					next();  obj[$length] = index;
@@ -786,13 +789,26 @@ MARK.parse = (function() {
 				else {
 					let val = value();
 					// only output non empty value
-					if (val) {
+					if (val != null) {
 						// store as non-enumerable
 						Object.defineProperty(obj, index, {value: val, writable:true, configurable:true}); 
 						index++;  // not setting $parent
 					}
+					needLB = true;
 				}
-				white();
+				if (!needLB) {
+					white();
+					if (ch === '"' || ch === '{' || ch === '<') { continue; }
+				}
+				// needLB
+				while (ch === ' ' && ch === '\t') { next(); } // skip spaces
+				if (ch === ';' || ch === '\n' || ch === '\r' && text[at] === '\n') { // line break
+					next();  white();
+				}
+				else if (ch === '>') {
+					// contiue
+				}
+				else error(UNEXPECT_CHAR + renderChar(ch));
 			}
 			error(UNEXPECT_END);		
 		};
@@ -805,6 +821,7 @@ MARK.parse = (function() {
 		}
 		next();  white();
 		if (extended) { // parse element name
+			// only accept symbol and identifier as element name, string not accepted
 			let ident = ch === "'" ? string(): identifier();  white();
 			obj = MARK(ident, null, null);
 		} else { // map
@@ -830,7 +847,12 @@ MARK.parse = (function() {
 				if (extended) { parseContent();  return obj; }
 				error(UNEXPECT_CHAR + renderChar(ch));
 			}
-			white();
+
+			let hasLB = false;
+			while (ch === ' ' || ch === '\t') { next(); } // skip spaces
+			if (ch === '\n' || ch === '\r' && text[at] === '\n') { // line break
+				next();  white();  hasLB = true;
+			}
 
 			if (ch === ':') { // property or JSON object
 				key = str;  next(); // skip ':'
@@ -842,11 +864,17 @@ MARK.parse = (function() {
 							// store as symbol
 							Object.defineProperty(obj, index, {value: Symbol.for(str), writable:true, configurable:true});
 							index++;
+							if (ch === ';') { next();  white(); } // skip ';' after symbol
+							else if (!hasLB) { error(UNEXPECT_CHAR + renderChar(ch)); }
 						} else {
 							putText(str);  // merge with previous text if any
+							if (ch === ';') { next();  white(); } // skip ';' after symbol
+							else if (!hasLB && (ch !== '"' && ch !== '<' && ch !== '{' && ch !== delim)) {
+								error(UNEXPECT_CHAR + renderChar(ch));
+							}
 						}
 					}
-					// else skip empty str
+					else { error("Empty attribute name not allowed"); }
 					parseContent();  return obj;
 				}
 				error(UNEXPECT_CHAR + renderChar(ch));
@@ -862,15 +890,27 @@ MARK.parse = (function() {
 			}
 			obj[key] = val;
 
-			white();
+			hasLB = false;
+			while (ch === ' ' || ch === '\t') { next(); } // skip spaces
+			if (ch === '\n' || ch === '\r' && text[at] === '\n') { // line break
+				next();  white();  hasLB = true;
+			}
+
 			if (ch === ',') {
 				next();  white();
 				if (ch === delim) { error(UNEXPECT_CHAR + renderChar(ch)); }
+			}
+			else if (ch === ';') { // end of the attribute
+				next();  white();
+				parseContent();  return obj;
 			}
 			else if (ch === delim) { // end of the element/map
 				next();  
 				if (extended) { obj[$length] = index; }
 				return obj;   // could be empty object
+			}
+			else if (hasLB) {
+				parseContent();  return obj;
 			}
 			else {
 				error(UNEXPECT_CHAR + renderChar(ch));
@@ -901,7 +941,6 @@ MARK.parse = (function() {
 		case '5':  case '6':  case '7':  case '8':  case '9':
             return number();
         default:
-			console.log('before paring word:', ch);
 			let w = word();
             return typeof w === 'string' ? Symbol.for(w) : w;
         }
