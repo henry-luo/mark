@@ -2,6 +2,19 @@
 const tapSpec = require('tap-spec');
 
 module.exports = function(karma) {
+  // Determine browsers based on platform, using headless versions to avoid popups
+  let browsers;
+  if (process.platform === 'darwin') {
+    // macOS - use headless Chrome to avoid Safari popups
+    browsers = ['ChromeHeadless'];
+  } else if (process.platform === 'win32') {
+    // Windows
+    browsers = ['ChromeHeadless'];
+  } else {
+    // Linux and others
+    browsers = ['ChromeHeadless'];
+  }
+
   karma.set({
     frameworks: ['tap','browserify'], //'tap',
     files: [
@@ -16,7 +29,19 @@ module.exports = function(karma) {
 		'test/*.js': ['browserify']
     },
 
-    browsers: ['Edge', 'Chrome', 'Firefox'], // 'IE', 
+    browsers: browsers,
+    
+    // Custom launcher configurations
+    customLaunchers: {
+      SafariNoPopup: {
+        base: 'Safari',
+        flags: ['--disable-web-security', '--allow-running-insecure-content']
+      },
+      ChromeHeadlessNoSandbox: {
+        base: 'ChromeHeadless',
+        flags: ['--no-sandbox', '--disable-web-security']
+      }
+    }, 
     browserConsoleLogOptions: {level: 'error', format: '%b %T: %m', terminal: false},	
 
     //logLevel: 'LOG_DEBUG',

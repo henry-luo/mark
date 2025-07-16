@@ -1,6 +1,6 @@
-/*--------------------------------------------------------
-Modified from JSON5 grammar
---------------------------------------------------------*/
+/* Note: this BFN is meant for illustrations only 
+Refer the Mark.js implementation and Lambda script grammar for extact syntax
+*/
 
 eol ::= LF | CRLF | CR          /* End-of-line */
 
@@ -34,13 +34,17 @@ null  ::= 'null'
 boolean  ::= 'true' | 'false'
 
 /*-- number ------------------------------------------------------*/
-number ::= ('+' | '-')? (nan | inf | dec)
+number ::= ('+' | '-')? (nan | inf | integer | float | decimal)
 
-nan ::= 'NaN'
+nan ::= 'nan'
 
-inf ::= 'Infinity'
+inf ::= 'inf'
 
-dec ::= (int ('.' digit*)? | ('.' digit+)) (exp)?   
+integer ::= int
+
+float ::= (int ('.' digit*)? | ('.' digit+)) exp?
+
+decimal ::= float ('n' | 'N')
 
 exp ::= ('e' | 'E') ('+' | '-')? digit+
 
@@ -48,28 +52,50 @@ int ::= '0' | ([1-9] digit*)
 
 digit ::= [0-9]
 
+/*-- datetime ----------------------------------------------------*/
+datetime ::= "t'" datetime_content "'"
+
+datetime_content ::= date_only | time_only | date_and_time
+
+date_only ::= year ('-' month ('-' day)?)?
+
+time_only ::= time timezone?
+
+date_and_time ::= date_only datetime_separator time timezone?
+
+datetime_separator ::= 'T' | 't' | ws_char+
+
+year ::= digit digit digit digit
+
+month ::= '0' [1-9] | '1' [0-2]
+
+day ::= '0' [1-9] | [12] digit | '3' [01]
+
+time ::= hour (':' minute (':' second ('.' millisecond)?)?)?
+
+hour ::= [01] digit | '2' [0-3]
+
+minute ::= [0-5] digit
+
+second ::= [0-5] digit
+
+millisecond ::= digit digit digit
+
+timezone ::= 'Z' | 'z' | ('+' | '-') hour ':' minute
+
 /*-- binary data -------------------------------------------------*/
-binary ::=  base64_binary | ascii85_binary
+binary ::= hex_binary | base64_binary
 
-base64_binary ::= '[#' ([0-9a-zA-Z] | '+' | '/' | ws_char)* '='? '='? ']' /* 2 optional padding characters */
+hex_binary ::= "b'" '\\x' (hex_char | ws_char)* "'"
 
-ascii85_binary ::= '[#~' ([#x21-u] | 'z' | ws_char)* '~]'
+base64_binary ::= "b'" '\\64' (base64_char | ws_char)* '='? '='? "'"
+
+hex_char ::= [0-9a-fA-F]
+
+base64_char ::= [0-9a-zA-Z] | '+' | '/'
 
 /*-- string ------------------------------------------------------*/
-string ::= s_string | d_string | t_string | identifier
-
-d_string ::= '"' (char | "'")* '"'
-
-s_string ::= "'" (char | '"')* "'"
-
-/* tripple quoted string */
-t_string ::= ("'''" triple_single "'''") | ('"""' triple_double '"""')
-
-tchar ::= [#x00-#x21] | [#x23-#x26] | [#x28-#x10FFFF] /* chars except " and ' */
-
-triple_single ::= (tchar | '"' | ("'" tchar) | ("''" tchar))* "'"? "'"? /* chars without tripple single quote */
-
-triple_double ::= (tchar | "'" | ('"' tchar) | ('""' tchar))* '"'? '"'? /* chars without tripple double quote */
+string ::= '"' (char | "'")* '"'
 
 char ::= unescaped | escaped
 
@@ -92,16 +118,10 @@ unicode ::= 'u' hex hex hex hex
 
 hex ::= [0-9a-fA-F]
 
-/*-- Mark pragma -----------------------------------------------*/
-mark_pragma ::= general_pragma | paired_pragma
+/*-- symbol ------------------------------------------------------*/
+symbol ::= _symbol | identifier
 
-general_pragma ::= '(?' (char_no_qmark | '??')* '?)' 
-
-paired_pragma ::= '(' (char_no_bracket | paired_pragma)* ')' 
-
-char_no_qmark ::= [#x00-#x3E] | [#x40-#x10FFFF]  /* chars except ? */
-
-char_no_bracket ::= [#x00-#x27] | [#x2A-#x10FFFF] /* chars except ( ) */
+_symbol ::= "'" (char | '"')* "'"
 
 /*-- array ------------------------------------------------------*/
 array ::= begin_array (value value_separator?)* end_array
@@ -112,12 +132,19 @@ end_array       ::= ws ']' ws
 
 value_separator ::= ws ',' ws
 
-/*-- JSON object ------------------------------------------------*/
-json_object ::= begin_object properties end_object
+/*-- list -------------------------------------------------------*/
+list ::= begin_list (value value_separator?)* end_list
 
-begin_object ::= ws '{' ws
+begin_list     ::= ws '(' ws
 
-end_object ::= ws '}' ws
+end_list       ::= ws ')' ws
+
+/*-- map ------------------------------------------------*/
+map ::= begin_map properties end_map
+
+begin_map ::= ws '{' ws
+
+end_map ::= ws '}' ws
 
 properties ::= (property value_separator?)*
 
@@ -125,25 +152,24 @@ property ::= key separator value
 
 separator ::= ws ':' ws
 
-key ::= string | identifier
+key ::= string | symbol
 
-identifier ::= begin_identifier continue_identifier*
+identifier ::= begin_ident continue_ident*
 
-begin_identifier ::= [a-zA-Z] | '_' | '$'
+begin_ident ::= [a-zA-Z] | '_' | '$'
 
-continue_identifier ::= begin_identifier | digit | '-' | '.'
+continue_ident ::= begin_ident | digit | '-' | '.'
 
-/*-- Mark object -----------------------------------------------*/
-/* Note: Mark property key cannot be numeric - this constraint cannot be directly expressed in BNF notation */ 
-mark_object ::= begin_object type_name properties contents end_object
+/*-- element -----------------------------------------------*/ 
+element ::= begin_element name properties contents end_elment
 
-type_name ::= key ws
+name ::= symbol
 
-contents ::= (text | binary | json_object | mark_object | mark_pragma | ws)*
+contents ::= (value ((';' | LF | CRLF) value)*)?
 
 text ::= (string ws)+   /* Mark text can be multiple consecutive strings */
 
 /*-- Mark root ------------------------------------------------------*/
-value ::= null | boolean | number | string | binary | array | json_object | mark_object | mark_pragma
+value ::= null | boolean | number | string | symbol | binary | datetime | list | array | map | element
 
-Mark ::= ws value ws
+Mark ::= ws contents ws

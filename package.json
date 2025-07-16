@@ -72,6 +72,7 @@
     "karma-edge-launcher": "^0.4.2",
     "karma-firefox-launcher": "^1.1.0",
     "karma-ie-launcher": "^1.0.0",
+    "karma-safari-launcher": "^1.0.0",
     "karma-tap": "^3.2.1",
     "karma-tap-pretty-reporter": "^3.0.5",
     "minicat": "^1.0.0",
