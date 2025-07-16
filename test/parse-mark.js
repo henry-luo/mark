@@ -13,6 +13,24 @@ test('Parse Mark object', function(assert) {
 	assert.deepEqual(Mark.parse("a; 123"), [Symbol.for("a"), 123], "Multiple top-level values");
 	assert.throws(() => Mark.parse("a 123"), /SyntaxError/, "Expected ';' or line breakafter value");
 
+	// test datetime
+	assert.deepEqual(Mark.parse("t'2025'"), new Date('2025-01-01T00:00:00'), "Date with year only");
+	assert.deepEqual(Mark.parse("t'2025-01-01'"), new Date(2025, 0, 1), "Date with year and month");
+	assert.deepEqual(Mark.parse("t'2025-01-01 12:00:00'"), new Date('2025-01-01T12:00:00'), "Date with time");
+	assert.deepEqual(Mark.parse("t'2025-01-01 12:00:00Z'"), new Date('2025-01-01T12:00:00Z'), "Date with UTC time");
+	assert.deepEqual(Mark.parse("t'2025-01-01 12:00:00+08:00'"), new Date('2025-01-01T04:00:00Z'), "Date with local time offset");
+	assert.deepEqual(Mark.parse("t'12:00:00'"), new Date('2000-01-01T12:00:00'), "Time only");
+	assert.deepEqual(Mark.parse("t'12:00:00Z'"), new Date('2000-01-01T12:00:00Z'), "UTC time only");
+	assert.deepEqual(Mark.parse("t'12:00:00+08:00'"), new Date('2000-01-01T04:00:00Z'), "Local time offset");
+	assert.deepEqual(Mark.parse("t'12:00:00-08:00'"), new Date('2000-01-01T20:00:00Z'), "Negative local time offset");
+
+	// test list
+	assert.deepEqual(Mark.parse("(1, 2, 3)"), [1, 2, 3], "Mark list");
+	assert.deepEqual(Mark.parse("(1, null, 3)"), [1, 3], "Mark list with null value");
+	assert.deepEqual(Mark.parse(`("a", "b", 3)`), ["ab", 3], "Mark list with merging text");
+	assert.deepEqual(Mark.parse(`("a", ("b", 3))`), ["ab", 3], "Mark list with nested list");
+	assert.deepEqual(Mark.parse(`["a", ("b", 3)]`), ["a", ["b", 3]], "Mark array with nested list");
+
 	// test array
 	assert.deepEqual(Mark.parse("[1, true, 'text']"), [1, true, Symbol.for('text')], "Mark array");
 	assert.deepEqual(Mark.parse("[1, true, 'yellow']"), [1, true, Symbol.for('yellow')], "Unquoted identifier as string value in Mark array");
@@ -113,10 +131,14 @@ function compareArrayBuffers(buffer1, buffer2) {
 }
 
 test('Parse Mark binary value', function(assert) {
+	// test hex binary parsing
+	assert.equal(Mark.parse("b'\\x'"), null, "empty binary");
+	assert.ok(compareArrayBuffers(Mark.parse("b'\\x 41 72 74'"), stringArrayBuffer("Art")), "Parse hex of 'Art'");
+
  	// test base64 parsing
  	assert.throws(() => Mark.parse("b'\\n'"), /Invalid binary/, "empty binary is invalid");
 	bin = Mark.parse("b'\\64 QXJ0'");  console.log("byte length:", bin.byteLength);
-	assert.equal(compareArrayBuffers(bin, stringArrayBuffer("Art")), true, "Parse base64 of 'Art'");
+	assert.ok(compareArrayBuffers(bin, stringArrayBuffer("Art")), "Parse base64 of 'Art'");
 	assert.equal(bin instanceof ArrayBuffer, true, "Mark base64 is instance of ArrayBuffer");
 	assert.equal(bin.byteLength, 3, "byteLength of 'Art' is 3");
 	assert.equal(compareArrayBuffers(Mark.parse("b'\\64 SGVs bG8 gd29 ybGQ='"), 
@@ -124,20 +146,8 @@ test('Parse Mark binary value', function(assert) {
 	assert.equal(compareArrayBuffers(Mark.parse("b'\\64 SGVsb \t G8gd29 \r\n ybGRzIQ=='"), 
 		stringArrayBuffer("Hello worlds!")), true, "Parse base64 of 'Hello worlds!'");
 	
-// 	var doc = Mark("{doc mime:'text/html' data:[#PGgxPkhlbGxvLCBXb3JsZCE8L2gxPg==]}");
-// 	assert.equal(compareArrayBuffers(doc.data, stringArrayBuffer("<h1>Hello, World!</h1>")), true, "Parse base64 of '<h1>Hello, World!</h1>'");
-	
-// 	// test base85 parsing
-// 	bin = Mark('[#~ \n ~]');
-// 	assert.equal(compareArrayBuffers(bin, new ArrayBuffer(0)), true, "zero-length base85 binary");
-// 	assert.equal(bin.byteLength, 0, "zero-length base85 binary");	
-// 	bin = Mark("[#~@ps7tD.7's~]");
-// 	assert.equal(compareArrayBuffers(bin, stringArrayBuffer("canumber")), true, "Parse base85 of 'canumber'");
-// 	assert.equal(bin instanceof ArrayBuffer, true, "Mark base85 is instance of ArrayBuffer");
-// 	assert.equal(bin.byteLength, 8, "byteLength of 'canumber' is 8");
-// 	assert.equal(compareArrayBuffers(Mark("[#~BOu! \t \n rDZ~]"), stringArrayBuffer("hello")), true, "Parse base85 of 'hello'");
-// 	assert.equal(compareArrayBuffers(Mark("[#~\n@p\ns7\ntD.3~]"), stringArrayBuffer("canumb")), true, "Parse base85 of 'canumb'");
-// 	assert.equal(compareArrayBuffers(Mark("[#~ @<5pm \rBfIs ~]"), stringArrayBuffer("ascii85")), true, "Parse base85 of 'ascii85'");
-	
+	var doc = Mark("<doc mime:'text/html', data:b'\\64PGgxPkhlbGxvLCBXb3JsZCE8L2gxPg=='>");
+	assert.equal(compareArrayBuffers(doc.data, stringArrayBuffer("<h1>Hello, World!</h1>")), true, "Parse base64 of '<h1>Hello, World!</h1>'");
+
  	assert.end();
 });

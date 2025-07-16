@@ -1,4 +1,6 @@
-﻿// Markup Notation. See README.md for details.
+﻿// Markup Notation - one unified notation for all data
+// 
+// See README.md for details.
 //
 // Mark parser is based on JSON5 at:
 // https://github.com/json5/json5/blob/master/lib/json5.js
@@ -18,11 +20,6 @@ const ws = [' ', '\t', '\r', '\n'];
 let $convert = null,  // Mark Convert API
 	$ctrs = {};	// cached constructors for the Mark objects
 
-if (!$ctrs.constructor.name) { 
-	// patch IE11, as it does not set constructor.name to 'Object'
-	$ctrs.constructor.name = 'Object';
-}
-
 // MARK is the static Mark API, it is different from the Mark.prototype that Mark object extends
 let MARK = (function() {
 	// for Mark content list
@@ -30,7 +27,7 @@ let MARK = (function() {
 		let len = this[$length];
 		let t = typeof val;
 		if (t === 'string') {
-			if (!val.length) return; // skip empty text '', ""
+			if (!val.length) return this; // skip empty text '', ""
 			let prevType = len ? (typeof this[len - 1]):null;
 			if (prevType === 'string') { 
 				len--;  val = this[len] + val;  // merge text nodes
@@ -43,7 +40,6 @@ let MARK = (function() {
 					for (let v of val) { push.call(this, v); }
 					return this;
 				}
-				// to consider: normalize the array content
 			}
 			// else, Mark object
 			val[$parent] = this;  // set $parent
@@ -62,7 +58,7 @@ let MARK = (function() {
 		}
 		return this;  // for call chaining
 	}
-	
+
 	// Mark.prototype and Mark object constructor
 	function Mark(typeName, props, contents) {
 		if (arguments.length === 1) {
@@ -589,9 +585,14 @@ MARK.parse = (function() {
 			// fix the date to '2000-01-01'
 			normalizedStr = '2000-01-01' + 'T' + normalizedStr;
 		}
+		if (dateOnly) {
+			// fix the time to '00:00:00'
+			normalizedStr += 'T00:00:00';
+		}
 		
 		// Create Date object
 		try {
+			console.log("Parsing datetime: ", normalizedStr);
 			let dateObj = new Date(normalizedStr);
 			if (isNaN(dateObj.getTime())) {
 				error("Invalid datetime value: " + dtStr);
@@ -606,6 +607,34 @@ MARK.parse = (function() {
 	
 	value,  // Place holder for the value function.
 
+	listPush = function(list, val) {
+		let t = typeof val;
+		if (t === 'string') {
+			if (!val.length) return; // skip empty text '', ""
+			let prevType = list.length ? (typeof list[list.length - 1]):null;
+			if (prevType === 'string') {
+				list[list.length - 1] += val;  // merge text nodes
+				return;
+			}
+		}
+		else if (t === 'object') { // map or element
+			if (val === null) return; // skip null value
+			else if (val instanceof Array) { 
+				if (val[$isList]) { // spread list inline
+					for (let v of val) { listPush(list, v); }
+					return;
+				}
+			}
+			// else, Mark object
+			val[$parent] = list;  // set $parent
+		}
+		else if (t === 'undefined') {
+			return;
+		}
+		// else { // other primitive values
+		list.push(val);  // keep the value	
+	},
+
 	// Parse an array
 	array = function() {
 		let array = [];
@@ -617,13 +646,17 @@ MARK.parse = (function() {
 		}  
 		while (ch) {
 			// ES5 allows omitted elements in arrays, e.g. [,] and [,null]. JSON and Mark don't allow this.
-			array.push(value());
-			if (ch === ',') {
-				next();  white();
-			}
+			let v = value();
+			if (delim === ')') { 
+				listPush(array, v);  console.log("Pushed to list:", v);
+			} 
+			else { array.push(v); }
+
+			if (ch === ',') { next();  white(); }
 			else if (ch === delim) { // end of array/list
 				next();
 				if (delim === ')') { // list
+					console.log("Parsed list:", array);
 					if (array.length === 0) { return null; } // empty list
 					else if (array.length === 1) { return array[0]; } // single item list
 					array[$isList] = true;  // mark as list
@@ -641,10 +674,7 @@ MARK.parse = (function() {
 	// Parse binary value
 	// Use a lookup table to find the index.
 	let lookup64 = new Uint8Array(128);
-	if (lookup64.fill) { lookup64.fill(65); } // '65' denotes invalid value
-	else { // patch for IE11
-		for (var i = 0; i < 128; i++) { lookup64[i] = 65; }
-	}
+	lookup64.fill(65);  // '65' denotes invalid value
 	for (var i = 0; i < 64; i++) { lookup64[base64.charCodeAt(i)] = i; }
 	// ' ', \t', '\r', '\n' spaces also allowed in base64 stream
 	lookup64[32] = lookup64[9] = lookup64[13] = lookup64[10] = 64;
@@ -684,6 +714,7 @@ MARK.parse = (function() {
 			let len = p / 2, code1, code2,
 				buffer = new ArrayBuffer(len), bytes = new Uint8Array(buffer);
 			// console.log('binary length: ', len);
+			if (len == 0) { return null; } // empty binary
 			for (let i = 0, p = 0; p < len; i += 2) {
 				code1 = hex[i];  code2 = hex[i+1];
 				if (code1 > 15 || code2 > 15) { error("Invalid hex character"); }
@@ -723,6 +754,7 @@ MARK.parse = (function() {
 			// second run decodes into actual binary data
 			let len = Math.floor(p * 0.75), code1, code2, code3, code4,
 				buffer = new ArrayBuffer(len), bytes = new Uint8Array(buffer);
+			if (len == 0) { return null; } // empty binary
 			for (let i = 0, p = 0; p < len; i += 4) {
 				code1 = base[i];  code2 = base[i+1];
 				code3 = base[i+2];  code4 = base[i+3];
