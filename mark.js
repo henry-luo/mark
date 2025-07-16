@@ -72,7 +72,7 @@ let MARK = (function() {
 				return MARK.parse(typeName); 
 			}
 			else if (!isNameStart(char)) {
-				throw "Invalid Mark type name: " + typeName;
+				throw "Invalid element name: " + typeName;
 			}
 		}
 		
@@ -717,6 +717,7 @@ MARK.parse = (function() {
 			}
 			at = end+1;  next();  // skip "'"
 			// check length
+			console.log('base64 char length: ', p, pad);
 			if (pad && (p + pad) % 4 != 0 || !pad && p % 4 == 1) { error("Invalid base64 stream length"); }
 
 			// second run decodes into actual binary data
