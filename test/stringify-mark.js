@@ -18,6 +18,10 @@ test('Stringify JSON object', function(assert) {
 
 
 test('Stringify Mark object', function(assert) {
+	// todo: t'2025-01-01'
+	assert.equal(Mark.stringify(Mark.parse(`[inf, -inf, nan, -nan, true, false, 123n, b'\\64 abcd', b'\\x 1234', t'2025-01-01 00:00z']`)), 
+		`[inf, -inf, nan, nan, true, false, 123n, b'\\64abcd', b'\\x1234', t'2025-01-01 00:00:00.000Z']`, "Stringify values");
+
 	assert.equal(Mark.stringify(Mark.parse('<obj>')), '<obj>', "Stringify <obj>");
 	assert.equal(Mark.stringify(Mark.parse('<div width:10>')), '<div width:10>', "Stringify <div width:10>");
 	assert.equal(Mark.stringify(Mark.parse('<div "text">')), '<div "text">', 'Stringify <div "text">');
