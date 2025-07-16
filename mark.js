@@ -65,7 +65,6 @@ let MARK = (function() {
 	
 	// Mark.prototype and Mark object constructor
 	function Mark(typeName, props, contents) {
-		console.log("Mark typeName:", typeName, ', arguments:', arguments);
 		if (arguments.length === 1) {
 			let char = typeName[0];
 			if (char === '<' || char === '{' || char === '[' || char === '(') { 
@@ -651,7 +650,6 @@ MARK.parse = (function() {
 	lookup64[32] = lookup64[9] = lookup64[13] = lookup64[10] = 64;
 	
 	let binary = function() {
-		console.log("parse binary:", ch, text[at]);
 		at++;  // skip the starting "b'"
 		if (text[at] !== '\\') { error("Expect '\\'"); }
 		at++;
@@ -874,7 +872,7 @@ MARK.parse = (function() {
 							}
 						}
 					}
-					else { error("Empty attribute name not allowed"); }
+					else { error(`Empty ${isSymbol ? 'symbol' : 'text'} not allowed`); }
 					parseContent();  return obj;
 				}
 				error(UNEXPECT_CHAR + renderChar(ch));
@@ -898,6 +896,7 @@ MARK.parse = (function() {
 
 			if (ch === ',') {
 				next();  white();
+				// trailing ',' not allowed
 				if (ch === delim) { error(UNEXPECT_CHAR + renderChar(ch)); }
 			}
 			else if (ch === ';') { // end of the attribute

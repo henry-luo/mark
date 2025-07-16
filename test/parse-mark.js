@@ -52,7 +52,8 @@ test('Parse Mark object', function(assert) {
 	assert.equal(Mark.parse('<div "text" <br>>').length, 2, 'Element <div "text" <br>>.length should be 2');
 	assert.equal(Mark.parse('<div "text">')[0], "text", 'Element <div "text">[0] should be "text"');
 	assert.equal(Mark.parse('<div "text" "" "merged">')[0], "textmerged", 'Element text merged');
-	assert.equal(Mark.parse('<div "">').length, 0, 'Empty text skipped');
+	assert.throws(() => Mark.parse('<div "">'), /SyntaxError/, 'Empty text not allowed');
+	assert.throws(() => Mark.parse("<div ''>"), /SyntaxError/, 'Empty symbol not allowed');
 
 	assert.equal(Mark.parse('<div <br>>')[0].constructor.name, "br", 'Element <div <br>>.constructor.name should be "br"');
 
@@ -94,7 +95,6 @@ function stringArrayBuffer(str) {
 }
 
 function compareArrayBuffers(buffer1, buffer2) {
-	console.log("typeof buffer1:", typeof buffer1, buffer1);
     var len1 = buffer1.byteLength;
     var len2 = buffer2.byteLength;
     var view1 = new Uint8Array(buffer1);
@@ -115,12 +115,14 @@ function compareArrayBuffers(buffer1, buffer2) {
 test('Parse Mark binary value', function(assert) {
  	// test base64 parsing
  	assert.throws(() => Mark.parse("b'\\n'"), /Invalid binary/, "empty binary is invalid");
-// 	bin = Mark('[#QXJ0]');  console.log("byte length:", bin.byteLength);
-// 	assert.equal(compareArrayBuffers(bin, stringArrayBuffer("Art")), true, "Parse base64 of 'Art'");
-// 	assert.equal(bin instanceof ArrayBuffer, true, "Mark base64 is instance of ArrayBuffer");
-// 	assert.equal(bin.byteLength, 3, "byteLength of 'Art' is 3");
-// 	assert.equal(compareArrayBuffers(Mark('[#SGVs bG8 gd29 ybGQ=]'), stringArrayBuffer("Hello world")), true, "Parse base64 of 'Hello world'");
-// 	assert.equal(compareArrayBuffers(Mark('[# SGVsb \t G8gd29 \r\n ybGRzIQ==]'), stringArrayBuffer("Hello worlds!")), true, "Parse base64 of 'Hello worlds!'");
+	bin = Mark.parse("b'\\64 QXJ0'");  console.log("byte length:", bin.byteLength);
+	assert.equal(compareArrayBuffers(bin, stringArrayBuffer("Art")), true, "Parse base64 of 'Art'");
+	assert.equal(bin instanceof ArrayBuffer, true, "Mark base64 is instance of ArrayBuffer");
+	assert.equal(bin.byteLength, 3, "byteLength of 'Art' is 3");
+	assert.equal(compareArrayBuffers(Mark.parse("b'\\64 SGVs bG8 gd29 ybGQ='"), 
+		stringArrayBuffer("Hello world")), true, "Parse base64 of 'Hello world'");
+	assert.equal(compareArrayBuffers(Mark.parse("b'\\64 SGVsb \t G8gd29 \r\n ybGRzIQ=='"), 
+		stringArrayBuffer("Hello worlds!")), true, "Parse base64 of 'Hello worlds!'");
 	
 // 	var doc = Mark("{doc mime:'text/html' data:[#PGgxPkhlbGxvLCBXb3JsZCE8L2gxPg==]}");
 // 	assert.equal(compareArrayBuffers(doc.data, stringArrayBuffer("<h1>Hello, World!</h1>")), true, "Parse base64 of '<h1>Hello, World!</h1>'");
