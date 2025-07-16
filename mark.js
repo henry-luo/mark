@@ -863,7 +863,7 @@ MARK.parse = (function() {
 							Object.defineProperty(obj, index, {value: Symbol.for(str), writable:true, configurable:true});
 							index++;
 							if (ch === ';') { next();  white(); } // skip ';' after symbol
-							else if (!hasLB) { error(UNEXPECT_CHAR + renderChar(ch)); }
+							else if (!hasLB && ch !== delim) { error(UNEXPECT_CHAR + renderChar(ch)); }
 						} else {
 							putText(str);  // merge with previous text if any
 							if (ch === ';') { next();  white(); } // skip ';' after symbol
@@ -1207,6 +1207,7 @@ MARK.stringify = function(obj, options) {
 					// print object content
 					let length = value[$length];
 					if (length) {
+						if (hasAttr) { buffer += ';'; }
 						for (let i = 0; i<length; i++) {
 							buffer += ' ';
 							let item = value[i];

@@ -23,7 +23,7 @@ test('Mark object model', function(assert) {
 	assert.equal(Mark('div').constructor(), undefined, "div.constructor returns nothing"); // for test coverage
 	assert.equal(Mark.stringify(Mark('div', {width:123})), '<div width:123>', "div with width");
 	assert.equal(Mark.stringify(Mark('div', {width:123}, ['text', '', Mark('br')])), 
-		'<div width:123 "text" <br>>', "div with prop and contents");
+		'<div width:123; "text" <br>>', "div with prop and contents");
 	assert.equal(Mark.stringify(Mark('div', null, ['text', '', 123, Mark('br'), Mark.list(['nested']), null])), 
 		'<div "text" 123 <br> "nested">', "div with nested contents");
 	assert.equal(Mark.stringify(Mark('div', null, [''])), '<div>', "div with empty text");
@@ -195,11 +195,11 @@ test('Mark object model', function(assert) {
 	assert.equal(div.length, 2, "div length after removing should be 2");
 	
 	// source API
-	// div = Mark.parse('<div width:10, "text">');
-	// assert.equal(div.source(), '<div width:10, "text">', "Mark source()");
+	div = Mark.parse('<div width:10; "text">');
+	assert.equal(div.source(), '<div width:10; "text">', "Mark source()");
 
 	// text API
-	div = Mark.parse('<div width:10, "text " <span "more">>');
+	div = Mark.parse('<div width:10; "text " <span "more">>');
 	assert.equal(div.text(), "text more", "Mark text()");
 	
 	// // JSON API
