@@ -854,6 +854,7 @@ MARK.parse = (function() {
 			}
 
 			if (ch === ':') { // property or JSON object
+				if (!str) { error("Empty key not allowed"); }
 				key = str;  next(); // skip ':'
 			} else {
 				if (extended) { // store the text/symbol
