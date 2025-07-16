@@ -217,11 +217,11 @@ let MARK = (function() {
 	};
 
 	// load additional APIs
-	// try { // mark.selector APIs
-	// 	require('./lib/mark.selector.js')(Mark);
-	// } catch (e) {
-	// 	console.trace("No Mark Selector API", e.message);
-	// } 
+	try { // mark.selector APIs
+		require('./lib/mark.selector.js')(Mark);
+	} catch (e) {
+		console.trace("No Mark Selector API", e.message);
+	} 
 	try { // mark.mutate APIs
 		require('./lib/mark.mutate.js')(Mark, push);
 	} catch (e) {
@@ -651,6 +651,7 @@ MARK.parse = (function() {
 	lookup64[32] = lookup64[9] = lookup64[13] = lookup64[10] = 64;
 	
 	let binary = function() {
+		console.log("parse binary:", ch, text[at]);
 		at++;  // skip the starting "b'"
 		if (text[at] !== '\\') { error("Expect '\\'"); }
 		at++;
@@ -900,10 +901,18 @@ MARK.parse = (function() {
 		case '5':  case '6':  case '7':  case '8':  case '9':
             return number();
         default:
+			console.log('before paring word:', ch);
 			let w = word();
             return typeof w === 'string' ? Symbol.for(w) : w;
         }
     };
+
+	let scanLineBreak = function() {
+		if (ch === ';' || ch === '\n' || ch === '\r' && text[at] === '\n') { 
+			next();  white();  return true;
+		}
+		return false;
+	}
 
 	// return the enclosed parse function. It will have access to all of the above functions and variables.
     return function(source, options) {
@@ -911,7 +920,8 @@ MARK.parse = (function() {
         at = 0;  lineNumber = 1;  columnStart = at;  ch = ' ';
 		text = String(source);
 		
-		if (!source) { text = '';  error(UNEXPECT_END); }
+		// empty input treated as null
+		if (!source) { return null; }
 		if (typeof options === 'object' && options.format && options.format != 'mark') { // parse as other formats
 			if (!$convert) { $convert = require('./lib/mark.convert.js')(MARK); }
 			return $convert.parse(source, options);
@@ -920,14 +930,31 @@ MARK.parse = (function() {
         
 		// start parsing the top-level value(s)
         let result = [];
+		white();  if (!ch) { return null; } // end of input
 		do {
-			white();
-			if (!ch) { break; } // end of input
-			result.push(value());
+			let val = value();
+			while (ch === ' ' || ch === '\t') { next(); } // skip spaces
+			if (val != null) {
+				result.push(val);
+				if (typeof val === 'object') {
+					if (!(val instanceof Date) || val instanceof ArrayBuffer || Array.isArray(val)) {
+						continue; // map, element
+					}
+				}
+				else if (typeof val === 'string') {
+					// check consecutive string, map, element
+					if (ch === '"' || ch === '<' || ch === '{') { continue; }
+				}
+				// else 'number', 'boolean, 'symbol', 'bigint', 'string'
+				// need line break after scalar value
+				if (!scanLineBreak()) {
+					if (ch) error("Expect ';' or line break");
+				}				
+			}
 		} while (ch);
 		// Mark does not support the legacy JSON reviver function
 		if (result.length === 0) { result = null; } // empty input
-		else if (result.length === 1) { result = result[0]; } // single item input
+		else if (result.length === 1) { result = result[0]; } // unwrap single item input
 		return result;
     };
 }());

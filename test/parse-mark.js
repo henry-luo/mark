@@ -10,8 +10,9 @@ test('Parse Mark object', function(assert) {
 	assert.ok(Number.isNaN(Mark.parse("nan")), 'Not a number');
 	assert.equal(Mark.parse("true"), true, "True value");
 	assert.equal(Mark.parse("word"), Symbol.for("word"), "Unquoted identifier as string value");
-	assert.deepEqual(Mark.parse("a 123"), [Symbol.for("a"), 123], "Multiple top-level values");
-	
+	assert.deepEqual(Mark.parse("a; 123"), [Symbol.for("a"), 123], "Multiple top-level values");
+	assert.throws(() => Mark.parse("a 123"), /SyntaxError/, "Expected ';' or line breakafter value");
+
 	// test array
 	assert.deepEqual(Mark.parse("[1, true, 'text']"), [1, true, Symbol.for('text')], "Mark array");
 	assert.deepEqual(Mark.parse("[1, true, 'yellow']"), [1, true, Symbol.for('yellow')], "Unquoted identifier as string value in Mark array");
@@ -113,8 +114,7 @@ function compareArrayBuffers(buffer1, buffer2) {
 
 test('Parse Mark binary value', function(assert) {
  	// test base64 parsing
- 	assert.throws(() => Mark("b'\\n'"), /Invalid binary/, "empty binary is invalid");
-// 	assert.equal(bin.byteLength, 0, "zero-length base64 binary");
+ 	assert.throws(() => Mark.parse("b'\\n'"), /Invalid binary/, "empty binary is invalid");
 // 	bin = Mark('[#QXJ0]');  console.log("byte length:", bin.byteLength);
 // 	assert.equal(compareArrayBuffers(bin, stringArrayBuffer("Art")), true, "Parse base64 of 'Art'");
 // 	assert.equal(bin instanceof ArrayBuffer, true, "Mark base64 is instance of ArrayBuffer");

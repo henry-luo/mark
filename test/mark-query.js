@@ -2,7 +2,7 @@ const test = require('tape');
 const Mark = require('./../mark.js');
 
 test('Mark Select', function(assert) {
-	let vtree = Mark.parse("{div {span class:'bold', width:'100px' 'text' {b 'bold'}} {br} {hr}}");
+	let vtree = Mark.parse("<div <span class:'bold', width:'100px' 'text' <b 'bold'>> <br> <hr>>");
 	assert.equal(vtree.find("span.bold").length, 1, "Match span.bold");
 	assert.equal(vtree.find("span[width='100px']").length, 1, "Match span[width='100px']");
 	assert.equal(vtree.find("div > span.bold").length, 1, "Match div > span.bold");

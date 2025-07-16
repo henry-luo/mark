@@ -161,9 +161,6 @@ test('Mark object model', function(assert) {
 	assert.equal(Mark.stringify(div), "<div <br> <p> <hr>>", "push <p> <hr> into Mark object <div>");
 	div.push(); // empty push
 	assert.equal(Mark.stringify(div), "<div <br> <p> <hr>>", "push null into Mark object <div>");
-	// div.push([['text']]); // nested array
-	// assert.equal(Mark.stringify(div), '{div {br} {p} {hr} "text"}', "push nested array into Mark object {div}");
-	// assert.equal(div.length, 4, "div legnth should be 4");
 	
 	// pop API
 	div = Mark.parse('<div "text" <br>>');  var item = div.pop();
