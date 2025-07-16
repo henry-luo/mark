@@ -8,10 +8,7 @@ module.exports = function(karma) {
 		'test/*.js',
 		{pattern: 'test/data/*.xml', included: false, served: true},
 	],
-	exclude: [
-		'test/parse-html-jsdom.js',
-		'test/parse-xml-jsdom.js',
-	],
+	exclude: [],
 	reporters: ['tap-pretty'],
     tapReporter: {prettify: tapSpec},
 	

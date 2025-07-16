@@ -6,7 +6,7 @@ node_js:
 install:
   - npm install -g codecov
   - npm install boolbase nth-check htmlparser2
-  - npm install tape tap-spec istanbul jsdom
+  - npm install tape tap-spec istanbul
 script:
   - npm run coverage
   - codecov

@@ -79,7 +79,7 @@ test('Parse Mark object', function(assert) {
 
 	// test shorthand
 	assert.equal(Mark('<div "text">').constructor.name, "div", "Mark() shorthand");
-	assert.throws(() => Mark(' <div "text">'), /Invalid Mark type name/, "Mark() shorthand should not start with space");
+	assert.throws(() => Mark(' <div "text">'), /Invalid element name/, "Mark() shorthand should not start with space");
 	assert.deepEqual(Mark('[123, "text"]'), [123, "text"], "Mark() shorthand starting with []");
 	
 	assert.end();
