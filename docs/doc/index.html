@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Mark Notation Documentation</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta name="description" content="Complete documentation for Mark Notation - a unified notation for both object and markup data">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>{ }</text></svg>">
+  
+  <style>
+    /* Import design system variables to match main site */
+    :root {
+      /* Colors - matching main site */
+      --primary-50: #eff6ff;
+      --primary-100: #dbeafe;
+      --primary-500: #3b82f6;
+      --primary-600: #2563eb;
+      --primary-700: #1d4ed8;
+      --primary-900: #1e3a8a;
+      
+      --neutral-50: #f8fafc;
+      --neutral-100: #f1f5f9;
+      --neutral-200: #e2e8f0;
+      --neutral-300: #cbd5e1;
+      --neutral-400: #94a3b8;
+      --neutral-500: #64748b;
+      --neutral-600: #475569;
+      --neutral-700: #334155;
+      --neutral-800: #1e293b;
+      --neutral-900: #0f172a;
+      
+      --accent-yellow: #fbbf24;
+      --accent-green: #10b981;
+      --accent-red: #ef4444;
+      --accent-purple: #8b5cf6;
+      
+      /* Typography */
+      --font-family-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      --font-family-mono: 'JetBrains Mono', 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', 'Fira Mono', 'Droid Sans Mono', 'Courier New', monospace;
+      
+      --font-size-xs: 0.75rem;
+      --font-size-sm: 0.875rem;
+      --font-size-base: 1rem;
+      --font-size-lg: 1.125rem;
+      --font-size-xl: 1.25rem;
+      --font-size-2xl: 1.5rem;
+      --font-size-3xl: 1.875rem;
+      --font-size-4xl: 2.25rem;
+      
+      --line-height-tight: 1.25;
+      --line-height-normal: 1.5;
+      --line-height-relaxed: 1.625;
+      
+      /* Spacing */
+      --spacing-xs: 0.25rem;
+      --spacing-sm: 0.5rem;
+      --spacing-md: 1rem;
+      --spacing-lg: 1.5rem;
+      --spacing-xl: 2rem;
+      --spacing-2xl: 3rem;
+      
+      /* Border radius */
+      --radius-sm: 0.25rem;
+      --radius-md: 0.375rem;
+      --radius-lg: 0.5rem;
+      --radius-xl: 0.75rem;
+      
+      /* Shadows */
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      
+      /* Docsify specific */
+      --theme-color: var(--primary-600);
+      --theme-color-secondary: var(--primary-700);
+      --sidebar-width: 300px;
+    }
+    
+    /* Reset and base styles to match main site */
+    body {
+      font-family: var(--font-family-primary);
+      color: var(--neutral-800);
+      background-color: var(--neutral-50);
+      line-height: var(--line-height-normal);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    
+    /* Sidebar styling */
+    .sidebar {
+      background-color: white;
+      border-right: 1px solid var(--neutral-200);
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .sidebar > h1 {
+      margin: 0;
+      padding: var(--spacing-lg);
+      border-bottom: 1px solid var(--neutral-200);
+    }
+    
+    /* Move search below title */
+    .search {
+      order: 2;
+      border-bottom: 1px solid var(--neutral-200);
+    }
+    
+    .sidebar-nav {
+      order: 3;
+    }
+    
+    .sidebar .content {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .app-name-link {
+      font-family: var(--font-family-primary);
+      font-weight: 700;
+      font-size: var(--font-size-2xl);
+      color: var(--primary-600) !important;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+    }
+    
+    .app-name-link::before {
+      content: "{ }";
+      font-family: var(--font-family-mono);
+      font-weight: 700;
+      color: var(--accent-green);
+    }
+    
+    .sidebar-nav {
+      padding: var(--spacing-md);
+    }
+    
+    .sidebar ul {
+      margin: 0;
+      padding: 0;
+    }
+    
+    .sidebar ul li {
+      margin: var(--spacing-xs) 0;
+    }
+    
+    .sidebar ul li a {
+      display: block;
+      padding: var(--spacing-sm) var(--spacing-md);
+      color: var(--neutral-600);
+      text-decoration: none;
+      border-radius: var(--radius-sm);
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+    
+    .sidebar ul li a:hover {
+      background-color: var(--primary-50);
+      color: var(--primary-700);
+    }
+    
+    .sidebar ul li.active > a {
+      background-color: var(--primary-600);
+      color: white;
+      font-weight: 600;
+    }
+    
+    /* Sidebar toggle button with << and light gray background */
+    .sidebar-toggle {
+      background-color: var(--neutral-200) !important;
+      border: none;
+      color: var(--neutral-600) !important;
+      padding: var(--spacing-sm);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-family-mono);
+      font-weight: 600;
+      font-size: var(--font-size-sm);
+    }
+    
+    .sidebar-toggle:hover {
+      background-color: var(--neutral-300) !important;
+      color: var(--neutral-700) !important;
+    }
+    
+    /* GitHub icon styling - white cat on gray background, medium size */
+    .github-corner {
+      position: fixed;
+      top: 0;
+      right: 0;
+      z-index: 999;
+      transform: scale(0.85);
+      transform-origin: top right;
+    }
+    
+    .github-corner svg {
+      fill: var(--neutral-400) !important;
+      color: white !important;
+      width: 70px !important;
+      height: 70px !important;
+    }
+    
+    .github-corner:hover svg {
+      fill: var(--neutral-500) !important;
+      color: white !important;
+    }
+    
+    /* Alternative GitHub icon styling if using different implementation */
+    .repo-link,
+    .repo-link svg,
+    .github-link,
+    .github-link svg {
+      background-color: var(--neutral-400) !important;
+      color: white !important;
+      transform: scale(0.9);
+    }
+    
+    .repo-link:hover,
+    .repo-link:hover svg,
+    .github-link:hover,
+    .github-link:hover svg {
+      background-color: var(--neutral-500) !important;
+      color: white !important;
+    }
+    
+    /* Main content area */
+    .content {
+      background-color: white;
+    }
+    
+    .markdown-section {
+      font-family: var(--font-family-primary);
+      line-height: var(--line-height-relaxed);
+      color: var(--neutral-800);
+      padding: var(--spacing-2xl);
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    /* Typography */
+    .markdown-section h1,
+    .markdown-section h2,
+    .markdown-section h3,
+    .markdown-section h4,
+    .markdown-section h5,
+    .markdown-section h6 {
+      font-family: var(--font-family-primary);
+      font-weight: 700;
+      color: var(--neutral-900);
+      line-height: var(--line-height-tight);
+      margin-top: var(--spacing-2xl);
+      margin-bottom: var(--spacing-md);
+    }
+    
+    .markdown-section h1 {
+      font-size: var(--font-size-4xl);
+      border-bottom: 2px solid var(--primary-600);
+      padding-bottom: var(--spacing-md);
+    }
+    
+    .markdown-section h2 {
+      font-size: var(--font-size-3xl);
+    }
+    
+    .markdown-section h3 {
+      font-size: var(--font-size-2xl);
+    }
+    
+    .markdown-section h4 {
+      font-size: var(--font-size-xl);
+    }
+    
+    .markdown-section p {
+      margin-bottom: var(--spacing-md);
+      color: var(--neutral-700);
+    }
+    
+    .markdown-section a {
+      color: var(--primary-600);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s ease;
+    }
+    
+    .markdown-section a:hover {
+      color: var(--primary-700);
+      text-decoration: underline;
+    }
+    
+    /* Code styling */
+    .markdown-section code {
+      font-family: var(--font-family-mono);
+      font-size: var(--font-size-sm);
+      background-color: var(--neutral-100);
+      color: var(--neutral-800);
+      padding: var(--spacing-xs) var(--spacing-sm);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--neutral-200);
+    }
+    
+    .markdown-section pre {
+      background-color: var(--neutral-900);
+      border: 1px solid var(--neutral-700);
+      border-radius: var(--radius-lg);
+      padding: var(--spacing-lg);
+      margin: var(--spacing-lg) 0;
+      overflow-x: auto;
+      box-shadow: var(--shadow-md);
+      position: relative;
+    }
+    
+    .markdown-section pre code {
+      color: var(--neutral-100);
+      background: none;
+      border: none;
+      padding: 0;
+      font-size: var(--font-size-sm);
+      line-height: var(--line-height-normal);
+    }
+    
+    /* Code syntax highlighting */
+    .token.string {
+      color: var(--accent-yellow);
+    }
+    
+    .token.property {
+      color: var(--accent-green);
+    }
+    
+    .token.punctuation {
+      color: var(--primary-500);
+    }
+    
+    .token.keyword {
+      color: var(--accent-purple);
+    }
+    
+    .token.number {
+      color: var(--accent-red);
+    }
+    
+    .token.comment {
+      color: var(--neutral-400);
+      font-style: italic;
+    }
+    
+    /* Lists */
+    .markdown-section ul,
+    .markdown-section ol {
+      margin-bottom: var(--spacing-md);
+      padding-left: var(--spacing-lg);
+    }
+    
+    .markdown-section li {
+      margin-bottom: var(--spacing-sm);
+      color: var(--neutral-700);
+    }
+    
+    /* Tables */
+    .markdown-section table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: var(--spacing-lg) 0;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .markdown-section th,
+    .markdown-section td {
+      padding: var(--spacing-md);
+      text-align: left;
+      border-bottom: 1px solid var(--neutral-200);
+    }
+    
+    .markdown-section th {
+      background-color: var(--neutral-50);
+      font-weight: 600;
+      color: var(--neutral-800);
+    }
+    
+    .markdown-section tr:hover {
+      background-color: var(--neutral-50);
+    }
+    
+    /* Alert boxes */
+    .markdown-section .tip,
+    .markdown-section .warning,
+    .markdown-section .danger {
+      padding: var(--spacing-lg);
+      margin: var(--spacing-lg) 0;
+      border-radius: var(--radius-md);
+      border-left: 4px solid;
+    }
+    
+    .markdown-section .tip {
+      background-color: var(--primary-50);
+      border-left-color: var(--primary-600);
+      color: var(--neutral-800);
+    }
+    
+    .markdown-section .warning {
+      background-color: #fef3c7;
+      border-left-color: var(--accent-yellow);
+      color: var(--neutral-800);
+    }
+    
+    .markdown-section .danger {
+      background-color: #fee2e2;
+      border-left-color: var(--accent-red);
+      color: var(--neutral-800);
+    }
+    
+    /* Blockquotes */
+    .markdown-section blockquote {
+      margin: var(--spacing-lg) 0;
+      padding: var(--spacing-lg);
+      background-color: var(--neutral-50);
+      border-left: 4px solid var(--neutral-300);
+      border-radius: var(--radius-md);
+      color: var(--neutral-700);
+      font-style: italic;
+    }
+    
+    /* Search */
+    .search .input-wrap {
+      padding: var(--spacing-md);
+    }
+    
+    .search input {
+      width: 100%;
+      padding: var(--spacing-sm) var(--spacing-md);
+      border: 1px solid var(--neutral-300);
+      border-radius: var(--radius-md);
+      font-family: var(--font-family-primary);
+      font-size: var(--font-size-sm);
+      background-color: white;
+    }
+    
+    .search input:focus {
+      outline: none;
+      border-color: var(--primary-600);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    /* Pagination */
+    .pagination-item {
+      color: var(--primary-600);
+      font-weight: 500;
+      padding: var(--spacing-sm) var(--spacing-md);
+      border-radius: var(--radius-sm);
+      transition: all 0.2s ease;
+    }
+    
+    .pagination-item:hover {
+      background-color: var(--primary-50);
+      color: var(--primary-700);
+    }
+    
+    /* Copy button styling */
+    .copy-button {
+      position: absolute;
+      top: var(--spacing-sm);
+      right: var(--spacing-sm);
+      background-color: var(--neutral-700);
+      color: white;
+      border: none;
+      padding: var(--spacing-xs) var(--spacing-sm);
+      border-radius: var(--radius-sm);
+      font-size: var(--font-size-xs);
+      font-family: var(--font-family-primary);
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      z-index: 10;
+    }
+    
+    .copy-button:hover {
+      background-color: var(--neutral-600);
+    }
+    
+    /* Responsive design */
+    @media (max-width: 768px) {
+      .markdown-section {
+        padding: var(--spacing-lg);
+      }
+      
+      .markdown-section h1 {
+        font-size: var(--font-size-3xl);
+      }
+      
+      .markdown-section h2 {
+        font-size: var(--font-size-2xl);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="app">Loading...</div>
+  
+  <script>
+    window.$docsify = {
+      name: 'Mark Notation',
+      repo: 'henry-luo/mark',
+      basePath: './',
+      relativePath: true,
+      loadSidebar: true,
+      loadNavbar: true,
+      subMaxLevel: 3,
+      auto2top: true,
+      homepage: 'README.md',
+      search: {
+        maxAge: 86400000, // Expiration time, the default one day
+        paths: 'auto',
+        placeholder: 'Search documentation...',
+        noData: 'No results found.',
+        depth: 3,
+        hideOtherSidebarContent: false,
+      },
+      plugins: [
+        function(hook, vm) {
+          // Customize sidebar layout and toggle button
+          hook.doneEach(function() {
+            // Move search below title
+            var sidebar = document.querySelector('.sidebar');
+            var search = document.querySelector('.search');
+            var sidebarNav = document.querySelector('.sidebar-nav');
+            
+            if (sidebar && search && sidebarNav) {
+              // Ensure proper order: title, search, navigation
+              var title = sidebar.querySelector('h1');
+              if (title) {
+                title.parentNode.insertBefore(search, title.nextSibling);
+              }
+            }
+            
+            // Customize sidebar toggle button
+            var toggleBtn = document.querySelector('.sidebar-toggle');
+            if (toggleBtn) {
+              toggleBtn.innerHTML = '&laquo;&laquo;';
+              toggleBtn.title = 'Toggle sidebar';
+            }
+          });
+          
+          // Add custom footer
+          hook.beforeEach(function(html) {
+            var editUrl = 'https://github.com/henry-luo/mark/edit/master/docs/' + vm.route.file;
+            return html + '\n\n---\n\n' +
+              '<div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #e2e8f0;">' +
+              '<span style="color: #64748b; font-size: 0.875rem;">Last updated: ' + new Date().toLocaleDateString() + '</span>' +
+              '<a href="' + editUrl + '" target="_blank" style="color: #2563eb; font-size: 0.875rem;">Edit this page</a>' +
+              '</div>';
+          });
+          
+          // Add copy button to code blocks
+          hook.doneEach(function() {
+            var codeBlocks = document.querySelectorAll('pre[data-lang]');
+            codeBlocks.forEach(function(block) {
+              if (block.querySelector('.copy-button')) return;
+              
+              var button = document.createElement('button');
+              button.className = 'copy-button';
+              button.innerHTML = 'Copy';
+              
+              block.style.position = 'relative';
+              block.appendChild(button);
+              
+              button.addEventListener('click', function() {
+                var code = block.querySelector('code').textContent;
+                navigator.clipboard.writeText(code).then(function() {
+                  button.innerHTML = 'Copied!';
+                  button.style.backgroundColor = '#10b981';
+                  setTimeout(function() {
+                    button.innerHTML = 'Copy';
+                    button.style.backgroundColor = '';
+                  }, 2000);
+                });
+              });
+            });
+          });
+        }
+      ],
+      alias: {
+        '/.*/_sidebar.md': '/_sidebar.md',
+        '/.*/_navbar.md': '/_navbar.md'
+      },
+      pagination: {
+        previousText: '← Previous',
+        nextText: 'Next →',
+        crossChapter: true,
+        crossChapterText: true,
+      },
+      // Syntax highlighting
+      prism: {
+        theme: 'dark'
+      }
+    }
+  </script>
+  
+  <!-- Docsify v4 -->
+  <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
+  
+  <!-- Search plugin -->
+  <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
+  
+  <!-- Copy to clipboard plugin -->
+  <script src="//cdn.jsdelivr.net/npm/docsify-copy-code@2"></script>
+  
+  <!-- Pagination plugin -->
+  <script src="//cdn.jsdelivr.net/npm/docsify-pagination@2/dist/docsify-pagination.min.js"></script>
+  
+  <!-- Syntax highlighting -->
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-javascript.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-json.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-markup.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-xml-doc.min.js"></script>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+</body>
+</html>
