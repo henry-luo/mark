@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jekyll Preview Pages - Mark Notation</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin: 40px; line-height: 1.6; }
+        .container { max-width: 900px; margin: 0 auto; }
+        h1 { color: #2563eb; margin-bottom: 10px; }
+        .subtitle { color: #64748b; margin-bottom: 30px; font-size: 18px; }
+        .page-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-top: 30px; }
+        .page-card { border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; transition: all 0.2s; }
+        .page-card:hover { border-color: #2563eb; transform: translateY(-2px); box-shadow: 0 10px 25px rgba(37, 99, 235, 0.1); }
+        .page-card h3 { margin: 0 0 12px 0; color: #1e293b; font-size: 18px; }
+        .page-card p { color: #64748b; margin: 0 0 16px 0; font-size: 14px; }
+        .page-card a { color: #2563eb; text-decoration: none; font-weight: 600; font-size: 14px; }
+        .page-card a:hover { text-decoration: underline; }
+        .status { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        .status.ready { background: #dcfce7; color: #166534; }
+        .note { background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%); border-left: 4px solid #2563eb; padding: 20px; margin: 30px 0; border-radius: 8px; }
+        .note strong { color: #1e293b; }
+        .server-info { background: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px; padding: 16px; margin: 20px 0; }
+        .server-info strong { color: #92400e; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎉 Jekyll Preview Pages</h1>
+        <p class="subtitle">Static HTML preview versions of your Jekyll documentation pages</p>
+        
+        <div class="server-info">
+            <strong>💡 Quick Start:</strong> Make sure your development server is running with <code>python3 -m http.server 8000</code>
+        </div>
+        
+        <div class="note">
+            <strong>Note:</strong> These are static HTML preview versions of your Jekyll pages. 
+            They show how your custom template will look with simplified markdown rendering.
+            For the full Jekyll experience, push to GitHub Pages or set up local Jekyll development.
+        </div>
+        
+        <div class="page-grid">
+            <div class="page-card">
+                <h3>🏠 Home Page</h3>
+                <p>Landing page with hero section, features, and examples</p>
+                <a href="./index-preview.html">View Home Page →</a>
+                <span class="status ready">Ready</span>
+            </div>
+            
+            <div class="page-card">
+                <h3>📖 Mark Syntax</h3>
+                <p>Complete syntax guide and grammar reference</p>
+                <a href="./syntax-preview.html">View Syntax →</a>
+                <span class="status ready">Ready</span>
+            </div>
+            
+            <div class="page-card">
+                <h3>🗂️ Data Model</h3>
+                <p>Understanding Mark's data types and structure</p>
+                <a href="./data-model-preview.html">View Data Model →</a>
+                <span class="status ready">Ready</span>
+            </div>
+            
+            <div class="page-card">
+                <h3>⚙️ JavaScript API</h3>
+                <p>Complete API reference for mark.js library</p>
+                <a href="./api-preview.html">View API →</a>
+                <span class="status ready">Ready</span>
+            </div>
+            
+            <div class="page-card">
+                <h3>❓ FAQ</h3>
+                <p>Frequently asked questions about Mark Notation</p>
+                <a href="./faq-preview.html">View FAQ →</a>
+                <span class="status ready">Ready</span>
+            </div>
+            
+            <div class="page-card">
+                <h3>📋 Grammar Reference</h3>
+                <p>BNF grammar specification and railroad diagrams</p>
+                <a href="./grammar-preview.html">View Grammar →</a>
+                <span class="status ready">Ready</span>
+            </div>
+        </div>
+        
+        <div style="margin-top: 50px; padding: 30px; background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border-radius: 12px; text-align: center; color: white;">
+            <h3 style="margin: 0 0 10px 0; color: white;">🚀 Ready for Production?</h3>
+            <p style="margin: 0 0 20px 0; opacity: 0.9;">Push your changes to GitHub to see the real Jekyll-processed version</p>
+            <code style="background: rgba(255,255,255,0.1); padding: 8px 12px; border-radius: 6px; font-family: 'SF Mono', Monaco, monospace;">https://mark.js.org</code>
+        </div>
+    </div>
+</body>
+</html>

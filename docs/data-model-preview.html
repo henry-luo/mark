@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mark Data Model - Mark Notation</title>
+    <meta name="description" content="Understanding Mark's fully-typed data model and how it extends JSON">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="./css/reset.css">
+    <link rel="stylesheet" href="./css/variables.css">
+    <link rel="stylesheet" href="./css/base.css">
+    <link rel="stylesheet" href="./css/components.css">
+    <link rel="stylesheet" href="./css/layout.css">
+    <link rel="stylesheet" href="./css/jekyll-theme.css">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&lt; &gt;</text></svg>">
+</head>
+<body class="layout-page">
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav__container">
+            <div class="nav__brand">
+                <a href="./index-preview.html" class="nav__logo">
+                    <span class="nav__logo-icon">&lt;</span>
+                    <span class="nav__logo-text" style="margin-left:-3px; margin-right:-5px;">Mark</span>
+                    <span class="nav__logo-icon">&gt;</span>
+                </a>
+            </div>
+            
+            <div class="nav__menu">
+                <a href="./index-preview.html#features" class="nav__link">Features</a>
+                <a href="./index-preview.html#syntax" class="nav__link">Syntax</a>
+                <a href="./syntax-preview.html" class="nav__link">Documentation</a>
+                <a href="./index-preview.html#examples" class="nav__link">Examples</a>
+                <a href="https://github.com/henry-luo/mark" class="nav__link nav__link--external" target="_blank">GitHub</a>
+            </div>
+            
+            <div class="nav__actions">
+                <a href="./syntax-preview.html" class="btn btn--primary">Get Started</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Layout -->
+    <div class="main-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar__content">
+                <h3 class="sidebar__title">Documentation</h3>
+                <nav class="sidebar__nav">
+                    <ul class="sidebar__menu">
+                        <li class="sidebar__menu-item">
+                            <a href="./syntax-preview.html" class="sidebar__link ">
+                                Mark Syntax
+                            </a>
+                        </li>
+                        <li class="sidebar__menu-item">
+                            <a href="./data-model-preview.html" class="sidebar__link sidebar__link--active">
+                                Data Model
+                            </a>
+                        </li>
+                        <li class="sidebar__menu-item">
+                            <a href="./api-preview.html" class="sidebar__link ">
+                                JavaScript API
+                            </a>
+                        </li>
+                        <li class="sidebar__menu-item">
+                            <a href="./faq-preview.html" class="sidebar__link ">
+                                FAQ
+                            </a>
+                        </li>
+                        <li class="sidebar__menu-item">
+                            <a href="./grammar-preview.html" class="sidebar__link ">
+                                Grammar Reference
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="content content--with-sidebar">
+            <div class="content__header">
+                <h1 class="content__title">Mark Data Model</h1>
+                <p class="content__description">Understanding Mark's fully-typed data model and how it extends JSON</p>
+            </div>
+            
+            <div class="content__body">
+                <br>
+<p>Mark has a simple and fully-typed data model. It is an extension to the JSON data model. </p>
+<br>
+<p>Mark extends JSON data model with several new data types:</p>
+<p>- scalar types: <strong>symbol</strong>, <strong>datetime</strong>, <strong>binary</strong>, and <strong>decimal</strong> number.</p>
+<p>- container types: <strong>list</strong> and <strong>element</strong>.</p>
+<br>
+<p>With the new data type additions, essentially all commonly used built-in data types are well represented under Mark.</p>
+<br>
+<p>Mark's data model is designed so that a well-formed HTML or XML document can be converted into Mark document without any loss in data model.</p>
+<br>
+<p>Roughly speaking, JSON, HTML and XML data models are subsets of Mark data model, and Mark data model is a subset of JS data model.</p>
+<br>
+<div align="center">
+<img align='center' src='{{ "/data-model.png" | relative_url }}' width='300'>
+</div>
+<br>
+<h2>1. Symbol</h2>
+<br>
+<p>Mark symbol.</p>
+<br>
+<h2>2. Datetime</h2>
+<br>
+<p>Mark datetime.</p>
+<br>
+<h2>3. Binary</h2>
+<br>
+<p>A <em>binary</em> object is represented by an JS ArrayBuffer, containing the bytes decoded from the source characters in either base64 or ascii85 encoding.</p>
+<br>
+<p>It has a property <strong>encoding</strong>, which can have the value <code>hex</code> or <code>b64</code>.</p>
+<br>
+<p>Unlike string, consecutive binary objects within the content of a Mark object are not merged.</p>
+<br>
+<h2>4. Decimal</h2>
+<br>
+<p>Mark decimal.</p>
+<br>
+<h2>3. Element</h2>
+<br>
+<p>Mark element extends map object with a type name and a list of content objects. Mark object is designed to act like element in HTML/XML.</p>
+<br>
+<p>A Mark element essentially contains 3 facets of data in its data model:</p>
+<br>
+<p>- <strong>element name</strong>: a string that represent the type name of the Mark object, which is like element name in HTML/XML. </p>
+<p>- <strong>properties</strong>: a collection of key-value pairs, like properties of JSON objects, and attributes of HTML/XML elements. </p>
+<p>  - For Mark object, property key <strong>cannot be numeric</strong>, which is reserved for the content objects. JSON object in Mark can still have all kinds of keys.</p>
+<p>  - And property key must be <strong>unique</strong> under the same object, for both Mark and JSON object. (JSON spec has left this open, and there are many implementations accept duplicate keys.)</p>
+<p>- <strong>contents</strong>: an ordered list of content objects, which are like child nodes of elements in HTML/XML. Mark utilizes a <em>novel</em> feature of JS that JS object can be array-like. It can store both named properties and indexed properties.</p>
+<br>
+<p>Mark performs following normalization on the content stored in an element:</p>
+<br>
+<p>- <code>null</code> values are discarded.</p>
+<p>- Consecutive strings are merged into one single string.</p>
+<p>- a <em>list</em> in the element content will have its items auto spread/flattened.</p>
+<br>
+<p>These normalizations are performed to make Mark more friendly to use under mixed-content use cases.</p>
+<br>
+<h2>4. List</h2>
+<br>
+<p>Mark list represents an ordered collection of items. Lists are one of the container types in Mark, alongside elements.</p>
+<br>
+<p>For detailed information about the JavaScript API for working with Mark objects, see <a href="{{ '/api/' | relative_url }}">Mark JavaScript API</a>.</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer__container">
+            <div class="footer__content">
+                <div class="footer__brand">
+                    <div class="footer__logo">
+                        <span class="footer__logo-icon">&lt;</span>
+                        <span class="footer__logo-text">Mark</span>
+                        <span class="footer__logo-icon">&gt;</span>
+                    </div>
+                    <p class="footer__description">
+                        A unified notation for both object and markup data.
+                    </p>
+                </div>
+                
+                <div class="footer__links">
+                    <div class="footer__column">
+                        <h4 class="footer__column-title">Documentation</h4>
+                        <ul class="footer__column-links">
+                            <li><a href="./syntax-preview.html">Syntax</a></li>
+                            <li><a href="./data-model-preview.html">Data Model</a></li>
+                            <li><a href="./api-preview.html">JavaScript API</a></li>
+                            <li><a href="./faq-preview.html">FAQ</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="footer__column">
+                        <h4 class="footer__column-title">Resources</h4>
+                        <ul class="footer__column-links">
+                            <li><a href="https://github.com/henry-luo/mark" target="_blank">GitHub</a></li>
+                            <li><a href="https://www.npmjs.com/package/mark-js" target="_blank">npm Package</a></li>
+                            <li><a href="./grammar-preview.html">Grammar Reference</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer__bottom">
+                <p class="footer__copyright">
+                    © 2025 Mark Notation. Released under the MIT License.
+                </p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
