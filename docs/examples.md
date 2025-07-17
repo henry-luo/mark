@@ -1,3 +1,9 @@
+---
+layout: page
+title: Examples
+description: Practical examples of using Mark Notation in various scenarios
+---
+
 # Examples
 
 Practical examples of using Mark Notation in various scenarios.

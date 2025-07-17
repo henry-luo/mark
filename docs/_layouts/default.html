@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="{{ '/css/components.css' | relative_url }}">
     <link rel="stylesheet" href="{{ '/css/layout.css' | relative_url }}">
     <link rel="stylesheet" href="{{ '/css/jekyll-theme.css' | relative_url }}">
+    <link rel="stylesheet" href="{{ '/css/syntax-highlighting.css' | relative_url }}">
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -60,6 +61,11 @@
                         <li class="sidebar__menu-item">
                             <a href="{{ '/syntax/' | relative_url }}" class="sidebar__link {% if page.url contains '/syntax' %}sidebar__link--active{% endif %}">
                                 Mark Syntax
+                            </a>
+                        </li>
+                        <li class="sidebar__menu-item">
+                            <a href="{{ '/examples/' | relative_url }}" class="sidebar__link {% if page.url contains '/examples' %}sidebar__link--active{% endif %}">
+                                Examples
                             </a>
                         </li>
                         <li class="sidebar__menu-item">
