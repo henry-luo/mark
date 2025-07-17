@@ -20,8 +20,8 @@
 - [Documentation](#documentation)
 - [Credits](#credits)
 
-- It has **clean syntax** with **fully-typed** data model *(like JSON, but even better)*
-- It is **generic** and **extensible** *(like XML, but even better)*
+- It has **clean syntax** with **fully-typed** data model *(like JSON, or even better)*
+- It is **generic** and **extensible** *(like XML, or even better)*
 - It has built-in **mixed content** support *(like HTML5 or even better)*
 - It supports **high-order** composition *(like S-expressions or even better)*
 
@@ -189,6 +189,7 @@ And Mark Notation support for VS Code:
 - [Data model and API specification](https://mark.js.org/mark-model.html)
 - [FAQ](https://mark.js.org/faq.html)
 - Discussion about Mark beta release at [Hacker News](https://news.ycombinator.com/item?id=16308581)
+
 ## Credits
 
 Thanks to the following platforms or services that support the open source development of Mark: NPM, GitHub, [Travis CI](https://travis-ci.org/), [Codecov](https://codecov.io/), [JS.org](https://js.org/).
