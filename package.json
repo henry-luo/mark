@@ -1,7 +1,7 @@
 {
   "name": "mark-js",
   "version": "1.0.0",
-  "description": "Mark, an unified notation for all data.",
+  "description": "Mark, an unified notation for all",
   "main": "mark.js",
   "directories": {
     "lib": "lib",
@@ -39,12 +39,12 @@
     "markup",
     "notation",
     "json",
-    "json5",
     "parser",
     "html",
     "xml",
-    "s-expression",
-    "schema"
+    "schema",
+    "config",
+    "data-oriented"
   ],
   "author": "Henry Luo",
   "license": "MIT",
