@@ -88,12 +88,12 @@
     --space-11: 2.75rem;     /* 44px */
     --space-12: 3rem;        /* 48px */
     --space-14: 3.5rem;      /* 56px */
-    --space-16: 4rem;        /* 64px */
-    --space-20: 5rem;        /* 80px */
-    --space-24: 6rem;        /* 96px */
-    --space-28: 7rem;        /* 112px */
-    --space-32: 8rem;        /* 128px */
-    
+    --space-16: 3.8rem;        /* 64px */
+    --space-20: 4.2rem;        /* 80px */
+    --space-24: 4.6rem;        /* 96px */
+    --space-28: 6rem;        /* 112px */
+    --space-32: 7rem;        /* 128px */
+
     /* Border Radius */
     --radius-none: 0;
     --radius-sm: 0.125rem;    /* 2px */
