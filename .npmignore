@@ -2,6 +2,7 @@ test/
 dev/
 docs/
 coverage/
+.obsidian/
 karma.conf.js
 .travis.yml
 .istanbul.yml

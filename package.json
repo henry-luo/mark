@@ -50,8 +50,8 @@
   "license": "MIT",
   "dependencies": {
     "commander": "~2.13.0",
-    "css-select": "~1.3.0-rc0",
-    "helmsman": "~1.0.3",
+    "css-select": "^6.0.0",
+    "helmsman": "^2.0.1",
     "htmlparser2": "~3.9.2"
   },
   "devDependencies": {
