@@ -91,8 +91,8 @@
     --space-16: 3.8rem;        /* 64px */
     --space-20: 4.2rem;        /* 80px */
     --space-24: 4.6rem;        /* 96px */
-    --space-28: 6rem;        /* 112px */
-    --space-32: 7rem;        /* 128px */
+    --space-28: 5rem;        /* 112px */
+    --space-32: 5.5rem;        /* 128px */
 
     /* Border Radius */
     --radius-none: 0;

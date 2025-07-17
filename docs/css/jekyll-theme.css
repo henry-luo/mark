@@ -312,6 +312,7 @@
     color: var(--color-gray-500);
     margin: 0;
     text-align: center;
+    flex: 1;
 }
 
 .footer__social {
