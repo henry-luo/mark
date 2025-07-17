@@ -77,18 +77,22 @@
                         <div class="code-demo__title">mark-example.mark</div>
                     </div>
                     <div class="code-demo__content">
-                        <pre class="code-demo__code"><code>{form
-  {'!--' "comment"}
-  {div class:"form-group"
-    {label for:email "Email address:"}
-    {input type:email id:email}
-  }
-  {div class:"form-group"
-    {label for:pwd "Password"}
-    {input type:password id:pwd}
-  }
-  {button class:[btn "btn-info"] "Submit"}
-}</code></pre>
+                        <pre class="code-demo__code"><code>&lt;form                                 // element with name 'form'
+  &lt;'!--'comment&gt;                      // HTML comment as special element
+  &lt;div class:'form-group'             // nested child element
+    &lt;label for:email                  // 'for' and its value, both unquoted
+      "Email address:"                // text needs to be double quoted
+    &gt;
+    &lt;input type:email, id:email&gt;      // element without child
+  &gt;
+  &lt;div class:'form-group'             // 'form-group' is a quoted symbol
+    &lt;label for:pwd; "Password"&gt;       // pwd is an unquoted symbol
+    &lt;input type:password, id:pwd&gt;     // attrs separated by comma, like JSON
+  &gt;
+  &lt;button class:[btn, 'btn-info']     // attribute with complex values
+    "Submit"                          // text quoted with double quote
+  &gt;
+&gt;</code></pre>
                     </div>
                 </div>
             </div>
@@ -211,18 +215,18 @@
                                 <span class="code-block__label">Mark Notation</span>
                                 <button class="code-block__copy">Copy</button>
                             </div>
-                            <pre class="code-block__content"><code>{form
-  {'!--' "comment"}
-  {div class:"form-group"
-    {label for:email "Email address:"}
-    {input type:email id:email}
-  }
-  {div class:"form-group"
-    {label for:pwd "Password"}
-    {input type:password id:pwd}
-  }
-  {button class:[btn "btn-info"] "Submit"}
-}</code></pre>
+                            <pre class="code-block__content"><code>&lt;form
+  &lt;'!--'comment&gt;
+  &lt;div class:'form-group'
+    &lt;label for:email "Email address:"&gt;
+    &lt;input type:email, id:email&gt;
+  &gt;
+  &lt;div class:'form-group'
+    &lt;label for:pwd; "Password"&gt;
+    &lt;input type:password, id:pwd&gt;
+  &gt;
+  &lt;button class:[btn, 'btn-info'] "Submit"&gt;
+&gt;</code></pre>
                         </div>
                     </div>
                     
@@ -335,8 +339,8 @@
                                 <button class="code-block__copy">Copy</button>
                             </div>
                             <pre class="code-block__content"><code>const Mark = require('mark-js');
-var obj = Mark.parse(`{div {span 'Hello World!'}}`);
-console.log(Mark.stringify(obj));</code></pre>
+var obj = Mark.parse(`&lt;div &lt;span "Hello World!"&gt;&gt;`);
+console.log("Greeting from Mark: " + Mark.stringify(obj));</code></pre>
                         </div>
                     </div>
                     
@@ -346,10 +350,10 @@ console.log(Mark.stringify(obj));</code></pre>
                                 <span class="code-block__label">Download and include</span>
                                 <button class="code-block__copy">Copy</button>
                             </div>
-                            <pre class="code-block__content"><code>&lt;script src='mark.js'&gt;&lt;/script&gt;
+                            <pre class="code-block__content"><code>&lt;script src='dist/mark.js'&gt;&lt;/script&gt;
 &lt;script&gt;
-var obj = Mark(`{div {span 'Hello World!'}}`);
-console.log(Mark.stringify(obj));
+var obj = Mark(`&lt;div &lt;span "Hello World!"&gt;&gt;`);  // using a shorthand
+console.log("Greeting from Mark: " + Mark.stringify(obj));
 &lt;/script&gt;</code></pre>
                         </div>
                     </div>
@@ -360,7 +364,11 @@ console.log(Mark.stringify(obj));
                                 <span class="code-block__label">Include from CDN</span>
                                 <button class="code-block__copy">Copy</button>
                             </div>
-                            <pre class="code-block__content"><code>&lt;script src='https://cdn.jsdelivr.net/npm/mark-js/dist/mark.js'&gt;&lt;/script&gt;</code></pre>
+                            <pre class="code-block__content"><code>&lt;script src='https://cdn.jsdelivr.net/npm/mark-js@1.0.0/dist/mark.js'&gt;&lt;/script&gt;
+&lt;script&gt;
+var obj = Mark(`&lt;div &lt;span "Hello World!"&gt;&gt;`);  // using a shorthand
+console.log("Greeting from Mark: " + Mark.stringify(obj));
+&lt;/script&gt;</code></pre>
                         </div>
                     </div>
                 </div>
