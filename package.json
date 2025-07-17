@@ -17,7 +17,7 @@
   "scripts": {
     "test": "(clear || cls) && tape test/mark-dom.js test/mark-model.js test/mark-query.js test/parse-error.js test/parse-json.js test/parse-mark.js test/stringify-mark.js | tap-spec",
     "test-dev": "(clear || cls) && tape dev/test/*.js | tap-spec",
-    "coverage": "istanbul cover -v --config .istanbul.yml node_modules/tape/bin/tape ./test/*.js",
+    "coverage": "istanbul cover -v --config .istanbul.yml node_modules/tape/bin/tape test/mark-dom.js test/mark-model.js test/mark-query.js test/parse-error.js test/parse-json.js test/parse-mark.js test/stringify-mark.js",
     "karma": "(clear || cls) && karma start",
     "build": "npm run build-core && npm run build-mark && cp-cli README.md docs/index.md",
     "build-core": "browserify -x ./lib/mark.update.js -x ./lib/mark.convert.js -x ./lib/mark.selector.js -x htmlparser2 mark.js | uglifyjs > dist/mark.core.js",

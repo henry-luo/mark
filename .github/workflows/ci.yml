@@ -29,9 +29,7 @@ jobs:
         npm install -g codecov
         
     - name: Install project dependencies
-      run: |
-        npm install boolbase nth-check htmlparser2
-        npm install tape tap-spec istanbul
+      run: npm install
         
     - name: Run tests with coverage
       run: npm run coverage
