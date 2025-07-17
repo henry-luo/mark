@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Examples - Mark Notation</title>
+    <meta name="description" content="Practical examples of using Mark Notation in various scenarios">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="./css/reset.css">
+    <link rel="stylesheet" href="./css/variables.css">
+    <link rel="stylesheet" href="./css/base.css">
+    <link rel="stylesheet" href="./css/components.css">
+    <link rel="stylesheet" href="./css/layout.css">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Syntax Highlighting CSS -->
+    <style>
+        /* Syntax highlighting for code blocks */
+        .highlight .token.keyword { color: #ff79c6; }
+        .highlight .token.string { color: #f1fa8c; }
+        .highlight .token.comment { color: #6272a4; }
+        .highlight .token.number { color: #bd93f9; }
+        .highlight .token.operator { color: #ff79c6; }
+        .highlight .token.punctuation { color: #f8f8f2; }
+        .highlight .token.function { color: #50fa7b; }
+        .highlight .token.property { color: #50fa7b; }
+        .highlight .token.tag { color: #ff79c6; }
+        .highlight .token.attr-name { color: #50fa7b; }
+        .highlight .token.attr-value { color: #f1fa8c; }
+        .highlight .token.boolean { color: #bd93f9; }
+        .highlight .token.null { color: #bd93f9; }
+        .highlight .token.undefined { color: #bd93f9; }
+        .highlight .token.variable { color: #8be9fd; }
+        .highlight .token.class-name { color: #8be9fd; }
+        .highlight .token.constant { color: #bd93f9; }
+        
+        /* Mark-specific highlighting */
+        .highlight .token.mark-tag { color: #ff79c6; }
+        .highlight .token.mark-property { color: #50fa7b; }
+        .highlight .token.mark-value { color: #f1fa8c; }
+        .highlight .token.mark-bracket { color: #f8f8f2; }
+        
+        /* Examples page specific styles */
+        .examples-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--space-8) var(--space-4);
+        }
+        
+        .examples-header {
+            text-align: center;
+            margin-bottom: var(--space-12);
+        }
+        
+        .examples-title {
+            font-size: var(--font-size-4xl);
+            font-weight: var(--font-weight-bold);
+            margin-bottom: var(--space-4);
+            color: var(--color-white);
+        }
+        
+        .examples-subtitle {
+            font-size: var(--font-size-lg);
+            color: var(--color-gray-300);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .section {
+            margin-bottom: var(--space-16);
+        }
+        
+        .section-title {
+            font-size: var(--font-size-2xl);
+            font-weight: var(--font-weight-bold);
+            margin-bottom: var(--space-6);
+            color: var(--color-white);
+        }
+        
+        .subsection {
+            margin-bottom: var(--space-8);
+        }
+        
+        .subsection-title {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: var(--space-4);
+            color: var(--color-gray-100);
+        }
+        
+        .example-description {
+            color: var(--color-gray-300);
+            margin-bottom: var(--space-4);
+            line-height: var(--line-height-relaxed);
+        }
+        
+        .code-block {
+            margin-bottom: var(--space-6);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav__container">
+            <div class="nav__brand">
+                <a href="/" class="nav__logo">
+                    <span class="nav__logo-icon">&lt;</span>
+                    <span class="nav__logo-text" style="margin-left:-3px; margin-right:-5px;">Mark</span>
+                    <span class="nav__logo-icon">&gt;</span>
+                </a>
+            </div>
+            
+            <div class="nav__menu">
+                <a href="/#features" class="nav__link">Features</a>
+                <a href="/#syntax" class="nav__link">Syntax</a>
+                <a href="/getting-started" class="nav__link">Documentation</a>
+                <a href="/examples.html" class="nav__link nav__link--active">Examples</a>
+                <a href="https://github.com/henry-luo/mark" class="nav__link nav__link--external" target="_blank">GitHub</a>
+            </div>
+            
+            <div class="nav__actions">
+                <a href="/getting-started" class="btn btn--primary">Get Started</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Examples Content -->
+    <main class="examples-container">
+        <header class="examples-header">
+            <h1 class="examples-title">Examples</h1>
+            <p class="examples-subtitle">Practical examples of using Mark Notation in various scenarios.</p>
+        </header>
+
+        <!-- Basic Usage -->
+        <section class="section">
+            <h2 class="section-title">Basic Usage</h2>
+            
+            <div class="subsection">
+                <h3 class="subsection-title">Simple Object Creation</h3>
+                <div class="code-block">
+                    <div class="code-block__header">
+                        <span class="code-block__label">JavaScript</span>
+                        <button class="code-block__copy">Copy</button>
+                    </div>
+                    <pre class="code-block__content highlight"><code><span class="token keyword">const</span> <span class="token variable">Mark</span> <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">'mark-js'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// Create a simple greeting</span>
+<span class="token keyword">const</span> <span class="token variable">greeting</span> <span class="token operator">=</span> <span class="token function">Mark</span><span class="token punctuation">(</span><span class="token string">'greeting'</span><span class="token punctuation">,</span> <span class="token punctuation">{</span> <span class="token property">lang</span><span class="token punctuation">:</span> <span class="token string">'en'</span> <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token string">'Hello, World!'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token variable">console</span><span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token variable">Mark</span><span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span><span class="token variable">greeting</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment">// Output: &lt;greeting lang:"en" "Hello, World!"&gt;</span>
+
+<span class="token comment">// Parse it back</span>
+<span class="token keyword">const</span> <span class="token variable">parsed</span> <span class="token operator">=</span> <span class="token variable">Mark</span><span class="token punctuation">.</span><span class="token function">parse</span><span class="token punctuation">(</span><span class="token string">`&lt;greeting lang:"en" "Hello, World!"&gt;`</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token variable">console</span><span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token variable">parsed</span><span class="token punctuation">.</span><span class="token property">lang</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// "en"</span>
+<span class="token variable">console</span><span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token variable">parsed</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// "Hello, World!"</span></code></pre>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3 class="subsection-title">Working with Properties</h3>
+                <div class="code-block">
+                    <div class="code-block__header">
+                        <span class="code-block__label">JavaScript</span>
+                        <button class="code-block__copy">Copy</button>
+                    </div>
+                    <pre class="code-block__content highlight"><code><span class="token comment">// Configuration object</span>
+<span class="token keyword">const</span> <span class="token variable">config</span> <span class="token operator">=</span> <span class="token variable">Mark</span><span class="token punctuation">.</span><span class="token function">parse</span><span class="token punctuation">(</span><span class="token string">`&lt;config
+  &lt;database
+    host:"localhost"
+    port:5432
+    ssl:true
+  &gt;
+  &lt;api
+    version:"v1"
+    timeout:5000
+  &gt;
+&gt;`</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// Access nested properties</span>
+<span class="token variable">console</span><span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token variable">config</span><span class="token punctuation">.</span><span class="token property">database</span><span class="token punctuation">.</span><span class="token property">host</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// "localhost"</span>
+<span class="token variable">console</span><span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token variable">config</span><span class="token punctuation">.</span><span class="token property">api</span><span class="token punctuation">.</span><span class="token property">version</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// "v1"</span></code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- HTML Forms -->
+        <section class="section">
+            <h2 class="section-title">HTML Forms</h2>
+            
+            <div class="subsection">
+                <h3 class="subsection-title">Contact Form</h3>
+                <div class="code-block">
+                    <div class="code-block__header">
+                        <span class="code-block__label">JavaScript</span>
+                        <button class="code-block__copy">Copy</button>
+                    </div>
+                    <pre class="code-block__content highlight"><code><span class="token keyword">const</span> <span class="token variable">contactForm</span> <span class="token operator">=</span> <span class="token variable">Mark</span><span class="token punctuation">.</span><span class="token function">parse</span><span class="token punctuation">(</span><span class="token string">`&lt;form
+  method:"POST"
+  action:"/contact"
+  
+  &lt;fieldset
+    &lt;legend "Contact Information"&gt;
+    
+    &lt;div class:"form-group"
+      &lt;label for:name "Full Name *"&gt;
+      &lt;input
+        type:text
+        id:name
+        name:name
+        required:true
+      &gt;
+    &gt;
+    
+    &lt;div class:"form-group"
+      &lt;label for:email "Email Address *"&gt;
+      &lt;input
+        type:email
+        id:email
+        name:email
+        required:true
+      &gt;
+    &gt;
+    
+    &lt;div class:"form-actions"
+      &lt;button type:submit "Send Message"&gt;
+      &lt;button type:reset "Clear Form"&gt;
+    &gt;
+  &gt;
+&gt;`</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// Access form elements</span>
+<span class="token variable">console</span><span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token variable">contactForm</span><span class="token punctuation">.</span><span class="token property">method</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// "POST"</span>
+<span class="token variable">console</span><span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token variable">contactForm</span><span class="token punctuation">.</span><span class="token property">action</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// "/contact"</span></code></pre>
+                </div>
+            </div>
+
+            <div class="subsection">
+                <h3 class="subsection-title">Dynamic Form Generation</h3>
+                <div class="code-block">
+                    <div class="code-block__header">
+                        <span class="code-block__label">JavaScript</span>
+                        <button class="code-block__copy">Copy</button>
+                    </div>
+                    <pre class="code-block__content highlight"><code><span class="token comment">// Form schema</span>
+<span class="token keyword">const</span> <span class="token variable">formSchema</span> <span class="token operator">=</span> <span class="token variable">Mark</span><span class="token punctuation">.</span><span class="token function">parse</span><span class="token punctuation">(</span><span class="token string">`&lt;form-schema
+  title:"User Registration"
+  &lt;field name:username type:text label:"Username" required:true&gt;
+  &lt;field name:email type:email label:"Email Address" required:true&gt;
+&gt;`</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// Generate form from schema</span>
+<span class="token keyword">function</span> <span class="token function">generateForm</span><span class="token punctuation">(</span><span class="token variable">schema</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">const</span> <span class="token variable">form</span> <span class="token operator">=</span> <span class="token function">Mark</span><span class="token punctuation">(</span><span class="token string">'form'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">schema</span><span class="token punctuation">.</span><span class="token property">title</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token variable">form</span><span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span><span class="token function">Mark</span><span class="token punctuation">(</span><span class="token string">'h2'</span><span class="token punctuation">,</span> <span class="token null">null</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token variable">schema</span><span class="token punctuation">.</span><span class="token property">title</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  
+  <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">let</span> <span class="token variable">i</span> <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> <span class="token variable">i</span> <span class="token operator">&lt;</span> <span class="token variable">schema</span><span class="token punctuation">.</span><span class="token property">length</span><span class="token punctuation">;</span> <span class="token variable">i</span><span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">const</span> <span class="token variable">field</span> <span class="token operator">=</span> <span class="token variable">schema</span><span class="token punctuation">[</span><span class="token variable">i</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token variable">field</span><span class="token punctuation">.</span><span class="token property">constructor</span><span class="token punctuation">.</span><span class="token property">name</span> <span class="token operator">===</span> <span class="token string">'field'</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">const</span> <span class="token variable">formGroup</span> <span class="token operator">=</span> <span class="token function">Mark</span><span class="token punctuation">(</span><span class="token string">'div'</span><span class="token punctuation">,</span> <span class="token punctuation">{</span> <span class="token property">class</span><span class="token punctuation">:</span> <span class="token string">'form-group'</span> <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token variable">formGroup</span><span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span><span class="token function">Mark</span><span class="token punctuation">(</span><span class="token string">'label'</span><span class="token punctuation">,</span> <span class="token punctuation">{</span> <span class="token property">for</span><span class="token punctuation">:</span> <span class="token variable">field</span><span class="token punctuation">.</span><span class="token property">name</span> <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token variable">field</span><span class="token punctuation">.</span><span class="token property">label</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      
+      <span class="token keyword">const</span> <span class="token variable">input</span> <span class="token operator">=</span> <span class="token function">Mark</span><span class="token punctuation">(</span><span class="token string">'input'</span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+        <span class="token property">type</span><span class="token punctuation">:</span> <span class="token variable">field</span><span class="token punctuation">.</span><span class="token property">type</span><span class="token punctuation">,</span>
+        <span class="token property">id</span><span class="token punctuation">:</span> <span class="token variable">field</span><span class="token punctuation">.</span><span class="token property">name</span><span class="token punctuation">,</span>
+        <span class="token property">name</span><span class="token punctuation">:</span> <span class="token variable">field</span><span class="token punctuation">.</span><span class="token property">name</span><span class="token punctuation">,</span>
+        <span class="token property">required</span><span class="token punctuation">:</span> <span class="token variable">field</span><span class="token punctuation">.</span><span class="token property">required</span>
+      <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      
+      <span class="token variable">formGroup</span><span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span><span class="token variable">input</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token variable">form</span><span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span><span class="token variable">formGroup</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+  
+  <span class="token variable">form</span><span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span><span class="token function">Mark</span><span class="token punctuation">(</span><span class="token string">'button'</span><span class="token punctuation">,</span> <span class="token punctuation">{</span> <span class="token property">type</span><span class="token punctuation">:</span> <span class="token string">'submit'</span> <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token string">'Register'</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">return</span> <span class="token variable">form</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Configuration Files -->
+        <section class="section">
+            <h2 class="section-title">Configuration Files</h2>
+            
+            <div class="subsection">
+                <h3 class="subsection-title">Application Configuration</h3>
+                <div class="code-block">
+                    <div class="code-block__header">
+                        <span class="code-block__label">JavaScript</span>
+                        <button class="code-block__copy">Copy</button>
+                    </div>
+                    <pre class="code-block__content highlight"><code><span class="token keyword">const</span> <span class="token variable">appConfig</span> <span class="token operator">=</span> <span class="token variable">Mark</span><span class="token punctuation">.</span><span class="token function">parse</span><span class="token punctuation">(</span><span class="token string">`&lt;config
+  &lt;app
+    name:"MyApp"
+    version:"1.2.3"
+    environment:"production"
+    debug:false
+  &gt;
+  
+  &lt;server
+    host:"0.0.0.0"
+    port:8080
+    &lt;ssl
+      enabled:true
+      cert:"/path/to/cert.pem"
+      key:"/path/to/key.pem"
+    &gt;
+  &gt;
+  
+  &lt;database
+    type:"postgresql"
+    host:"db.example.com"
+    port:5432
+    name:"myapp_prod"
+    &lt;credentials
+      username:"app_user"
+      password:"secure_password"
+    &gt;
+  &gt;
+&gt;`</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// Access configuration values</span>
+<span class="token variable">console</span><span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token variable">appConfig</span><span class="token punctuation">.</span><span class="token property">app</span><span class="token punctuation">.</span><span class="token property">name</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// "MyApp"</span>
+<span class="token variable">console</span><span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token variable">appConfig</span><span class="token punctuation">.</span><span class="token property">server</span><span class="token punctuation">.</span><span class="token property">port</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 8080</span></code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Template Examples -->
+        <section class="section">
+            <h2 class="section-title">Template Examples</h2>
+            
+            <div class="subsection">
+                <h3 class="subsection-title">Email Template</h3>
+                <div class="code-block">
+                    <div class="code-block__header">
+                        <span class="code-block__label">JavaScript</span>
+                        <button class="code-block__copy">Copy</button>
+                    </div>
+                    <pre class="code-block__content highlight"><code><span class="token keyword">const</span> <span class="token variable">emailTemplate</span> <span class="token operator">=</span> <span class="token variable">Mark</span><span class="token punctuation">.</span><span class="token function">parse</span><span class="token punctuation">(</span><span class="token string">`&lt;email
+  &lt;header
+    from:"noreply@example.com"
+    to:"{{user.email}}"
+    subject:"Welcome to {{app.name}}, {{user.name}}!"
+  &gt;
+  
+  &lt;body
+    &lt;div class:"container"
+      &lt;h1 "Welcome {{user.name}}!"&gt;
+      
+      &lt;p "Thank you for signing up for " &lt;strong "{{app.name}}"&gt; ". "
+         "We're excited to have you on board!"&gt;
+      
+      &lt;div class:"cta"
+        &lt;a href:"{{app.url}}/dashboard" class:"button primary"
+          "Get Started"
+        &gt;
+      &gt;
+    &gt;
+  &gt;
+&gt;`</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// Template rendering function</span>
+<span class="token keyword">function</span> <span class="token function">renderTemplate</span><span class="token punctuation">(</span><span class="token variable">template</span><span class="token punctuation">,</span> <span class="token variable">data</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">const</span> <span class="token variable">rendered</span> <span class="token operator">=</span> <span class="token variable">Mark</span><span class="token punctuation">.</span><span class="token function">stringify</span><span class="token punctuation">(</span><span class="token variable">template</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">return</span> <span class="token variable">rendered</span><span class="token punctuation">.</span><span class="token function">replace</span><span class="token punctuation">(</span><span class="token regex">/\{\{([^}]+)\}\}/g</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token variable">match</span><span class="token punctuation">,</span> <span class="token variable">path</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+    <span class="token keyword">const</span> <span class="token variable">keys</span> <span class="token operator">=</span> <span class="token variable">path</span><span class="token punctuation">.</span><span class="token function">split</span><span class="token punctuation">(</span><span class="token string">'.'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">let</span> <span class="token variable">value</span> <span class="token operator">=</span> <span class="token variable">data</span><span class="token punctuation">;</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">let</span> <span class="token variable">key</span> <span class="token keyword">of</span> <span class="token variable">keys</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token variable">value</span> <span class="token operator">=</span> <span class="token variable">value</span> <span class="token operator">&amp;&amp;</span> <span class="token variable">value</span><span class="token punctuation">[</span><span class="token variable">key</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> <span class="token variable">value</span> <span class="token operator">||</span> <span class="token variable">match</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// Render with data</span>
+<span class="token keyword">const</span> <span class="token variable">emailData</span> <span class="token operator">=</span> <span class="token punctuation">{</span>
+  <span class="token property">user</span><span class="token punctuation">:</span> <span class="token punctuation">{</span> <span class="token property">name</span><span class="token punctuation">:</span> <span class="token string">'Alice'</span><span class="token punctuation">,</span> <span class="token property">email</span><span class="token punctuation">:</span> <span class="token string">'alice@example.com'</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token property">app</span><span class="token punctuation">:</span> <span class="token punctuation">{</span> <span class="token property">name</span><span class="token punctuation">:</span> <span class="token string">'MyApp'</span><span class="token punctuation">,</span> <span class="token property">url</span><span class="token punctuation">:</span> <span class="token string">'https://myapp.com'</span> <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> <span class="token variable">renderedEmail</span> <span class="token operator">=</span> <span class="token function">renderTemplate</span><span class="token punctuation">(</span><span class="token variable">emailTemplate</span><span class="token punctuation">,</span> <span class="token variable">emailData</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer__container">
+            <div class="footer__content">
+                <div class="footer__section">
+                    <div class="footer__brand">
+                        <span class="footer__logo">
+                            <span>&lt;</span>Mark<span>&gt;</span>
+                        </span>
+                        <p class="footer__description">
+                            A unified notation for object and markup data.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="footer__section">
+                    <h4 class="footer__title">Documentation</h4>
+                    <ul class="footer__links">
+                        <li><a href="/getting-started" class="footer__link">Getting Started</a></li>
+                        <li><a href="/syntax" class="footer__link">Syntax</a></li>
+                        <li><a href="/examples.html" class="footer__link">Examples</a></li>
+                        <li><a href="/api" class="footer__link">API Reference</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer__section">
+                    <h4 class="footer__title">Community</h4>
+                    <ul class="footer__links">
+                        <li><a href="https://github.com/henry-luo/mark" class="footer__link">GitHub</a></li>
+                        <li><a href="https://github.com/henry-luo/mark/issues" class="footer__link">Issues</a></li>
+                        <li><a href="https://github.com/henry-luo/mark/discussions" class="footer__link">Discussions</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer__bottom">
+                <p class="footer__copyright">
+                    © 2025 Mark Notation. MIT Licensed.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="./js/main.js"></script>
+</body>
+</html>
