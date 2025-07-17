@@ -3,7 +3,6 @@
 [![npm version](https://badge.fury.io/js/mark-js.svg)](https://badge.fury.io/js/mark-js)
 [![Build Status](https://travis-ci.org/henry-luo/mark.svg?branch=master)](https://travis-ci.org/henry-luo/mark)
 [![codecov](https://codecov.io/gh/henry-luo/mark/branch/master/graph/badge.svg)](https://codecov.io/gh/henry-luo/mark)
-[![Analytics](https://ga-beacon.appspot.com/UA-114747922-1/readme.md)](https://github.com/henry-luo/mark)
 
 **Mark Notation** or simply **Mark**, is a new unified notation for both object and markup data. The notation is a superset of what can be represented by JSON, HTML and XML, but overcomes many limitations of these popular data formats, yet still having a very clean syntax and simple data model.
 
