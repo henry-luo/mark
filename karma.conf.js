@@ -31,6 +31,12 @@ module.exports = function(karma) {
 
     browsers: browsers,
     
+    // Increase timeout to handle browserify bundling
+    browserDisconnectTimeout: 60000,
+    browserDisconnectTolerance: 3,
+    browserNoActivityTimeout: 60000,
+    captureTimeout: 60000,
+    
     // Custom launcher configurations
     customLaunchers: {
       SafariNoPopup: {
