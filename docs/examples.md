@@ -2,9 +2,8 @@
 layout: page
 title: Examples
 description: Practical examples of using Mark Notation in various scenarios
+permalink: /examples/
 ---
-
-# Examples
 
 Practical examples of using Mark Notation in various scenarios.
 
@@ -18,10 +17,10 @@ const Mark = require('mark-js');
 // Create a simple greeting
 const greeting = Mark('greeting', { lang: 'en' }, ['Hello, World!']);
 console.log(Mark.stringify(greeting));
-// Output: <greeting lang:"en" "Hello, World!">
+// Output: <greeting lang:"en"; "Hello, World!">
 
 // Parse it back
-const parsed = Mark.parse(`<greeting lang:"en" "Hello, World!">`);
+const parsed = Mark.parse(`<greeting lang:"en"; "Hello, World!">`);
 console.log(parsed.lang); // "en"
 console.log(parsed[0]); // "Hello, World!"
 ```
@@ -32,12 +31,12 @@ console.log(parsed[0]); // "Hello, World!"
 // Configuration object
 const config = Mark.parse(`<config
   <database
-    host:"localhost"
-    port:5432
+    host:"localhost",
+    port:5432,
     ssl:true
   >
   <api
-    version:"v1"
+    version:"v1",
     timeout:5000
   >
 >`);
@@ -53,35 +52,35 @@ console.log(config.api.version); // "v1"
 
 ```javascript
 const contactForm = Mark.parse(`<form
-  method:"POST"
+  method:"POST",
   action:"/contact"
   
   <fieldset
     <legend "Contact Information">
     
     <div class:"form-group"
-      <label for:name "Full Name *">
+      <label for:name; "Full Name *">
       <input
-        type:text
-        id:name
-        name:name
+        type:text,
+        id:name,
+        name:name,
         required:true
       >
     >
     
     <div class:"form-group"
-      <label for:email "Email Address *">
+      <label for:email; "Email Address *">
       <input
-        type:email
-        id:email
-        name:email
+        type:email,
+        id:email,
+        name:email,
         required:true
       >
     >
     
     <div class:"form-actions"
-      <button type:submit "Send Message">
-      <button type:reset "Clear Form">
+      <button type:submit; "Send Message">
+      <button type:reset; "Clear Form">
     >
   >
 >`);
@@ -95,10 +94,10 @@ console.log(contactForm.action); // "/contact"
 
 ```javascript
 // Form schema
-const formSchema = Mark.parse(`<form-schema
+const formSchema = Mark.parse(`<'form-schema'
   title:"User Registration"
-  <field name:username type:text label:"Username" required:true>
-  <field name:email type:email label:"Email Address" required:true>
+  <field name:"username", type:"text", label:"Username", required:true>
+  <field name:"email", type:"email", label:"Email Address", required:true>
 >`);
 
 // Generate form from schema
@@ -139,29 +138,29 @@ function generateForm(schema) {
 ```javascript
 const appConfig = Mark.parse(`<config
   <app
-    name:"MyApp"
-    version:"1.2.3"
-    environment:"production"
+    name:"MyApp",
+    version:"1.2.3",
+    environment:"production",
     debug:false
   >
   
   <server
-    host:"0.0.0.0"
+    host:"0.0.0.0",
     port:8080
     <ssl
-      enabled:true
-      cert:"/path/to/cert.pem"
+      enabled:true,
+      cert:"/path/to/cert.pem",
       key:"/path/to/key.pem"
     >
   >
   
   <database
-    type:"postgresql"
-    host:"db.example.com"
-    port:5432
+    type:"postgresql",
+    host:"db.example.com",
+    port:5432,
     name:"myapp_prod"
     <credentials
-      username:"app_user"
+      username:"app_user",
       password:"secure_password"
     >
   >
@@ -178,7 +177,7 @@ console.log(appConfig.server.port); // 8080
 const buildConfig = Mark.parse(`<build
   input:"src/index.js"
   <output
-    path:"dist"
+    path:"dist",
     filename:"bundle.js"
   >
   
@@ -190,7 +189,7 @@ const buildConfig = Mark.parse(`<build
     <webpack
       mode:"production"
       <optimization
-        minimize:true
+        minimize:true,
         splitChunks:true
       >
     >
@@ -207,9 +206,9 @@ const article = Mark.parse(`<article
   <header
     <h1 "Getting Started with Mark Notation">
     <meta
-      author:"Jane Developer"
-      published:"2025-01-15"
-      tags:["tutorial" "markup" "javascript"]
+      author:"Jane Developer",
+      published:"2025-01-15",
+      tags:["tutorial", "markup", "javascript"]
     >
   >
   
@@ -251,8 +250,8 @@ function extractMetadata(article) {
 ```javascript
 const emailTemplate = Mark.parse(`<email
   <header
-    from:"noreply@example.com"
-    to:"{{user.email}}"
+    from:"noreply@example.com",
+    to:"{{user.email}}",
     subject:"Welcome to {{app.name}}, {{user.name}}!"
   >
   
@@ -264,9 +263,7 @@ const emailTemplate = Mark.parse(`<email
          "We're excited to have you on board!">
       
       <div class:"cta"
-        <a href:"{{app.url}}/dashboard" class:"button primary"
-          "Get Started"
-        >
+        <a href:"{{app.url}}/dashboard", class:"button primary"; "Get Started">
       >
     >
   >
