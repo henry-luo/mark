@@ -16,26 +16,26 @@ module.exports = function(karma) {
   }
 
   karma.set({
-    frameworks: ['tap','browserify'], //'tap',
+    frameworks: ['jasmine', 'browserify'],
     files: [
-		'test/*.js',
+		'test/mark-full-suite.js',
 		{pattern: 'test/data/*.xml', included: false, served: true},
 	],
 	exclude: [],
-	reporters: ['tap-pretty'],
-    tapReporter: {prettify: tapSpec},
+	reporters: ['progress'],
+    //tapReporter: {prettify: tapSpec},
 	
     preprocessors: {
-		'test/*.js': ['browserify']
+		'test/mark-full-suite.js': ['browserify']
     },
 
     browsers: browsers,
     
-    // Increase timeout to handle browserify bundling
-    browserDisconnectTimeout: 60000,
-    browserDisconnectTolerance: 3,
-    browserNoActivityTimeout: 60000,
-    captureTimeout: 60000,
+    // Reduce timeout for faster feedback
+    browserDisconnectTimeout: 10000,
+    browserDisconnectTolerance: 1,
+    browserNoActivityTimeout: 30000,
+    captureTimeout: 10000,
     
     // Custom launcher configurations
     customLaunchers: {
@@ -57,7 +57,7 @@ module.exports = function(karma) {
 
     // browserify configuration
     browserify: {
-		// debug: true,
+		debug: true,
 		transform:
 			process.env.BROWSER == 'ie' ? [['babelify', {presets:['es2015'], plugins:['transform-runtime', "transform-remove-strict-mode"]}]]:[]
     }
