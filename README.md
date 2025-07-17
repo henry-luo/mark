@@ -1,24 +1,38 @@
 # Mark Notation
 
 [![npm version](https://badge.fury.io/js/mark-js.svg)](https://badge.fury.io/js/mark-js)
-[![Build Status](https://travis-ci.org/henry-luo/mark.svg?branch=master)](https://travis-ci.org/henry-luo/mark)
+[![CI](https://github.com/henry-luo/mark/actions/workflows/ci.yml/badge.svg)](https://github.com/henry-luo/mark/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/henry-luo/mark/branch/master/graph/badge.svg)](https://codecov.io/gh/henry-luo/mark)
 
-**Mark Notation** or simply **Mark**, is a new unified notation for both object and markup data. The notation is a superset of what can be represented by JSON, HTML/JSX, XML, YAML, etc., but overcomes many limitations of these popular data formats, yet still having a clean syntax and simple data model.
+**Mark Notation** is a modern, unified data format that combines the best aspects of JSON, XML, HTML, and other popular formats while eliminating their limitations. It provides a clean syntax with full type support, making it ideal for configuration files, data exchange, and document markup.
 
-- It has **clean syntax** with **fully-type** data model *(like JSON, but even better)*
+## Table of Contents
+
+- [Mark Syntax](#mark-syntax)
+- [Mark Data Model](#mark-data-model)
+- [Comparisons](#mark-vs-json)
+  - [Mark vs. JSON](#mark-vs-json)
+  - [Mark vs. HTML/JSX](#mark-vs-htmljsx)
+  - [Mark vs. XML](#mark-vs-xml)
+  - [Mark vs. S-expressions](#mark-vs-s-expressions)
+- [mark.js Library](#markjs)
+- [Installation & Usage](#usage)
+- [Documentation](#documentation)
+- [Credits](#credits)
+
+- It has **clean syntax** with **fully-typed** data model *(like JSON, but even better)*
 - It is **generic** and **extensible** *(like XML, but even better)*
 - It has built-in **mixed content** support *(like HTML5 or even better)*
 - It supports **high-order** composition *(like S-expressions or even better)*
 
-|                        | Mark                           | JSON     | HTML | JSX                                   | XML                            | S-expr                             | YAML                                  |
-| ---------------------- | ------------------------------ | -------- | ---- | ------------------------------------- | ------------------------------ | ---------------------------------- | ------------------------------------- |
-| Clean syntax           | yes                            | yes      | no   | no                                    | verbose                        | yes                                | yes <sub>(only for basic usage)</sub> |
-| Fully-typed            | yes                            | yes      | no   | partial<br><sub>(only in {...})</sub> | no <sub>(when no schema)</sub> | yes                                | yes                                   |
-| Generic                | yes                            | yes      | no   | no                                    | yes                            | yes                                | yes                                   |
-| Mixed content support  | yes                            | hard     | yes  | yes                                   | yes                            | hard <sub>(poor map support)</sub> | hard                                  |
-| High-order composition | yes                            | possible | no   | yes                                   | verbose                        | yes                                | possible                              |
-| Wide adoption          | not <sub>(at the moment)</sub> | yes      | yes  | yes                                   | yes                            | limited                            | limited                               |
+|                        | Mark                           | JSON     | HTML | JSX                                | XML          | S-expr                             | YAML                                  |
+| ------------ | ---- | ---- | ---- | ---------------------------------- | ------------ | ------ | ------------------------------------- |
+| Clean syntax           | yes                            | yes      | no   | no                                 | verbose      | yes                                | yes <sub>(only for basic usage)</sub> |
+| Fully-typed            | yes                            | yes      | no   | partially<br><sub>(in {...})</sub> | need schema  | yes                                | yes                                   |
+| Generic                | yes                            | yes      | no   | no                                 | yes                                    | yes                                | yes                                   |
+| Mixed content support  | yes                            | hard     | yes  | yes                                | yes                                    | hard <sub>(poor map support)</sub> | hard                                  |
+| High-order composition | yes                            | possible | no   | yes                                | verbose                                | yes                                | possible                              |
+| Wide adoption          | not <sub>(at the moment)</sub> | yes      | yes  | yes                                | yes                                    | limited                            | limited                               |
 
 ## Mark Syntax
 
@@ -76,7 +90,7 @@ Each Mark element has 3 facets of data:
 
 Mark utilizes a novel feature in JavaScript that a plain JS object is actually *array-like*, it can contain both named properties and indexed properties.
 
-So each Mark element is mapped to just **one** plain JavaScript object, which is more compact and efficient comparing to other JSON-based DOM models (e.g. [JsonML](http://www.jsonml.org/), [virtual-dom](https://github.com/Matt-Esch/virtual-dom), [MicroXML](https://dvcs.w3.org/hg/microxml/raw-file/tip/spec/microxml.html)), and is more intuitive to used under JS.
+So each Mark element is mapped to just **one** plain JavaScript object, which is more compact and efficient compared to other JSON-based DOM models (e.g. [JsonML](http://www.jsonml.org/), [virtual-dom](https://github.com/Matt-Esch/virtual-dom), [MicroXML](https://dvcs.w3.org/hg/microxml/raw-file/tip/spec/microxml.html)), and is more intuitive to use under JS.
 
 Roughly speaking, data models of JSON, XML, HTML are subsets of Mark data model, and Mark data model is a subset of JS data model.
 
@@ -90,21 +104,21 @@ You can refer to the [data model spec](https://mark.js.org/mark-model.html) for 
 
 Mark is a superset of JSON. It extends JSON notation with additional scalar and container types.
 
-Comparing to JSON, Mark has the following advantages:
+Compared to JSON, Mark has the following advantages:
 
-- Additional scalar types supported under Mark, comparing to JSON, include: *symbol*, *decimal number*, *datetime*, *binary* (supporting essentially all the major built-in data types under JS).
-- For container types, other than *array* and *map*, Mark support a new type *element*. Mark *element* has a type-name, which is important in identifying what the data represents; whereas JSON map is actually an anonymous object, missing the type name.
-- Mark element has built-in mixed-content support, which is common in all markup formats, and thus allows Mark to convenient represent document-oriented data, which is awkward for JSON.
-- Mark incorporates some syntax enhancements to JSON ~(e.g. allowing comments, name without quotes)~, thus making the format more friendly for human.
+- Additional scalar types supported under Mark, compared to JSON, include: *symbol*, *decimal number*, *datetime*, *binary* (supporting essentially all the major built-in data types under JS).
+- For container types, other than *array* and *map*, Mark supports a new type *element*. Mark *element* has a type-name, which is important in identifying what the data represents; whereas JSON map is actually an anonymous object, missing the type name.
+- Mark element has built-in mixed-content support, which is common in all markup formats, and thus allows Mark to conveniently represent document-oriented data, which is awkward for JSON.
+- Mark incorporates some syntax enhancements to JSON ~(e.g. allowing comments, name without quotes)~, thus making the format more friendly for humans.
 
-Some disadvantages of Mark, comparing to JSON would be:
+Some disadvantages of Mark, compared to JSON would be:
 
 - It is no longer a subset of JavaScript literal syntax, although a Mark object is still a simple POJO in JS data model.
 - It does not yet have wide support, like JSON, at the moment.
 
 ## Mark vs. HTML/JSX
 
-Comparing to HTML/JSX, Mark has the following advantages:
+Compared to HTML/JSX, Mark has the following advantages:
 
 - Mark is a generic data format, whereas HTML is a specialized format for web content.
 - It does not have whitespace ambiguity, as the text objects are quoted explicitly. Thus Mark can be minified or prettified without worrying about changing the underlying content.
@@ -115,17 +129,17 @@ Comparing to HTML/JSX, Mark has the following advantages:
 
 ## Mark vs. XML
 
-Comparing to XML, Mark has the following advantages:
+Compared to XML, Mark has the following advantages:
 
-- Mark attributes can have complex object as value; whereas XML attribute values always need to be quoted and cannot have complex object as value, which is not flexible in syntax and data model.
+- Mark attributes can have complex objects as values; whereas XML attribute values always need to be quoted and cannot have complex objects as values, which is not flexible in syntax and data model.
 - Mark syntax is much cleaner than XML. It does not have whitespace ambiguity. It does not have all the legacy things like DTD. It does not have the verbose closing tag.
 - The data model produced by Mark is fully typed, like JSON; whereas XML is only semi-typed, when there's no schema.
 
 ## Mark vs. S-expressions
 
-S-expression from Lisp gave rise to novel ideas like high-order composition, self-hosting program. It's the source of inspiration of Mark and [Lambda Script](https://github.com/henry-luo/lambda).
+Lisp and S-expression gave rise to novel ideas like high-order composition, self-hosting program, data as code, code as data, etc.. It's the source of inspiration of Mark and [Lambda Script](https://github.com/henry-luo/lambda).
 
-The advantage of Mark over S-expressions is that it takes a more modern, JS-first approach in its design, and can be more readily used in web and Node.js environments.
+The advantage of Mark over S-expressions is that it takes a more modern, web-first approach in its design, making it more readily usable in web and Node.js environments.
 
 ## mark.js
 
@@ -166,17 +180,15 @@ Note: /dist/mark.js has bundled all sub-modules and all dependencies with it, an
 
 *If you just want the core functional API, without the sub-modules, you can also use mark.core.js, which is only 7K after gzip. You can also refer to the package.json to create your own custom bundle with the sub-modules you need.*
 
+And Mark Notation support for VS Code:
+- [Mark VSC Extension](https://marketplace.visualstudio.com/items?itemName=henryluo.mark-vsce) 
+
 ## Documentation
 
 - [Syntax specification](https://mark.js.org/mark-syntax.html)
 - [Data model and API specification](https://mark.js.org/mark-model.html)
 - [FAQ](https://mark.js.org/faq.html)
 - Discussion about Mark beta release at [Hacker News](https://news.ycombinator.com/item?id=16308581)
-
-## Tools, Extensions and Applications of Mark
-
-- [Mark VSC Extension](https://marketplace.visualstudio.com/items?itemName=henryluo.mark-vsce): Mark Notation support for Visual Studio Code.
-
 ## Credits
 
 Thanks to the following platforms or services that support the open source development of Mark: NPM, GitHub, [Travis CI](https://travis-ci.org/), [Codecov](https://codecov.io/), [JS.org](https://js.org/).
