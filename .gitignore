@@ -6,3 +6,5 @@ npm-debug.log
 .obsidian/
 /yarn.lock
 test.js
+Gemfile.lock
+docs/_site/

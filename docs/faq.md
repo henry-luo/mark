@@ -1,3 +1,9 @@
+---
+layout: page
+title: FAQ
+permalink: /faq/
+---
+
 # Mark FAQ
 
 ## Is JSON a strict subset of Mark?

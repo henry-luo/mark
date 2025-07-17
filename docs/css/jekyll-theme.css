@@ -94,6 +94,7 @@
 }
 
 .content__title {
+    margin-top: 5rem;
     font-size: 2.5rem;
     font-weight: 700;
     color: var(--color-gray-900);

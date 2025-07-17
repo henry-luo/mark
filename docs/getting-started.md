@@ -1,3 +1,9 @@
+---
+layout: page
+title: Getting Started
+description: Getting Started with Mark Notation
+permalink: /getting-started/
+---
 # Getting Started
 
 This guide will help you get started with Mark Notation quickly and easily.
