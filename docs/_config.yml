@@ -1,2 +1,46 @@
 theme: jekyll-theme-architect
 google_analytics: UA-114747922-1
+
+# Site settings
+title: Mark Notation
+description: A unified notation for both object and markup data
+url: "https://mark.js.org"
+baseurl: ""
+
+# Navigation pages
+navigation:
+  - title: Syntax
+    url: /syntax/
+  - title: Data Model
+    url: /data-model/
+  - title: JavaScript API
+    url: /api/
+  - title: FAQ
+    url: /faq/
+  - title: Grammar Reference
+    url: /grammar/
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+sass:
+  style: compressed
+
+# Plugins
+plugins:
+  - jekyll-sitemap
+  - jekyll-feed
+
+# Exclude files from processing
+exclude:
+  - node_modules
+  - package.json
+  - package-lock.json
+  - README.md
+  - Gemfile
+  - Gemfile.lock
+  - doc/
+
+# Include files
+include:
+  - _pages
