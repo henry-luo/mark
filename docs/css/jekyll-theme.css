@@ -88,6 +88,7 @@
 
 .content__header {
     margin-bottom: 3rem;
+    padding-top: 2rem; /* Add padding to prevent title from hiding behind fixed nav */
     padding-bottom: 2rem;
     border-bottom: 1px solid var(--color-gray-200);
 }
@@ -236,7 +237,7 @@
 
 .footer__content {
     display: grid;
-    grid-template-columns: 1fr auto auto;
+    grid-template-columns: 1fr auto;
     gap: 3rem;
     margin-bottom: 2rem;
 }
@@ -277,6 +278,9 @@
     list-style: none;
     margin: 0;
     padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 2rem;
 }
 
 .footer__column-links li {
@@ -327,6 +331,10 @@
         grid-template-columns: 1fr;
         gap: 2rem;
     }
+    
+    .footer__column-links {
+        gap: 0 1.5rem;
+    }
 }
 
 @media (max-width: 768px) {
@@ -340,5 +348,10 @@
     
     .sidebar__content {
         padding: 1.5rem;
+    }
+    
+    .footer__column-links {
+        gap: 0 1rem;
+        font-size: 0.9rem;
     }
 }
