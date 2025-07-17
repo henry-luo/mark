@@ -1,6 +1,10 @@
 # Mark Data Model and APIs
 
-Mark has a simple and fully-typed data model. It is an extension to the JSON data model. Mark extends JSON data model with 3 new data types: **binary object**, **Mark pragma** and **Mark object**.
+Mark has a simple and fully-typed data model. It is an extension to the JSON data model. Mark extends JSON data model with several new data types:
+- scalar types: **symbol**, **datetime**, **binary**, and **decimal** number.
+- container types: **list** and **element**.
+
+With the new data type additions, essentially, all commonly used built-in data types are well represented under Mark.
 
 Mark's data model is designed so that a well-formed HTML or XML document can be converted into Mark document without any loss in data model.
 
@@ -10,64 +14,55 @@ Roughly speaking, JSON, HTML and XML data models are subsets of Mark data model,
 <img align='center' src='https://mark.js.org/data-model.png' width='300'>
 </div>
 
-## 1. Binary Object
+## 1. Symbol
 
-A binary object is represented by an JS ArrayBuffer, containing the bytes decoded from the source characters in either base64 or ascii85 encoding.
+Mark symbol.
 
-It has a property **encoding**, which can have the value `b64` or `a85`.
+## 2. Datetime
+
+Mark datetime.
+
+## 3. Binary
+
+A *binary* object is represented by an JS ArrayBuffer, containing the bytes decoded from the source characters in either base64 or ascii85 encoding.
+
+It has a property **encoding**, which can have the value `hex` or `b64`.
 
 Unlike string, consecutive binary objects within the content of a Mark object are not merged.
 
-## 2. Mark Pragma
+## 4. Decimal
 
-Mark pragma is just a simple object with string content when data model is concerned. The interpretation of the text content stored in the pragma object is left up to the application. Mark pragma can be thought of like comment in HTML and processing instruction in XML.
+Mark decimal.
 
-### 2.1 Pragma vs. Comment
+## 3. Element
 
-Mark comment is only a lexical construct. All Mark comments are thrown away during parsing, and they do not appear in the parsed data model.
+Mark element extends map object with a type name and a list of content objects. Mark object is designed to act like element in HTML/XML.
 
-Mark pragmas are preserved during parsing and appear in the result data model.
+A Mark element essentially contains 3 facets of data in its data model:
 
-### 2.2 Pragma API
-
-Mark pragma constructor:
-
-- `Mark.pragma(value)`: constructs a pragma object with the given `value` string.
-
-The constructed pragma is a special JS object. It's does not have a constructor, like other normal JS objects. `typeof pragmaObj === 'object'`, however `pragmaObj.constructor` is `undefined`. It has the following API functions:
-
-- `pragmaObj.pragma()`: returns the content string stored in the pragma; 
-- `pragmaObj.parent()`: returns the parent object of the pragma.
-- `pragmaObj.valueOf()`: inherited from `Object.prototype.valueOf`, and just return the pragma itself.
-- `pragmaObj.toString()`: returns `"[object Pragma]"`.
-
-Mark pragma is a specially constructed JS object, it has been stripped off all standard JS object methods except the ones defined above.
-
-## 3. Mark Object
-
-Mark object extends JSON object with a type name and a list of content objects. Mark object is designed to act like element in HTML/XML.
-
-A Mark object essentially contains 3 facets of data in its data model:
-
-- **type name**: a string that represent the type name of the Mark object, which is like element name in HTML/XML. 
+- **element name**: a string that represent the type name of the Mark object, which is like element name in HTML/XML. 
 - **properties**: a collection of key-value pairs, like properties of JSON objects, and attributes of HTML/XML elements. 
   - For Mark object, property key **cannot be numeric**, which is reserved for the content objects. JSON object in Mark can still have all kinds of keys.
   - And property key must be **unique** under the same object, for both Mark and JSON object. (JSON spec has left this open, and there are many implementations accept duplicate keys.)
 - **contents**: an ordered list of content objects, which are like child nodes of elements in HTML/XML. Mark utilizes a *novel* feature of JS that JS object can be array-like. It can store both named properties and indexed properties.
 
-Mark has some restrictions on the objects that can be stored in the content:
+Mark performs following normalization on the content stored in an element:
 
-- Objects allowed in Mark content are: `string`, `binary object` (i.e. `ArrayBuffer`), `Mark pragma`, `JSON object`, `Mark object`.
-- `Array`, `number`, `boolean` and `null` values are not allowed in Mark content.
+- `null` values are discarded.
 - Consecutive strings are merged into one single string.
+- a *list* in the element content will have its items auto spread/flattened.
 
-These restrictions are defined so that Mark content model can align with that of HTML and XML.
+These normalizations are performed to make Mark more friendly to use under mixed-content use cases.
+
+## 4. List
+
+Mark list
 
 ### 3.1 Core API
 
 Mark object constructor:
 
-- `Mark(source)`: shorthand for `Mark.parse(source)`. `source` parameter must start with '{'.
+- `Mark(source)`: shorthand for `Mark.parse(source)`. `source` parameter must start with '<', '{' or '[' or '('.
 - `Mark(type_name, properties, contents)`: Mark object constructor takes 3 parameters, except `type_name`, the other 2 are optional.
   - `type_name`: a string. It must not start with '{'.
   - `properties`: a JSON object containing name-value pairs. Numeric property keys are ignored.

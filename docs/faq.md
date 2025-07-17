@@ -2,11 +2,9 @@
 
 ## Is JSON a strict subset of Mark?
 
-Yes. Mark is carefully designed to have JSON as a strict subset. Any valid JSON source should be accepted as valid Mark input, except one circumstance you need to be aware of.
+Yes. Mark is carefully designed to have JSON as a strict subset. Any valid JSON source should be accepted as valid Mark input, except one corner case.
 
-Under Mark, property keys for both Mark and JSON objects must be unique under the same object. This is strictly enforced under Mark. But is left open in the initial JSON spec, and there are many implementations that accept duplicate keys in JSON. But the official JSON spec strongly advise against such practice.
-
-And there even are programmers [utilize that loophole](https://stackoverflow.com/questions/244777/can-comments-be-used-in-json) to put comment in JSON. If you follow such bad practice, then your JSON needs to be cleaned up first before migrating to Mark.
+JSON accept empty string "" as key. Mark does not accept that. E.g. `{"":123}` is valid under JSON, but not under Mark.
 
 ## Is Mark a subset of JavaScript?
 
@@ -36,15 +34,9 @@ Yes. Mark is designed to be a generalized data format, like JSON and XML. It is 
 
 However, due to limited resource, the Mark handling library is currently only implemented in JS. But as Mark has a very simple syntax and data model, it should not be hard to port it to other languages. 
 
-## Is Mark Turing complete?
-
-No. By itself, Mark is just a markup notation, thus not Turing complete.
-
-However, if some interpretation is applied to the content embodied in the Mark document, then it can be a very powerful Turing complete scripting language. [Mark Template](https://github.com/henry-luo/mark-template) is such an example. Ant and XSLT are similar examples in XML.
-
 ## What is Mark's road map?
 
-Like JSON, Mark's syntax and data model is designed to be stable. I don't foresee any changes in the near future. Thus the mark.js library shall remain stable as well.
+Like JSON, Mark 1.0's syntax and data model is designed to be stable. Thus the mark.js library shall remain stable as well.
 
 However, for Mark to be useful, a lot need to be developed on top of the basic Mark syntax and data model. And those activities shall happen in separate projects (like Mark Template, Mark Schema), without changing the Mark syntax and data model.
 
