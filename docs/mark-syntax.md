@@ -1,31 +1,25 @@
 # Mark Syntax
 
-Mark syntax is a superset of JSON. The primary extension that Mark makes to JSON is the introduction of a new object notation to support markup data, commonly seen in HTML and XML.
+Mark syntax is a superset of JSON. The primary extension that Mark makes to JSON is the introduction of a new element notation to support markup data, commonly seen in HTML and XML.
 
-## 1. Mark Object
+## 1. Mark Element
 
-Below are the key grammar rules for the new Mark object in BNF notation:
+Below are the key grammar rules for the new Mark element in BNF notation:
 
 ```BNF
-Mark ::= value     /* root of Mark grammar */
+element ::= '<' type_name properties contents '>'
 
-value ::= null | boolean | number | string | binary | array | json_object | mark_object | mark_pragma
-
-mark_object ::= '{' type_name properties contents '}'
-
-type_name ::= key
-
-key ::= string | identifier
+type_name ::= identifier | symbol
 ```
 
 *(Note: for clarify, whitespace rules are omitted in the grammar above. You can refer to the [formal BNF](mark.bnf).)*
 
-Comparing to a JSON object, a Mark object has two extensions:
+Comparing to a JSON object, a Mark element has two extensions:
 
 - A **type name**, which corresponds to class name or type name of an object. In JavaScript, that is `obj.constructor.name`. In HTML and XML, that's the element name.
 - Optional list of **content** values following the named properties, which corresponds to child nodes in markup documents like HTML and XML.
 
-### 1.1 Object Properties
+### 1.1 Element Properties
 
 ```BNF
 properties ::= (property ','?)*
@@ -47,7 +41,7 @@ continue_identifier ::= begin_identifier | digit | '-' | '.'
 - Property keys **must be unique** (for both Mark and JSON object).
 - Comma between properties is optional, and last property can have trailing comma.
 
-### 1.2 Object Contents
+### 1.2 Element Contents
 
 ```BNF
 contents ::= (text | binary | json_object | mark_object | mark_pragma)*
@@ -56,60 +50,51 @@ contents ::= (text | binary | json_object | mark_object | mark_pragma)*
 - To better support mixed content, not all Mark values are allowed in the contents of a Mark object. Array, number, boolean and null values are not allowed.
 - Consecutive text values are merged into a single text value.
 
-## 2. Mark Pragma
+## 2. Other Syntax Extensions to JSON
 
-Mark pragma is a sequence of characters enclosed in brackets `( ... )`. It has two syntax forms. The general form is quoted in `(? ... ?)`, and the pair form is quoted in `( ... )`. 
+### 2.1 Root level
 
-In the general form, character `?` needs to be escaped with double `??`. 
+JSON allows only one value at root-level.
 
-In paired form, no character needs to be escaped. It can contain embedded brackets, as long as they are balanced. Outer brackets are delimiters, whereas embedded brackets are part of the pragma content.
+Mark allows multiple values at root-level, separated by ';' or line break.
 
-```BNF
-mark_pragma ::= general_pragma | paired_pragma
-general_pragma ::= '(?' (char_no_qmark | '??')* '?)' 
-paired_pragma ::= '(' (char_no_bracket | mark_pragma)* ')' 
-```
+### 2.2 String
 
-It can be used for content like comments in HTML and processing instructions in XML, and embedded expressions in templates.
+- Strings under Mark can only be double quoted. (Single quoted is for *symbol* under Mark.)
+- Strings can span across multiple lines.
+- Unlike JSON string, control characters, like Tab and Line Feed, are allowed in Mark string. Actually, all Unicode characters are allowed in Mark string, just like JS string. Only double-quote ("),  and back-slash (\\) need to be escaped.
 
-## 3. Other Syntax Extensions to JSON
+### 2.3 Symbol
 
-Other syntax extensions made to JSON are pretty much just syntax sugars, some inspired by [JSON5](http://json5.org/).
+Symbol is a new data type introduced in Mark 1.0.
 
-### 3.1 Unique property keys
+Syntax wise, it is quite similar to string, except that it is single-quoted. And if the characters matches JS identifier, the single-quote can also be omitted.
 
-- Property keys of JSON object in Mark must be **unique** under the same object. (JSON spec has left this open, and there are many implementations that accept duplicate keys. This is probably an overlooked issue in initial JSON design.)
-
-### 3.2 Arrays
-
-- Comma between array items are optional, and last item in array can have a trailing comma.
-
-### 3.3 Strings
-
-- Strings can be single or double quoted.
-- Strings can split across multiple lines.
-- String can also be triple-quoted with single or double quote character, similar to Python or Scala.
-  - The quoted sequence of characters is arbitrary, except that it may contain three or more consecutive quote characters only at the very end. Escape sequences are not interpreted.
-- Unlike JSON string, control characters, like Tab and Line Feed, are allowed in Mark string. Actually, all Unicode characters are allowed in Mark string, just like JS string. Only double-quote ("),  single-quote (') and back-slash (\\) need to be escaped.
-
-### 3.4 Numbers
+### 2.4 Number
 
 - Numbers can begin or end with a (leading or trailing) decimal point.
-- Numbers can include `Infinity`, `-Infinity`,  `NaN`, and `-NaN`.
+- Numbers can include `inf`, `-inf`,  `nan`, and `-nan`.
 - Numbers can begin with an explicit plus sign.
+- Mark support supports big *decimal* number. It is a integer or decimal number postfixed with 'N' or 'n', e.g. 123n. (*Note: under current mark.js implementation, only bigint is supported at the moment. We'll expand the implementation to cover big decimal.*)
 
-### 3.5 Binary Value
+### 2.4 Datetime
 
-- Binary data can be encoded as a sequence of characters delimited by `[#]` and `]`. 
-- It can encoded in either [base64](https://en.wikipedia.org/wiki/Base64) or [ascii85](https://en.wikipedia.org/wiki/Ascii85) *(Adobe version)* encoding.
+- Datetime under Mark is [ISO 8601 Datetime](https://en.wikipedia.org/wiki/ISO_8601) string quoted in `t'...'`
+- `T`, `t`, and space `' '` are accepted as date time separator.
+- Note that only are subset of ISO 8601 Datetime format is supported under Mark.
+
+### 2.5 Binary Value
+
+- Binary data can be encoded as a sequence of characters delimited by `b'...'`. 
+- It can encoded in either *hex* or *base64* encoding.
 - Whitespaces are allowed between the encoded characters and are ignored by the parser. 
 
 ```BNF
-binary ::=  base64_binary | ascii85_binary
+binary ::= hex_binary | base64_binary
 
-base64_binary ::= '[#' ([0-9a-zA-Z] | '+' | '/' | ws_char)* '='? '='? ']'
+hex_binary ::= "b'" '\\x' (hex_char | ws_char)* "'"
 
-ascii85_binary ::= '[#~' ([#x21-u] | 'z' | ws_char)* '~]'
+base64_binary ::= "b'" '\\64' (base64_char | ws_char)* '='? '='? "'"
 ```
 
 ### 3.6 Comments
