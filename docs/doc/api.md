@@ -10,21 +10,30 @@ The Mark.js library provides a simple API centered around parsing, stringifying,
 
 The main constructor function for creating Mark objects.
 
+**Constructor Signatures:**
+
 ```javascript
-Mark(typeName, properties?, content?)
+Mark(source)  // shorthand for Mark.parse(source)
+Mark(typeName, properties?, content?)  // object constructor
 ```
 
-**Parameters:**
-- `typeName` (string): The type name for the object
-- `properties` (object, optional): Key-value pairs for object properties
-- `content` (array, optional): Array of content items
+**Parameters for parse shorthand:**
+- `source` (string): Mark notation string that must start with '<', '{', '[', or '('
 
-**Returns:** Mark object
+**Parameters for object constructor:**
+- `typeName` (string): The type name for the object (must not start with '{')
+- `properties` (object, optional): Key-value pairs for object properties (numeric keys ignored)
+- `content` (array, optional): Array of content items (null values skipped, primitives converted to strings, arrays flattened, consecutive strings merged)
+
+**Returns:** Mark object (POJO with special properties)
 
 **Examples:**
 
 ```javascript
-// Simple object
+// Parse shorthand
+const obj = Mark('<user name:"Alice">');
+
+// Object constructor - simple object
 const greeting = Mark('greeting');
 
 // Object with properties
@@ -36,6 +45,142 @@ const list = Mark('list', null, ['item1', 'item2', 'item3']);
 // Object with both properties and content
 const div = Mark('div', { class: 'container' }, ['Hello, World!']);
 ```
+
+## Mark Object Structure
+
+The constructed Mark object is a simple POJO (Plain Old JavaScript Object) with these special characteristics:
+
+### Accessing Data
+
+- **Type name**: Access through `markObj.constructor.name`
+- **Properties**: Access through `markObj.prop` or `markObj['prop']` for non-identifier names
+- **Content**: Access through `markObj[index]` (array-like indexed properties)
+
+**Examples:**
+
+```javascript
+const element = Mark.parse('<div class:"container" id:main "Hello" "World">');
+
+// Type name
+console.log(element.constructor.name); // "div"
+
+// Properties
+console.log(element.class); // "container"
+console.log(element.id); // "main"
+
+// Content (array-like access)
+console.log(element[0]); // "Hello"
+console.log(element[1]); // "World"
+console.log(element.length); // 2
+```
+
+### Enumeration
+
+- **Properties**: Use `for...in` loop (content items are non-enumerable)
+- **Content**: Use `for...of` loop or array-like iteration
+
+```javascript
+const obj = Mark.parse('<user name:"Alice" age:30 "bio text" "more info">');
+
+// Iterate properties
+for (let prop in obj) {
+  console.log(`${prop}: ${obj[prop]}`);
+}
+// Output: name: Alice, age: 30
+
+// Iterate content
+for (let item of obj) {
+  console.log(item);
+}
+// Output: "bio text", "more info"
+```
+
+## Instance Methods
+
+### Core Methods
+
+#### .length
+
+```javascript
+obj.length
+```
+
+Returns the number of content items. If a `length` property is defined on the object, returns that value instead. Use `Mark.lengthOf()` to always get content length.
+
+#### .contents()
+
+```javascript
+obj.contents()
+```
+
+Returns an array of all content items stored in the Mark object.
+
+#### .parent()
+
+```javascript
+obj.parent()
+```
+
+Returns the parent object of the current Mark object.
+
+#### .source(options)
+
+```javascript
+obj.source(options?)
+```
+
+Shorthand for stringifying the current Mark object. Same as `Mark.stringify(obj, options)`.
+
+#### .text()
+
+```javascript
+obj.text()
+```
+
+Returns a string which is the concatenation of all descendant text content items.
+
+### Array-like Methods
+
+Mark objects support most array methods for working with content:
+
+```javascript
+// Functional array methods
+obj.filter(callback, thisArg?)
+obj.map(callback, thisArg?)
+obj.reduce(callback, initialValue?)
+obj.every(callback, thisArg?)
+obj.some(callback, thisArg?)
+obj.each(callback, thisArg?)       // alias for forEach
+obj.forEach(callback, thisArg?)
+
+// Search methods
+obj.includes(searchElement, fromIndex?)
+obj.indexOf(searchElement, fromIndex?)
+obj.lastIndexOf(searchElement, fromIndex?)
+
+// Slice method
+obj.slice(begin?, end?)
+```
+
+**Example:**
+
+```javascript
+const list = Mark.parse('<list "apple" "banana" "cherry">');
+
+// Filter content
+const filtered = list.filter(item => item.includes('a'));
+console.log(filtered); // ["apple", "banana"]
+
+// Map content
+const lengths = list.map(item => item.length);
+console.log(lengths); // [5, 6, 6]
+
+// Check if all items are strings
+const allStrings = list.every(item => typeof item === 'string');
+console.log(allStrings); // true
+```
+
+**Note:** When these methods are overridden by properties of the same name, you can still call them from the prototype: `Mark.prototype.contents.call(markObj)`.
 
 ## Parse API
 
@@ -51,11 +196,6 @@ Mark.parse(markString, options?)
 - `markString` (string): The Mark notation string to parse
 - `options` (object, optional): Parsing options
 
-**Options:**
-- `strict` (boolean): Enable strict parsing mode (default: false)
-- `preserveComments` (boolean): Preserve comments in output (default: false)
-- `maxDepth` (number): Maximum nesting depth (default: 100)
-
 **Returns:** Mark object
 
 **Throws:** `SyntaxError` if the input is invalid
@@ -64,17 +204,20 @@ Mark.parse(markString, options?)
 
 ```javascript
 // Basic parsing
-const obj = Mark.parse(`{user name:"Alice" age:30}`);
-
-// With options
-const strict = Mark.parse(`{config port:3000}`, { strict: true });
+const obj = Mark.parse('<user name:"Alice" age:30>');
 
 // Complex structure
-const form = Mark.parse(`{form
-  {input type:text name:username}
-  {input type:password name:password}
-  {button type:submit "Login"}
-}`);
+const form = Mark.parse(`<form
+  <input type:text name:username>
+  <input type:password name:password>
+  <button type:submit "Login">
+>`);
+
+// Mixed content
+const article = Mark.parse(`<article
+  <h1 "Title">
+  <p "This is " <em "emphasized"> " text.">
+>`);
 ```
 
 ### Error Handling
@@ -83,14 +226,12 @@ Parse errors include detailed information about the syntax issue:
 
 ```javascript
 try {
-  const obj = Mark.parse(`{invalid syntax`);
+  const obj = Mark.parse('<invalid syntax');
 } catch (error) {
-  console.log(error.message); // "Unexpected end of input"
-  console.log(error.line); // 1
-  console.log(error.column); // 16
+  console.log(error.message); // Error description
+  console.log(error.line);    // Line number (if available)
+  console.log(error.column);  // Column number (if available)
 }
-```
-
 ## Stringify API
 
 ### Mark.stringify()
@@ -106,10 +247,7 @@ Mark.stringify(markObject, options?)
 - `options` (object, optional): Stringification options
 
 **Options:**
-- `indent` (string|number): Indentation for pretty printing (default: null)
-- `maxLineLength` (number): Maximum line length before wrapping (default: 80)
-- `sortKeys` (boolean): Sort object keys alphabetically (default: false)
-- `includeComments` (boolean): Include comments in output (default: false)
+- `space` (string|number): Indentation for pretty printing. If number, indicates spaces per level (max 10). If string, uses that string for indentation (max 10 characters).
 
 **Returns:** String representation of the Mark object
 
@@ -120,49 +258,324 @@ const obj = Mark('user', { name: 'Alice', age: 30 }, ['Hello']);
 
 // Compact output
 Mark.stringify(obj);
-// Result: {user name:"Alice" age:30 "Hello"}
+// Result: <user name:"Alice" age:30 "Hello">
 
-// Pretty printed
-Mark.stringify(obj, { indent: 2 });
+// Pretty printed with 2 spaces
+Mark.stringify(obj, { space: 2 });
 // Result:
-// {user
+// <user
 //   name:"Alice"
 //   age:30
 //   "Hello"
-// }
+// >
 
-// With line length limit
-Mark.stringify(obj, { indent: 2, maxLineLength: 40 });
+// Pretty printed with custom indentation
+Mark.stringify(obj, { space: '\t' });
+// Uses tabs for indentation
 ```
 
-## Constructor API
+**Note:** Mark does not support `reviver` function (like `JSON.parse()`) or `replacer` function (like `JSON.stringify()`). These are not structured nor secure ways to serialize and deserialize custom data types.
 
-### Mark.create()
+## Static Methods
 
-Alternative constructor with more explicit parameter handling.
+### Mark.lengthOf()
+
+Returns the content length of a Mark object, even when the object has a `length` property.
 
 ```javascript
-Mark.create(typeName, options?)
+Mark.lengthOf(markObject)
 ```
 
 **Parameters:**
-- `typeName` (string): The type name for the object
-- `options` (object, optional): Configuration options
+- `markObject` (object): The Mark object to measure
 
-**Options:**
-- `properties` (object): Object properties
-- `content` (array): Object content
-- `prototype` (object): Custom prototype (advanced)
-
-**Returns:** Mark object
+**Returns:** Number of content items
 
 **Example:**
 
 ```javascript
-const user = Mark.create('user', {
-  properties: { name: 'Alice', age: 30 },
-  content: ['Welcome message']
-});
+const obj = Mark.parse('<list length:5 "a" "b" "c">');
+console.log(obj.length);           // 5 (property value)
+console.log(Mark.lengthOf(obj));   // 3 (actual content length)
+```
+
+## Mutative API
+
+Mutative API functions are in the separate sub-module `mark.mutate.js`. These allow modification of Mark objects and can be excluded if using Mark in a purely functional manner.
+
+### .set()
+
+Sets a property or content item on a Mark object.
+
+```javascript
+obj.set(key, value)
+```
+
+**Parameters:**
+- `key` (string|number): Property name or content index
+- `value` (any): Value to set
+
+**Returns:** The Mark object (for chaining)
+
+**Examples:**
+
+```javascript
+const obj = Mark.parse('<user name:"Alice">');
+
+// Set property
+obj.set('age', 30);
+
+// Set content (numeric key)
+obj.set(0, 'Hello, Alice!');
+
+console.log(Mark.stringify(obj));
+// Result: <user name:"Alice" age:30 "Hello, Alice!">
+```
+
+### .push()
+
+Adds one or more items to the end of the content.
+
+```javascript
+obj.push(item1, item2, ...)
+```
+
+**Parameters:**
+- `item1, item2, ...` (any): Items to add
+
+**Returns:** The Mark object (for chaining, unlike Array.push which returns length)
+
+**Example:**
+
+```javascript
+const list = Mark.parse('<list "a" "b">');
+list.push('c', 'd');
+console.log(Mark.stringify(list));
+// Result: <list "a" "b" "c" "d">
+```
+
+### .pop()
+
+Removes and returns the last content item.
+
+```javascript
+obj.pop()
+```
+
+**Returns:** The removed item
+
+**Example:**
+
+```javascript
+const list = Mark.parse('<list "a" "b" "c">');
+const last = list.pop();
+console.log(last); // "c"
+console.log(Mark.stringify(list)); // <list "a" "b">
+```
+
+### .splice()
+
+Changes content by removing existing items and/or adding new items.
+
+```javascript
+obj.splice(index, deleteCount, item1, item2, ...)
+```
+
+**Parameters:**
+- `index` (number): Start index
+- `deleteCount` (number): Number of items to remove
+- `item1, item2, ...` (any): Items to add
+
+**Returns:** Array of removed items
+
+**Example:**
+
+```javascript
+const list = Mark.parse('<list "a" "b" "c" "d">');
+const removed = list.splice(1, 2, 'x', 'y');
+console.log(removed); // ["b", "c"]
+console.log(Mark.stringify(list)); // <list "a" "x" "y" "d">
+```
+
+## Pragma API
+
+For Mark pragma objects (special metadata comments):
+
+### .set() (Pragma)
+
+Sets the content of a pragma object.
+
+```javascript
+pragma.set(value)
+```
+
+**Parameters:**
+- `value` (any): Value to set
+
+**Returns:** The pragma object
+
+## Converter API
+
+Additional functions in `mark.convert.js` for converting Mark to other formats:
+
+### .html()
+
+Converts a Mark object to HTML string.
+
+```javascript
+obj.html(options?)
+```
+
+**Parameters:**
+- `options` (object, optional): Same as `Mark.stringify()` options
+
+**Returns:** HTML string
+
+**Example:**
+
+```javascript
+const element = Mark.parse('<div class:"container" <p "Hello World">>');
+console.log(element.html());
+// Result: <div class="container"><p>Hello World</p></div>
+```
+
+### .xml()
+
+Converts a Mark object to XML string.
+
+```javascript
+obj.xml(options?)
+```
+
+**Parameters:**
+- `options` (object, optional): Same as `Mark.stringify()` options
+
+**Returns:** XML string
+
+**Example:**
+
+```javascript
+const element = Mark.parse('<book title:"My Book" <author "John Doe">>');
+console.log(element.xml());
+// Result: <book title="My Book"><author>John Doe</author></book>
+```
+
+## Selector API
+
+Additional functions in `mark.selector.js` for CSS-like querying:
+
+### .matches()
+
+Tests whether the Mark object matches a CSS selector.
+
+```javascript
+obj.matches(selector)
+```
+
+**Parameters:**
+- `selector` (string): CSS selector string
+
+**Returns:** Boolean
+
+**Example:**
+
+```javascript
+const element = Mark.parse('<div class:"container" id:main>');
+console.log(element.matches('.container')); // true
+console.log(element.matches('#main'));      // true
+console.log(element.matches('span'));       // false
+```
+
+### .find()
+
+Finds child or descendant elements that match a CSS selector.
+
+```javascript
+obj.find(selector)
+```
+
+**Parameters:**
+- `selector` (string): CSS selector string
+
+**Returns:** Array of matching Mark objects
+
+**Example:**
+
+```javascript
+const doc = Mark.parse(`<document
+  <div class:"container"
+    <p "First paragraph">
+    <p "Second paragraph">
+  >
+  <span "Some text">
+>`);
+
+const paragraphs = doc.find('p');
+console.log(paragraphs.length); // 2
+
+const container = doc.find('.container');
+console.log(container.length); // 1
+```
+
+## Type Checking
+
+### Mark.isMark()
+
+Checks if an object is a Mark object.
+
+```javascript
+Mark.isMark(obj)
+```
+
+**Parameters:**
+- `obj` (any): Object to test
+
+**Returns:** Boolean
+
+**Example:**
+
+```javascript
+const mark = Mark.parse('<test>');
+const plain = { test: true };
+
+console.log(Mark.isMark(mark));  // true
+console.log(Mark.isMark(plain)); // false
+```
+
+## Best Practices
+
+### Memory Management
+
+Mark objects are plain JavaScript objects, so they follow normal garbage collection rules:
+
+```javascript
+// Objects are automatically cleaned up when no longer referenced
+function processData() {
+  const obj = Mark.parse('<data "large content">');
+  // Process obj...
+  // obj will be garbage collected when function exits
+}
+```
+
+### Performance Considerations
+
+- Use `Mark.stringify()` sparingly for large objects
+- Consider using mutative API for building large structures
+- Cache parsed objects when possible
+
+### Error Handling
+
+Always wrap parsing in try-catch blocks:
+
+```javascript
+function safeParseMarkup(markup) {
+  try {
+    return Mark.parse(markup);
+  } catch (error) {
+    console.error('Mark parsing failed:', error.message);
+    return null;
+  }
+}
 ```
 
 ### Mark.extend()

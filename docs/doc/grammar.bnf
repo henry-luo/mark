@@ -1,0 +1,175 @@
+/* Note: this BFN is meant for illustrations only 
+Refer the Mark.js implementation and Lambda script grammar for extact syntax
+*/
+
+eol ::= LF | CRLF | CR          /* End-of-line */
+
+eof ::= EOF           			/* End-of-input */
+
+/*-- comment ------------------------------------------------------*/
+comment ::= sl_comment | ml_comment
+
+sl_comment ::= '//' char_no_eol* (eol | eof)
+
+/* multi-line comment can be nested */
+ml_comment ::= '/*' (ml_comment | char_no_star | ('*' char_no_slash))* '*/'
+
+/* char ::= [#x00-#x10FFFF]  any Unicode character */
+
+char_no_eol ::= [#x00-#x09] | [#x0B-#x0C] | [#x0E-#x10FFFF] /* Character except LF, CR */
+
+char_no_star ::= [#x00-#x29] | [#x2B-#x10FFFF] /* Character except star * */
+
+char_no_slash ::= [#x20-#x2E] | [#x30-#x10FFFF] /* Character except slash / */
+
+/*-- whitespace --------------------------------------------------*/
+ws_char ::= SP |        /* Space */
+        TAB |           /* Horizontal tab */
+        eol				/* Line ending */
+ws ::= (ws_char | comment)*
+
+/*-- primitive values --------------------------------------------*/
+null  ::= 'null'
+
+boolean  ::= 'true' | 'false'
+
+/*-- number ------------------------------------------------------*/
+number ::= ('+' | '-')? (nan | inf | integer | float | decimal)
+
+nan ::= 'nan'
+
+inf ::= 'inf'
+
+integer ::= int
+
+float ::= (int ('.' digit*)? | ('.' digit+)) exp?
+
+decimal ::= float ('n' | 'N')
+
+exp ::= ('e' | 'E') ('+' | '-')? digit+
+
+int ::= '0' | ([1-9] digit*)
+
+digit ::= [0-9]
+
+/*-- datetime ----------------------------------------------------*/
+datetime ::= "t'" datetime_content "'"
+
+datetime_content ::= date_only | time_only | date_and_time
+
+date_only ::= year ('-' month ('-' day)?)?
+
+time_only ::= time timezone?
+
+date_and_time ::= date_only datetime_separator time timezone?
+
+datetime_separator ::= 'T' | 't' | ws_char+
+
+year ::= digit digit digit digit
+
+month ::= '0' [1-9] | '1' [0-2]
+
+day ::= '0' [1-9] | [12] digit | '3' [01]
+
+time ::= hour (':' minute (':' second ('.' millisecond)?)?)?
+
+hour ::= [01] digit | '2' [0-3]
+
+minute ::= [0-5] digit
+
+second ::= [0-5] digit
+
+millisecond ::= digit digit digit
+
+timezone ::= 'Z' | 'z' | ('+' | '-') hour ':' minute
+
+/*-- binary data -------------------------------------------------*/
+binary ::= hex_binary | base64_binary
+
+hex_binary ::= "b'" '\\x' (hex_char | ws_char)* "'"
+
+base64_binary ::= "b'" '\\64' (base64_char | ws_char)* '='? '='? "'"
+
+hex_char ::= [0-9a-fA-F]
+
+base64_char ::= [0-9a-zA-Z] | '+' | '/'
+
+/*-- string ------------------------------------------------------*/
+string ::= '"' (char | "'")* '"'
+
+char ::= unescaped | escaped
+
+unescaped ::= [#x00-#x21] | [#x23-#x26] | [#x28-#x5B] | [#x5D-#x10FFFF]  /* chars except ", ', \ */
+   
+escaped ::= '\' (
+   "'" |			/* this is needed as we allows single quote string */
+   '"' |
+   '\' |
+   '/' |
+   'b' |            /* b    backspace       U+0008 */
+   'f' |            /* f    form feed       U+000C */
+   'n' |            /* n    line feed       U+000A */
+   'r' |            /* r    carriage return U+000D */
+   't' |         	/* t    tab             U+0009 */
+   unicode			/* uXXXX                U+XXXX */
+   )
+
+unicode ::= 'u' hex hex hex hex	
+
+hex ::= [0-9a-fA-F]
+
+/*-- symbol ------------------------------------------------------*/
+symbol ::= _symbol | identifier
+
+_symbol ::= "'" (char | '"')* "'"
+
+/*-- array ------------------------------------------------------*/
+array ::= begin_array (value value_separator?)* end_array
+
+begin_array     ::= ws '[' ws
+
+end_array       ::= ws ']' ws
+
+value_separator ::= ws ',' ws
+
+/*-- list -------------------------------------------------------*/
+list ::= begin_list (value value_separator?)* end_list
+
+begin_list     ::= ws '(' ws
+
+end_list       ::= ws ')' ws
+
+/*-- map ------------------------------------------------*/
+map ::= begin_map properties end_map
+
+begin_map ::= ws '{' ws
+
+end_map ::= ws '}' ws
+
+properties ::= (property value_separator?)*
+
+property ::= key separator value
+
+separator ::= ws ':' ws
+
+key ::= string | symbol
+
+identifier ::= begin_ident continue_ident*
+
+begin_ident ::= [a-zA-Z] | '_' | '$'
+
+continue_ident ::= begin_ident | digit | '-' | '.'
+
+/*-- element -----------------------------------------------*/ 
+element ::= begin_element name properties contents end_elment
+
+name ::= symbol
+
+contents ::= (value ((';' | LF | CRLF) value)*)?
+
+text ::= (string ws)+   /* Mark text can be multiple consecutive strings */
+
+/*-- Mark root ------------------------------------------------------*/
+value ::= null | boolean | number | string | symbol | binary | datetime | list | array | map | element
+
+Mark ::= ws contents ws

@@ -1,54 +1,250 @@
 # Data Model
 
-Understanding Mark's data model is essential for effectively working with Mark objects in JavaScript.
+Mark has a simple and fully-typed data model. It is an extension to the JSON data model.
 
 ## Overview
 
-Mark has a simple and fully-typed data model where each Mark object has three facets:
+Mark extends JSON data model with several new data types:
+- **Scalar types**: symbol, datetime, binary, and decimal number
+- **Container types**: list and element
 
-1. **Type name** - identifies what the object represents
-2. **Properties** - key-value pairs stored as named properties
-3. **Content** - ordered list stored as indexed properties
+With these additions, essentially all commonly used built-in data types are well represented under Mark.
 
-## Type System
+Mark's data model is designed so that a well-formed HTML or XML document can be converted into Mark document without any loss in data model.
 
-### Type Names
+Roughly speaking, JSON, HTML and XML data models are subsets of Mark data model, and Mark data model is a subset of JS data model.
 
-Every Mark object has a type name that maps to `object.constructor.name` in JavaScript:
+<div align="center">
+<img align='center' src='../data-model.png' width='300'>
+</div>
+
+## Mark Element Structure
+
+A Mark element contains 3 facets of data in its data model:
+
+### 1. Element Name
+
+A string that represents the type name of the Mark object, which is like element name in HTML/XML.
 
 ```javascript
-const user = Mark.parse(`{user name:"Alice"}`);
-console.log(user.constructor.name); // "user"
-console.log(typeof user); // "object"
+const element = Mark.parse('<div>');
+console.log(element.constructor.name); // "div"
 ```
 
-### Dynamic Types
+### 2. Properties
 
-Type names are determined at parse time and create dynamic constructor functions:
+A collection of key-value pairs, like properties of JSON objects, and attributes of HTML/XML elements.
 
-```javascript
-const blog = Mark.parse(`{blog title:"My Blog"}`);
-console.log(blog instanceof Object); // true
-console.log(blog.constructor.name); // "blog"
-```
-
-## Object Structure
-
-### Dual Nature: Named and Indexed Properties
-
-Mark objects are unique because they combine both object and array characteristics:
+**Important rules:**
+- For Mark objects, property keys **cannot be numeric** (reserved for content)
+- Property keys must be **unique** within the same object
+- JSON objects in Mark can still have all kinds of keys
 
 ```javascript
-const element = Mark.parse(`{div class:"container" "Text content" {span "nested"}}`);
-
-// Named properties (object-like)
+const element = Mark.parse('<div class:"container" id:"main">');
 console.log(element.class); // "container"
+console.log(element.id);    // "main"
+```
 
-// Indexed properties (array-like)
-console.log(element[0]); // "Text content"
+### 3. Contents
+
+An ordered list of content objects, like child nodes of elements in HTML/XML. Mark utilizes a novel feature of JavaScript where objects can be array-like, storing both named properties and indexed properties.
+
+```javascript
+const element = Mark.parse('<div "Hello" <span "World">>');
+console.log(element[0]); // "Hello"
 console.log(element[1].constructor.name); // "span"
 console.log(element.length); // 2
 ```
+
+## Data Type Extensions
+
+### 1. Symbol
+
+Mark symbols are single-quoted identifiers or unquoted valid identifiers:
+
+```javascript
+const obj = Mark.parse("<config theme:'dark' debug:false>");
+console.log(typeof obj.theme); // "string" (symbols become strings in JS)
+console.log(obj.debug);        // false
+```
+
+### 2. Datetime
+
+ISO 8601 datetime strings quoted in `t'...'`:
+
+```javascript
+const event = Mark.parse("<event start:t'2025-01-01T10:00:00Z'>");
+console.log(event.start instanceof Date); // true
+```
+
+### 3. Binary
+
+Binary objects represented by ArrayBuffer, decoded from base64 or hex encoding:
+
+```javascript
+const data = Mark.parse("<data hex:b'\\x48656c6c6f'>");
+console.log(data.hex instanceof ArrayBuffer); // true
+console.log(data.hex.encoding); // "hex"
+```
+
+**Note:** Unlike strings, consecutive binary objects within content are not merged.
+
+### 4. Decimal
+
+Big decimal numbers postfixed with 'n':
+
+```javascript
+const big = Mark.parse('<number value:123456789012345678901234567890n>');
+console.log(typeof big.value); // "bigint"
+```
+
+## Content Normalization
+
+Mark performs the following normalization on element content:
+
+- **Null values** are discarded
+- **Consecutive strings** are merged into one single string  
+- **Arrays** in element content have their items auto-spread/flattened
+
+These normalizations make Mark more friendly for mixed-content use cases.
+
+**Example:**
+
+```javascript
+// This Mark notation...
+const element = Mark.parse('<div "Hello" null "World" ["a" "b"]>');
+
+// Results in normalized content:
+console.log(element[0]); // "HelloWorld" (strings merged)
+console.log(element[1]); // "a" (array flattened)
+console.log(element[2]); // "b"
+console.log(element.length); // 3 (null discarded)
+```
+
+## JavaScript Integration
+
+### Array-like Behavior
+
+Mark objects support array methods for working with content:
+
+```javascript
+const list = Mark.parse('<list "apple" "banana" "cherry">');
+
+// Array methods work
+const filtered = list.filter(item => item.includes('a'));
+console.log(filtered); // ["apple", "banana"]
+
+// Iteration works
+for (let item of list) {
+  console.log(item);
+}
+
+// Length property
+console.log(list.length); // 3
+```
+
+### Property Enumeration
+
+Content items are non-enumerable, so `for...in` loops only iterate over properties:
+
+```javascript
+const obj = Mark.parse('<user name:"Alice" age:30 "bio" "info">');
+
+// Only properties appear in for...in
+for (let prop in obj) {
+  console.log(prop); // "name", "age" (not "bio" or "info")
+}
+
+// Use for...of for content
+for (let item of obj) {
+  console.log(item); // "bio", "info"
+}
+```
+
+### Type Checking
+
+```javascript
+const mark = Mark.parse('<test>');
+const plain = { test: true };
+
+console.log(Mark.isMark(mark));  // true
+console.log(Mark.isMark(plain)); // false
+```
+
+## Comparison with Other Models
+
+### Mark vs JSON
+
+| Feature | JSON | Mark |
+|---------|------|------|
+| Type information | None | Built-in type names |
+| Mixed content | Difficult | Native support |
+| Data types | 6 basic types | Extended type system |
+| Object structure | Maps only | Maps + array-like content |
+
+### Mark vs HTML/XML DOM
+
+| Feature | DOM | Mark |
+|---------|-----|------|
+| Node types | Multiple node types | Unified object model |
+| JavaScript integration | DOM API required | Plain objects |
+| Memory overhead | High | Low |
+| Serialization | Complex | Simple |
+
+### Mark vs Virtual DOM
+
+| Feature | Virtual DOM | Mark |
+|---------|-------------|------|
+| Purpose | UI rendering | Data representation |
+| Reconciliation | Built-in | Not needed |
+| Props vs attributes | Separate concepts | Unified as properties |
+| Children handling | Special prop | Array-like content |
+
+## Best Practices
+
+### 1. Leverage Type Names
+
+Use meaningful type names that describe your data:
+
+```javascript
+// Good
+const user = Mark('user', { id: 1, name: 'Alice' });
+const product = Mark('product', { sku: 'ABC123', price: 29.99 });
+
+// Avoid generic names
+const thing = Mark('object', { data: 'value' });
+```
+
+### 2. Use Mixed Content Appropriately
+
+Mixed content is powerful for document-oriented data:
+
+```javascript
+// Good use of mixed content
+const article = Mark.parse(`<article
+  <h1 "Introduction to Mark">
+  <p "Mark notation combines " <em "structure"> " and " <em "content"> ".">
+>`);
+
+// Don't force mixed content where arrays are better
+const coordinates = Mark('point', { x: 10, y: 20 }); // Better than mixed content
+```
+
+### 3. Understand Property vs Content
+
+- Use **properties** for metadata and attributes
+- Use **content** for data and child elements
+
+```javascript
+// Clear separation
+const blogPost = Mark('post', 
+  { id: 123, published: true },  // metadata as properties
+  ['Post content goes here']     // actual content
+);
+```
+
+For detailed information about the JavaScript API for working with Mark objects, see the [API Reference](api.md).
 
 ### Property Access
 

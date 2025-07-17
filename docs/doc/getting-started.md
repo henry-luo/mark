@@ -44,7 +44,7 @@ Download the latest release from [GitHub](https://github.com/henry-luo/mark/rele
 const Mark = require('mark-js');
 
 // Parse a simple Mark object
-const obj = Mark.parse(`{greeting 'Hello, World!'}`);
+const obj = Mark.parse(`<greeting "Hello, World!">`);
 
 console.log(obj.constructor.name); // "greeting"
 console.log(obj[0]); // "Hello, World!"
@@ -58,13 +58,13 @@ const greeting = Mark('greeting', { lang: 'en' }, ['Hello, World!']);
 
 // Convert to Mark notation string
 console.log(Mark.stringify(greeting));
-// Output: {greeting lang:en 'Hello, World!'}
+// Output: <greeting lang:en "Hello, World!">
 ```
 
 ### Working with Properties
 
 ```javascript
-const element = Mark.parse(`{div class:"container" id:main}`);
+const element = Mark.parse(`<div class:"container" id:main>`);
 
 console.log(element.class); // "container"
 console.log(element.id); // "main"
@@ -75,17 +75,17 @@ console.log(element.id); // "main"
 ### Simple HTML-like Structure
 
 ```javascript
-const form = Mark.parse(`{form
-  {div class:"form-group"
-    {label for:email "Email:"}
-    {input type:email id:email required:true}
-  }
-  {div class:"form-group"
-    {label for:password "Password:"}
-    {input type:password id:password}
-  }
-  {button type:submit "Sign In"}
-}`);
+const form = Mark.parse(`<form
+  <div class:"form-group"
+    <label for:email "Email:">
+    <input type:email id:email required:true>
+  >
+  <div class:"form-group"
+    <label for:password "Password:">
+    <input type:password id:password>
+  >
+  <button type:submit "Sign In">
+>`);
 
 // Access form elements
 console.log(form[0].constructor.name); // "div"
@@ -95,22 +95,22 @@ console.log(form[0].class); // "form-group"
 ### Configuration Data
 
 ```javascript
-const config = Mark.parse(`{config
-  {database
+const config = Mark.parse(`<config
+  <database
     host:"localhost"
     port:5432
     name:"myapp"
-    {credentials
+    <credentials
       username:"admin"
       password:"secret"
-    }
-  }
-  {features
+    >
+  >
+  <features
     logging:true
     debug:false
-    {cache ttl:3600 size:1000}
-  }
-}`);
+    <cache ttl:3600 size:1000>
+  >
+>`);
 
 // Access configuration values
 console.log(config.database.host); // "localhost"
@@ -120,17 +120,17 @@ console.log(config.features.logging); // true
 ### Mixed Content Document
 
 ```javascript
-const article = Mark.parse(`{article
-  {header
-    {h1 "Getting Started with Mark"}
-    {meta author:"John Doe" date:"2025-01-01"}
-  }
-  {section
-    {p "Mark Notation combines the " {em "best features"} " of JSON, HTML, and XML."}
-    {code lang:javascript "const obj = Mark.parse('{greeting}');"}
-    {p "This makes it ideal for configuration files and document markup."}
-  }
-}`);
+const article = Mark.parse(`<article
+  <header
+    <h1 "Getting Started with Mark">
+    <meta author:"John Doe" date:"2025-01-01">
+  >
+  <section
+    <p "Mark Notation combines the " <em "best features"> " of JSON, HTML, and XML.">
+    <code lang:javascript "const obj = Mark.parse('<greeting>');>
+    <p "This makes it ideal for configuration files and document markup.">
+  >
+>`);
 
 // Navigate the document structure
 console.log(article.header.h1[0]); // "Getting Started with Mark"
@@ -144,7 +144,7 @@ console.log(article.section.p[1].constructor.name); // "em"
 Every Mark object has a type name that identifies what kind of data it represents:
 
 ```javascript
-const obj = Mark.parse(`{user name:"Alice"}`);
+const obj = Mark.parse(`<user name:"Alice">`);
 console.log(obj.constructor.name); // "user"
 ```
 
@@ -153,7 +153,7 @@ console.log(obj.constructor.name); // "user"
 Mark objects can have both properties (key-value pairs) and content (ordered list):
 
 ```javascript
-const element = Mark.parse(`{div class:"container" "Some text" {span "nested"}}`);
+const element = Mark.parse(`<div class:"container" "Some text" <span "nested">>`);
 
 // Properties
 console.log(element.class); // "container"
@@ -168,7 +168,7 @@ console.log(element[1].constructor.name); // "span"
 Mark objects are plain JavaScript objects, so you can use standard JavaScript methods:
 
 ```javascript
-const list = Mark.parse(`{list "item1" "item2" "item3"}`);
+const list = Mark.parse(`<list "item1" "item2" "item3">`);
 
 // Use array methods on content
 console.log(list.length); // 3
