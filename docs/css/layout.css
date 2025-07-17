@@ -389,7 +389,8 @@
 .footer__bottom {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
+    position: relative;
     padding-top: var(--space-8);
     border-top: 1px solid var(--color-gray-700);
 }
@@ -397,6 +398,14 @@
 .footer__copyright {
     color: var(--color-gray-500);
     font-size: var(--font-size-sm);
+    text-align: center;
+}
+
+.footer__social {
+    position: absolute;
+    right: 0;
+    display: flex;
+    gap: var(--space-4);
 }
 
 .footer__copyright a {
