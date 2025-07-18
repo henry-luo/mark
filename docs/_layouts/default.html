@@ -64,23 +64,18 @@
                             </a>
                         </li>
                         <li class="sidebar__menu-item">
-                            <a href="{{ '/examples/' | relative_url }}" class="sidebar__link {% if page.url contains '/examples' %}sidebar__link--active{% endif %}">
-                                Examples
-                            </a>
-                        </li>
-                        <li class="sidebar__menu-item">
                             <a href="{{ '/data-model/' | relative_url }}" class="sidebar__link {% if page.url contains '/data-model' %}sidebar__link--active{% endif %}">
                                 Data Model
                             </a>
                         </li>
                         <li class="sidebar__menu-item">
+                            <a href="{{ '/examples/' | relative_url }}" class="sidebar__link {% if page.url contains '/examples' %}sidebar__link--active{% endif %}">
+                                Examples
+                            </a>
+                        </li>                        
+                        <li class="sidebar__menu-item">
                             <a href="{{ '/api/' | relative_url }}" class="sidebar__link {% if page.url contains '/api' %}sidebar__link--active{% endif %}">
                                 JavaScript API
-                            </a>
-                        </li>
-                        <li class="sidebar__menu-item">
-                            <a href="{{ '/faq/' | relative_url }}" class="sidebar__link {% if page.url contains '/faq' %}sidebar__link--active{% endif %}">
-                                FAQ
                             </a>
                         </li>
                         <li class="sidebar__menu-item">
@@ -88,6 +83,11 @@
                                 Grammar Reference
                             </a>
                         </li>
+                        <li class="sidebar__menu-item">
+                            <a href="{{ '/faq/' | relative_url }}" class="sidebar__link {% if page.url contains '/faq' %}sidebar__link--active{% endif %}">
+                                FAQ
+                            </a>
+                        </li>                        
                     </ul>
                 </nav>
             </div>
