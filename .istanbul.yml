@@ -1,2 +1,2 @@
 instrumentation:
-    excludes: ['**/lib/css-select/**', '**/dev/**']
+    excludes: ['**/lib/css-select/**']
