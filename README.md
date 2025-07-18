@@ -183,7 +183,7 @@ And here's the [Mark VSC Extension](https://marketplace.visualstudio.com/items?i
 
 ## 1.0 and Beyond
 
-Mark 1.0 release just mark the start of a long journey to make web a better platform to exchange and store both object and markup data.
+Mark 1.0 release just mark the start of a long journey to make web a better platform to store and exchange both object and markup data.
 
 1.0 release just means whatever is released in this version will receive backward compatible support in the foreseeable future like the ever-green HTML. 
 
