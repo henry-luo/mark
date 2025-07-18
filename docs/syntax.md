@@ -24,7 +24,7 @@ Comparing to a JSON object, a Mark element has two extensions:
 - A **type name**, which corresponds to class name or type name of an object. In JavaScript, that is `obj.constructor.name`. In HTML and XML, that's the element name.
 - Optional list of **content** values following the named properties, which corresponds to child nodes in markup documents like HTML and XML.
 
-### 1.1 Element Properties
+### 1.1 Element properties
 
 ```BNF
 properties ::= (property ','?)*
@@ -39,21 +39,24 @@ continue_identifier ::= begin_identifier | digit | '-' | '.'
 ```
 
 - Property key and value can be unquoted if they're valid identifiers.  JS reserved keywords (like `default`) are valid unquoted keys in Mark. However, it is recommended that you avoid using JS keywords, or JS and Mark object prototype function names as property keys, as they could cause confusion, inconvenience and even errors (as the underlying functions are overridden).
-- Comparing to JS identifier, Mark identifier allows dash '-' and dot '.' in it. These two special characters are added as they are commonly used in markup formats, like HTML, CSS, XML.
-- Property keys and values can be single, double or triple quoted.
-- Property keys can be any string **except a number**, which is reserved for Mark object contents. (This restriction does not apply to JSON properties.)
+- Property keys and values can be single, double.
+- Property keys can be any string **except a number**, which is reserved for element contents. (This restriction does not apply to JSON properties.)
 - Property keys are **case-sensitive**.
-- Property keys **must be unique** (for both Mark and JSON object).
-- Comma between properties is optional, and last property can have trailing comma.
+- Property keys **must be unique** (for both element and map).
+- Comma between properties is required, and last property will need to terminate with ';', if there's following content on the same line.
 
-### 1.2 Element Contents
+### 1.2 Element contents
 
 ```BNF
-contents ::= (text | binary | json_object | mark_object | mark_pragma)*
+contents ::= (markup_run ((';' | LF | CRLF) markup_run)*)?
+markup_run ::= (string | map | element)+ | other_value
+other_value ::= list | array | symbol | number | 
+   datetime | binary | boolean | null
 ```
 
-- To better support mixed content, not all Mark values are allowed in the contents of a Mark object. Array, number, boolean and null values are not allowed.
+- Unlike HTML or XML, Mark allows all datatypes to be contained in its content.
 - Consecutive text values are merged into a single text value.
+- If another value immediately follows another value on the same line, ';' is usually required, except the case of consecutive text, map and elements.
 
 ## 2. Other Syntax Extensions to JSON
 
@@ -88,7 +91,7 @@ Syntax wise, it is quite similar to string, except that it is single-quoted. And
 - `T`, `t`, and space `' '` are accepted as date time separator.
 - Note that only are subset of ISO 8601 Datetime format is supported under Mark.
 
-### 2.5 Binary Value
+### 2.5 Binary
 
 - Binary data can be encoded as a sequence of characters delimited by `b'...'`. 
 - It can encoded in either *hex* or *base64* encoding.
@@ -102,7 +105,7 @@ hex_binary ::= "b'" '\\x' (hex_char | ws_char)* "'"
 base64_binary ::= "b'" '\\64' (base64_char | ws_char)* '='? '='? "'"
 ```
 
-### 3.6 Comments
+### 2.6 Comments
 
 - Both inline (single-line)  `//...` and block (multi-line) comments `/* ... */` are allowed in Mark, similar to those in JS.
 - One difference is that, Mark block comment can be nested, whereas JS block comment cannot be nested.
@@ -113,4 +116,4 @@ The formal grammar specification in BNF is [here](https://github.com/henry-luo/m
 
 Following the JSON convention, a [railroad diagram]({{ '/mark-grammar.html' | relative_url }}) of the entire grammar is also provided to help you visualize the grammar. You can click on the grammar terms to navigate around. Below is a snapshot of the top-level of the grammar.
 
-<img src='{{ "/mark-railway-diagram.png" | relative_url }}' width="600px">
+<img src='mark-railway-diagram.png' width="600px">

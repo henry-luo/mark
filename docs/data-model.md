@@ -4,46 +4,47 @@ title: Mark Data Model
 description: Understanding Mark's fully-typed data model and how it extends JSON
 permalink: /data-model/
 ---
-
 Mark has a simple and fully-typed data model. It is an extension to the JSON data model. 
 
-Mark extends JSON data model with several new data types:
+Mark 1.0 extends JSON data model with several new data types:
 - scalar types: **symbol**, **datetime**, **binary**, and **decimal** number.
 - container types: **list** and **element**.
 
-With the new data type additions, essentially all commonly used built-in data types are well represented under Mark.
+With the new data type additions, essentially all commonly used built-in data types under JS are well represented under Mark.
 
-Mark's data model is designed so that a well-formed HTML or XML document can be converted into Mark document without any loss in data model.
+<div align="center"><img src='docs/mark-datatype-hierarchy.png' width="650"></div>
 
 Roughly speaking, JSON, HTML and XML data models are subsets of Mark data model, and Mark data model is a subset of JS data model.
 
 <div align="center">
-<img align='center' src='{{ "/data-model.png" | relative_url }}' width='300'>
+<img align='center' src='https://mark.js.org/data-model.png' width='300'>
 </div>
 
 ## 1. Symbol
 
-Mark symbol.
+Mark symbol maps to JS symbol.
 
 ## 2. Datetime
 
-Mark datetime.
+Mark datetime accepts ISO 8601 Datatime input, and is parsed into JS Date.
 
 ## 3. Binary
 
-A *binary* object is represented by an JS ArrayBuffer, containing the bytes decoded from the source characters in either base64 or ascii85 encoding.
+A *binary* object is represented by an JS ArrayBuffer, containing the bytes decoded from the source characters in either hex or base64 encoding.
 
-It has a property **encoding**, which can have the value `hex` or `b64`.
+It has a property **encoding**, which currently can be `hex` or `b64`.
 
-Unlike string, consecutive binary objects within the content of a Mark object are not merged.
+Unlike string, consecutive binary objects within the content of a Mark element content are not merged.
 
 ## 4. Decimal
 
-Mark decimal.
+Mark supports (big) decimal number. It is an integer or decimal number ended with postfix 'n' or 'N'. 
 
-## 3. Element
+mark.js library currently only implemented *bigint* support. Big decimal support will be added later.
 
-Mark element extends map object with a type name and a list of content objects. Mark object is designed to act like element in HTML/XML.
+## 5. Element
+
+Mark element extends map object with a type name and a list of content objects. Mark element is designed to act like element in HTML/XML.
 
 A Mark element essentially contains 3 facets of data in its data model:
 
@@ -61,8 +62,14 @@ Mark performs following normalization on the content stored in an element:
 
 These normalizations are performed to make Mark more friendly to use under mixed-content use cases.
 
-## 4. List
+## 6. List
 
-Mark list represents an ordered collection of items. Lists are one of the container types in Mark, alongside elements.
+Mark list represents an ordered collection of items. It is introduced to represent the data model of Mark element content.
 
-For detailed information about the JavaScript API for working with Mark objects, see [Mark JavaScript API]({{ '/api/' | relative_url }}).
+Mark list behaves differently from an *array*. It performs normalization when data is added into the array:
+- `null` values are discarded.
+- Consecutive strings are merged into one single string.
+- a nested *list* will have its items auto spread/flattened.
+- if the list contains only one item, the list will be normalized to just that item.
+
+

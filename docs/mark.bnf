@@ -165,7 +165,12 @@ element ::= begin_element name properties contents end_elment
 
 name ::= symbol
 
-contents ::= (value ((';' | LF | CRLF) value)*)?
+contents ::= (markup_run ((';' | LF | CRLF) markup_run)*)?
+
+markup_run ::= (string | map | element)+ | other_value
+
+other_value ::= list | array | symbol | number | 
+   datetime | binary | boolean | null
 
 text ::= (string ws)+   /* Mark text can be multiple consecutive strings */
 

@@ -175,9 +175,10 @@ And here's the [Mark VSC Extension](https://marketplace.visualstudio.com/items?i
 
 ## Documentation
 
-- [Syntax specification](https://mark.js.org/mark-syntax.html)
-- [Data model and API specification](https://mark.js.org/mark-model.html)
-- [FAQ](https://mark.js.org/faq.html)
+- [Syntax documentation](https://mark.js.org/syntax)
+- [Data model documentation](https://mark.js.org/data-model)
+- [API documentation](https://mark.js.org/api)
+- [FAQ](https://mark.js.org/faq)
 - Discussion about Mark beta release at [Hacker News](https://news.ycombinator.com/item?id=16308581)
 
 ## Credits

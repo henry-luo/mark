@@ -4,32 +4,31 @@ title: JavaScript API
 description: Complete reference for the Mark.js JavaScript API and methods
 permalink: /api/
 ---
-
 ## Core API
 
 Mark object constructor:
 
 - `Mark(source)`: shorthand for `Mark.parse(source)`. `source` parameter must start with '<', '{' or '[' or '('.
-- `Mark(type_name, properties, contents)`: Mark object constructor takes 3 parameters, except `type_name`, the other 2 are optional.
-  - `type_name`: a string. It must not start with '{'.
+- `Mark(type_name, properties, contents)`: Mark element constructor takes 3 parameters, except `type_name`, the other 2 are optional.
+  - `type_name`: a string.
   - `properties`: a JSON object containing name-value pairs. Numeric property keys are ignored.
   - `contents`: an array of content objects. Null values are skipped, primitive values are converted into strings, arrays will be flattened, and consecutive strings will be merged into one.
 
-The constructed Mark object is just a simple POJO. So basically:
+The constructed Mark element is just a simple POJO. So basically:
 
 - `type_name`: can be accessed through `markObj.constructor.name`.
 - `properties`: can be accessed through `markObj.prop` or `markObj['prop']` when `prop` is not a proper JS identifier. You can also use JS `for ... in` loop to iterate through the properties. Unlike normal JS array, Mark object has been specially constructed so that Mark contents are not enumerable, thus do not appear in `for ... in` loop.
 - `contents`: can be accessed through `markObj[index]`. You can also use JS `for ... of` loop to iterate through the content items.
 
-Besides the above POJO behaviors, there are some additional prototype functions defined to work with the data model:
+Besides the above POJO behaviors, there are some additional prototype functions defined to work with the element data model:
 
 - `.length`: when `length` property is not defined on the object, it returns the number of content items stored in the Mark object; otherwise, it returns the value of the `length` property. You can use `Mark.lengthOf()` to get the content length, when `length` property is defined on the object.
-- `.contents()`: returns the list of content items stored in the Mark object.
-- `.parent()`: returns the parent object of current Mark object.
-- `.source(options)`: shorthand for stringifying current Mark object.
+- `.contents()`: returns the list of content items stored in the Mark element.
+- `.parent()`: returns the parent element of current Mark element.
+- `.source(options)`: shorthand for stringifying current Mark element.
 - `.text()`: returns a string, which is the concatenation of all descendant text content items.
 
-As Mark object is array-like, most functional JS code that works with array-like data, can be work with Mark object without change. The following API functions are directly mapped to those from `Array.prototype`.
+Mark element is a *map* and an *array* at the same time. Being **array-like**, most functional JS code that works with array-like data, can be work with Mark element without change. The following API functions are directly mapped to those from `Array.prototype`.
 
 - `.filter(callback, thisArg)`: mapped to JS `Array.prototype.filter`.
 - `.map(callback, thisArg)`: mapped to JS `Array.prototype.map`.
@@ -60,16 +59,19 @@ Mark does not support `reviver` function defined in `JSON.parse()`, and `replace
 
 Mutative API functions are now separated into its own sub-module `mark.mutate.js`, which allows this part to be easily excluded from the package, if Mark is used in a pure functional manner.
 
-The mutative API functions defined on a Mark object are:
+The mutative API functions defined on a Mark element are:
 
 - `.set(key, value)`: if the `key` is numeric, then it sets the indexed content item of the Mark object; otherwise, it sets a named property of the Mark object. 
 - `.push(item, ...)`: pushes item(s) at the end of the contents of current Mark object. However, unlike JS `Array.prototype.push`, which returns the new array length, this function returns the current this object, so that the function call can be chained.
 - `.pop()`: pop an item from the end of contents.
 - `.splice(index, cnt, item, ...)`: remove `cnt` of items starting at the `index`, and then insert given item(s), similar to `Array.splice(...)`.
 
-The mutative API function defined on a Mark pragma:
+## Selector API
 
-- `.set(value)`: sets the content in the pragma, and returns the pragma itself.
+These are additional prototype functions implemented in `mark.selector.js`, for processing the constructed data model using special selectors, like CSS selector:
+
+- `markObj.matches('selector')`: returns whether the `markObj` matches the given CSS `selector`.
+- `markObj.find('selector')`: returns child or descendent content objects that matches the given CSS `selector`.
 
 ## Converter API
 
@@ -78,9 +80,4 @@ These are additional prototype functions implemented in `mark.converter.js`, for
 - `markObj.html(options)`: serializes the Mark object into HTML. `options` parameter is same as that of `Mark.stringify()`.
 - `markObj.xml(options)`: serializes the Mark object into XML.  `options` parameter is same as that of `Mark.stringify()`.
 
-## Selector API
 
-These are additional prototype functions implemented in `mark.selector.js`, for processing the constructed data model using special selectors, like CSS selector:
-
-- `markObj.matches('selector')`: returns whether the `markObj` matches the given CSS `selector`.
-- `markObj.find('selector')`: returns child or descendent content objects that matches the given CSS `selector`.
