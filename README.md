@@ -108,19 +108,19 @@ Some disadvantages of Mark, compared to JSON:
 Compared to HTML/JSX, Mark has the following advantages:
 
 - Mark is a generic data format, whereas HTML is a specialized format for web content.
-- It does not have whitespace ambiguity, as the text objects are quoted explicitly. Thus Mark can be minified or prettified without worrying about changing the underlying content.
+- It does not have whitespace ambiguity, as the text objects are quoted explicitly. It can be minified or prettified without worrying about changing the underlying content.
 - Mark attributes can have complex values, like JSON, not just quoted string values as in HTML.
-- It has a very clean syntax, whereas HTML5 parsing can be challenging even with HTML5 spec.
-- It is always properly closed; whereas HTML self-closing tag syntax is non-extensible and error-prone.
-- The DOM produced under Mark model, is just a hierarchy of POJO objects, which can be easily processed using the built-in JS functions or 3rd party libraries, making Mark an ideal candidate for virtual DOM and other application usages.
+- It has a very clean syntax, whereas HTML5 parsing is complicated, e.g. the non-extensible and error-prone self-closing syntax rules.
+- Mark contains just a hierarchy of POJO objects, which can be easily processed using the built-in JS language or any 3rd party libraries, without the need of complex DOM APIs. Making it an ideal for virtual DOM and other application usages.
 
 ### Mark vs. XML
 
 Compared to XML, Mark has the following advantages:
 
-- Mark attributes can have complex objects as values; whereas XML attribute values always need to be quoted and cannot have complex objects as values.
-- Mark syntax is much cleaner than XML. It does not have whitespace ambiguity. It does not have the verbose closing tag. It does not have all the legacy things like DTD, which is half-baked for full schema definition. 
+- Mark attributes can have complex objects as values; whereas XML attribute values always need to be quoted, and cannot have complex objects as values.
+- Mark syntax is much cleaner than XML. No whitespace ambiguity. No verbose closing tag. Does not have legacies like DTD, which is half-baked for full schema definition. 
 - The data model produced by Mark is fully typed, like JSON; whereas XML is only semi-typed, when there's no schema.
+- Simple POJO vs. complex DOM APIs.
 
 ### Mark vs. S-expressions
 
