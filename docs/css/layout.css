@@ -103,7 +103,7 @@
 
 /* Hero Section */
 .hero {
-    padding: var(--space-32) 0 var(--space-24);
+    padding: var(--space-24) 0 var(--space-12);
     background: linear-gradient(135deg, var(--color-gray-50) 0%, var(--color-white) 100%);
     margin-top: 72px; /* Account for fixed nav */
 }
@@ -163,7 +163,7 @@
     .hero__container {
         grid-template-columns: 1fr;
         gap: var(--space-12);
-        text-align: center;
+        align-items: center;
     }
     
     .hero__title {
@@ -173,7 +173,7 @@
 
 @media (max-width: 768px) {
     .hero {
-        padding: var(--space-24) 0 var(--space-16);
+        padding: var(--space-20) 0 var(--space-12);
     }
     
     .hero__container {
@@ -196,7 +196,7 @@
 
 /* Features Section */
 .features {
-    padding: var(--space-24) 0;
+    padding: var(--space-16) 0;
 }
 
 .features__container {

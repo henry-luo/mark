@@ -175,6 +175,7 @@
     display: flex;
     border-bottom: 1px solid var(--color-border-light);
     margin-bottom: var(--space-6);
+    margin-top: -1em;
 }
 
 .tab {
@@ -301,7 +302,7 @@
 /* Section Headers */
 .section-header {
     text-align: center;
-    margin-bottom: var(--space-16);
+    margin-bottom: var(--space-10);
 }
 
 .section-title {
@@ -331,7 +332,7 @@
     }
     
     .section-header {
-        margin-bottom: var(--space-12);
+        margin-bottom: var(--space-10);
     }
     
     .section-title {
