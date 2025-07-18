@@ -26,7 +26,6 @@ For example, a HTML registration form:
 
 ```html
 <form>
-  <!--comment-->
   <div class="form-group">
     <label for="email">Email address:</label>
     <input type="email" id="email">
@@ -54,8 +53,8 @@ Could be represented in Mark as:
     <input type:password, id:pwd>     // attrs separated by comma, like JSON
   >
   <button class:[btn,'btn-info']      // attribute with complex values
-    "Submit"                          
-  >                                   // comment like in JS!
+    "Submit"                          // comment like in JS!
+  >                                   
 >
 ```
 

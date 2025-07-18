@@ -78,7 +78,6 @@
                     </div>
                     <div class="code-demo__content">
                         <pre class="code-demo__code"><code>&lt;form                                 // element with name 'form'
-  &lt;'!--'comment&gt;                      // HTML comment as special element
   &lt;div class:'form-group'             // nested child element
     &lt;label for:email                  // 'for' and its value, both unquoted
       "Email address:"                // text needs to be double quoted
@@ -89,8 +88,8 @@
     &lt;label for:pwd; "Password"&gt;       // pwd is an unquoted symbol
     &lt;input type:password, id:pwd&gt;     // attrs separated by comma, like JSON
   &gt;
-  &lt;button class:[btn, 'btn-info']     // attribute with complex values
-    "Submit"                          // text quoted with double quote
+  &lt;button class:[btn,'btn-info']      // attribute with complex values
+    "Submit"                          // comment like in JS!
   &gt;
 &gt;</code></pre>
                     </div>
