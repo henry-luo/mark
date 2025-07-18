@@ -12,12 +12,12 @@ Mark 1.0 extends JSON data model with several new data types:
 
 With the new data type additions, essentially all commonly used built-in data types under JS are well represented under Mark.
 
-<div align="center"><img src='docs/mark-datatype-hierarchy.png' width="650"></div>
+<div align="center"><img src='/mark-datatype-hierarchy.png' width="650"></div>
 
 Roughly speaking, JSON, HTML and XML data models are subsets of Mark data model, and Mark data model is a subset of JS data model.
 
 <div align="center">
-<img align='center' src='https://mark.js.org/data-model.png' width='300'>
+<img align='center' src='/data-model.png' width='300'>
 </div>
 
 ## 1. Symbol

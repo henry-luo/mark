@@ -110,10 +110,10 @@ base64_binary ::= "b'" '\\64' (base64_char | ws_char)* '='? '='? "'"
 - Both inline (single-line)  `//...` and block (multi-line) comments `/* ... */` are allowed in Mark, similar to those in JS.
 - One difference is that, Mark block comment can be nested, whereas JS block comment cannot be nested.
 
-## 4. Full Grammar Specification
+## 3. Full Grammar Specification
 
 The formal grammar specification in BNF is [here](https://github.com/henry-luo/mark/blob/master/docs/mark.bnf).
 
 Following the JSON convention, a [railroad diagram]({{ '/mark-grammar.html' | relative_url }}) of the entire grammar is also provided to help you visualize the grammar. You can click on the grammar terms to navigate around. Below is a snapshot of the top-level of the grammar.
 
-<img src='mark-railway-diagram.png' width="600px">
+<img src='/mark-railway-diagram.png' width="600px">
