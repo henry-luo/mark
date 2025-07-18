@@ -1,6 +1,6 @@
 <mxfile host="Electron" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/26.2.2 Chrome/134.0.6998.178 Electron/35.1.2 Safari/537.36" version="26.2.2">
   <diagram name="Mark Type Hierarchy Enhanced" id="mark-enhanced">
-    <mxGraphModel dx="788" dy="570" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="1000" math="0" shadow="0">
+    <mxGraphModel dx="1313" dy="950" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="1000" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -29,7 +29,7 @@
             <mxPoint x="342.5" y="270" as="sourcePoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="title" value="Mark 1.0 Datatype Hierarchy" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=24;fontStyle=1;fontColor=#212529;" parent="1" vertex="1">
+        <mxCell id="title" value="Mark Datatype Hierarchy" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=24;fontStyle=1;fontColor=#212529;" parent="1" vertex="1">
           <mxGeometry x="335" y="126" width="400" height="40" as="geometry" />
         </mxCell>
         <mxCell id="any" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;Any&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;strokeWidth=2;fontSize=16;fontStyle=0;" parent="1" vertex="1">
@@ -130,25 +130,25 @@
             <mxPoint x="911.25" y="280" as="sourcePoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="pnR0VYwcgWo3NYEOfSO3-1" value="&lt;span style=&quot;color: rgb(21, 101, 192); font-size: 18px;&quot;&gt;Scalar Types&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=2;fontSize=16;fontStyle=1;" parent="1" vertex="1">
+        <mxCell id="pnR0VYwcgWo3NYEOfSO3-1" value="&lt;span style=&quot;color: rgb(21, 101, 192); font-size: 18px;&quot;&gt;Scalar Types&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=2;fontSize=16;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="210" y="250" width="150" height="50" as="geometry" />
         </mxCell>
-        <mxCell id="pnR0VYwcgWo3NYEOfSO3-2" value="&lt;span style=&quot;font-size: 18px;&quot;&gt;&lt;font style=&quot;color: rgb(181, 115, 157);&quot;&gt;Container Types&lt;/font&gt;&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;strokeWidth=2;fontSize=16;fontStyle=1;" parent="1" vertex="1">
+        <mxCell id="pnR0VYwcgWo3NYEOfSO3-2" value="&lt;span style=&quot;font-size: 18px;&quot;&gt;&lt;font style=&quot;color: rgb(181, 115, 157);&quot;&gt;Container Types&lt;/font&gt;&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;strokeWidth=2;fontSize=16;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="661" y="250" width="180" height="50" as="geometry" />
         </mxCell>
-        <mxCell id="pnR0VYwcgWo3NYEOfSO3-9" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E8;strokeColor=#82b366;strokeWidth=2;fontSize=18;" parent="1" vertex="1">
+        <mxCell id="pnR0VYwcgWo3NYEOfSO3-9" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E8;strokeColor=#82b366;strokeWidth=2;fontSize=18;" vertex="1" parent="1">
           <mxGeometry x="291" y="570" width="20" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="pnR0VYwcgWo3NYEOfSO3-10" value="&lt;span style=&quot;font-weight: normal;&quot;&gt;JSON Defined Types&lt;/span&gt;" style="text;html=1;strokeColor=none;fillColor=#FFFFFF;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#000000;strokeWidth=2;" parent="1" vertex="1">
+        <mxCell id="pnR0VYwcgWo3NYEOfSO3-10" value="&lt;span style=&quot;font-weight: normal;&quot;&gt;JSON Defined Types&lt;/span&gt;" style="text;html=1;strokeColor=none;fillColor=#FFFFFF;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#000000;strokeWidth=2;" vertex="1" parent="1">
           <mxGeometry x="331" y="570" width="180" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="pnR0VYwcgWo3NYEOfSO3-11" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff3e0;strokeColor=#f57c00;strokeWidth=2;fontSize=18;" parent="1" vertex="1">
+        <mxCell id="pnR0VYwcgWo3NYEOfSO3-11" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff3e0;strokeColor=#f57c00;strokeWidth=2;fontSize=18;" vertex="1" parent="1">
           <mxGeometry x="574.5" y="570" width="20" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="pnR0VYwcgWo3NYEOfSO3-12" value="Mark Extended Types" style="text;html=1;strokeColor=none;fillColor=#FFFFFF;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=0;fontColor=#000000;strokeWidth=2;" parent="1" vertex="1">
+        <mxCell id="pnR0VYwcgWo3NYEOfSO3-12" value="Mark Extended Types" style="text;html=1;strokeColor=none;fillColor=#FFFFFF;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=0;fontColor=#000000;strokeWidth=2;" vertex="1" parent="1">
           <mxGeometry x="609.5" y="572.5" width="185" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="pnR0VYwcgWo3NYEOfSO3-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" parent="1" source="pnR0VYwcgWo3NYEOfSO3-12" target="pnR0VYwcgWo3NYEOfSO3-12" edge="1">
+        <mxCell id="pnR0VYwcgWo3NYEOfSO3-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="pnR0VYwcgWo3NYEOfSO3-12" target="pnR0VYwcgWo3NYEOfSO3-12">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
       </root>

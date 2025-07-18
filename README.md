@@ -58,11 +58,21 @@ Could be represented in Mark as:
 >
 ```
 
-You can refer to the [syntax spec](https://mark.js.org/mark-syntax.html) for details.
+You can refer to the [Mark syntax doc](https://mark.js.org/mark-syntax.html) for details.
 
 ## Mark Data Model
 
-Mark has a very simple and fully-typed data model. 
+Mark 1.0 introduced a few new data types: *symbol*, *datetime*, *binary*, and *list*. Together with the existing data types (in Mark 0.11 beta release), they pretty well cover all the commonly used built-in datatypes in JS. And here's the Mark 1.0 datatype hierarchy:
+
+<div align="center"><img src='docs/mark-datatype-hierarchy.png' width="650"></div>
+
+Roughly speaking, data models of JSON, XML, HTML are subsets of Mark data model, and Mark data model is a subset of JS data model.
+
+<div align="center">
+<img src='https://mark.js.org/data-model.png' width='280'>
+</div>
+
+### Mark element
 
 Each Mark element has 3 facets of data:
 
@@ -74,31 +84,26 @@ Mark utilizes a novel feature in JavaScript that a plain JS object is actually *
 
 So each Mark element is mapped to just **one** plain JavaScript object, which is more compact and efficient compared to other JSON-based DOM models (e.g. [JsonML](http://www.jsonml.org/), [virtual-dom](https://github.com/Matt-Esch/virtual-dom), [MicroXML](https://dvcs.w3.org/hg/microxml/raw-file/tip/spec/microxml.html)), and is more intuitive to use under JS.
 
-Roughly speaking, data models of JSON, XML, HTML are subsets of Mark data model, and Mark data model is a subset of JS data model.
+You can refer to the [Mark data model doc](https://mark.js.org/mark-model.html) for details.
 
-<div align="center">
-<img src='https://mark.js.org/data-model.png' width='300'>
-</div>
-
-You can refer to the [data model spec](https://mark.js.org/mark-model.html) for details.
-
-## Mark vs. JSON
+## Mark vs. Other Formats
+### Mark vs. JSON
 
 Mark is a superset of JSON. It extends JSON notation with additional scalar and container types.
 
 Compared to JSON, Mark has the following advantages:
 
-- Additional scalar types supported under Mark, compared to JSON, include: *symbol*, *decimal number*, *datetime*, *binary* (supporting essentially all the major built-in data types under JS).
-- For container types, other than *array* and *map*, Mark supports a new type *element*. Mark *element* has a type-name, which is important in identifying what the data represents; whereas JSON map is actually an anonymous object, missing the type name.
-- Mark element has built-in mixed-content support, which is common in all markup formats, and thus allows Mark to conveniently represent document-oriented data, which is awkward for JSON.
-- Mark incorporates some syntax enhancements to JSON ~(e.g. allowing comments, name without quotes)~, thus making the format more friendly for humans.
+- Additional scalar types supported under Mark, including: *symbol*, *decimal number*, *datetime*, *binary* (essentially covering all commonly used built-in data types under JS).
+- Mark supports a new container type: ***element***. Mark *element* has a type-name, which is important in identifying what the data represents; whereas JSON map is actually an anonymous object, missing the type name.
+- Mark element has built-in mixed-content support, like in HTML and XML, which is awkward for JSON.
+- Mark incorporates some syntax enhancements to JSON (e.g. allowing comments, name without quotes, etc.), thus making the format even more friendly to use than JSON.
 
-Some disadvantages of Mark, compared to JSON would be:
+Some disadvantages of Mark, compared to JSON:
 
 - It is no longer a subset of JavaScript literal syntax, although a Mark object is still a simple POJO in JS data model.
 - It does not yet have wide support, like JSON, at the moment.
 
-## Mark vs. HTML/JSX
+### Mark vs. HTML/JSX
 
 Compared to HTML/JSX, Mark has the following advantages:
 
@@ -109,21 +114,23 @@ Compared to HTML/JSX, Mark has the following advantages:
 - It is always properly closed; whereas HTML self-closing tag syntax is non-extensible and error-prone.
 - The DOM produced under Mark model, is just a hierarchy of POJO objects, which can be easily processed using the built-in JS functions or 3rd party libraries, making Mark an ideal candidate for virtual DOM and other application usages.
 
-## Mark vs. XML
+### Mark vs. XML
 
 Compared to XML, Mark has the following advantages:
 
-- Mark attributes can have complex objects as values; whereas XML attribute values always need to be quoted and cannot have complex objects as values, which is not flexible in syntax and data model.
-- Mark syntax is much cleaner than XML. It does not have whitespace ambiguity. It does not have all the legacy things like DTD. It does not have the verbose closing tag.
+- Mark attributes can have complex objects as values; whereas XML attribute values always need to be quoted and cannot have complex objects as values.
+- Mark syntax is much cleaner than XML. It does not have whitespace ambiguity. It does not have the verbose closing tag. It does not have all the legacy things like DTD, which is half-baked for full schema definition. 
 - The data model produced by Mark is fully typed, like JSON; whereas XML is only semi-typed, when there's no schema.
 
-## Mark vs. S-expressions
+### Mark vs. S-expressions
 
 Lisp and S-expression gave rise to novel ideas like high-order composition, self-hosting program, data as code, code as data, etc.. It's the source of inspiration of Mark and [Lambda Script](https://github.com/henry-luo/lambda).
 
 The advantage of Mark over S-expressions is that it takes a more modern, web-first approach in its design, making it more readily usable in web and Node.js environments.
 
-## mark.js
+## Using Mark
+
+### mark.js library
 
 `mark.js` is the JS library to work with data in Mark format. It consists of 4 modules:
 
@@ -132,7 +139,7 @@ The advantage of Mark over S-expressions is that it takes a more modern, web-fir
 - Sub-module `mark.convert.js`, which provides conversion between Mark format and other formats like HTML and XML.
 - Sub-module `mark.selector.js`, which provides CSS selector based query interface on the Mark object model, like jQuery.
 
-## Usage
+### mark.js installation
 
 Install from NPM:
 
@@ -162,8 +169,9 @@ Note: /dist/mark.js has bundled all sub-modules and all dependencies with it, an
 
 *If you just want the core functional API, without the sub-modules, you can also use mark.core.js, which is only 7K after gzip. You can also refer to the package.json to create your own custom bundle with the sub-modules you need.*
 
-And Mark Notation support for VS Code:
-- [Mark VSC Extension](https://marketplace.visualstudio.com/items?itemName=henryluo.mark-vsce) 
+### VS Code extension
+
+And here's the [Mark VSC Extension](https://marketplace.visualstudio.com/items?itemName=henryluo.mark-vsce) to help syntax highlight Mark documents when you edit it in VS Code.
 
 ## Documentation
 
