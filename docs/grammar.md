@@ -21,7 +21,7 @@ Below is a snapshot of the top-level grammar structure:
 
 <img src='{{ "/mark-railway-diagram.png" | relative_url }}' width="600px" alt="Mark Grammar Railroad Diagram">
 
-## Key Grammar Elements
+## Key Grammar Differences vs. JSON
 
 ### Root Level
 - Mark allows multiple values at root level, separated by ';' or line break
@@ -44,11 +44,3 @@ Mark extends JSON with several new data types:
 - **Decimal**: Big decimal numbers with 'n' suffix
 - **Comments**: Both `//` and `/* */` style comments
 
-### Identifiers
-```bnf
-identifier ::= begin_identifier continue_identifier*
-begin_identifier ::= [a-zA-Z] | '_' | '$'
-continue_identifier ::= begin_identifier | digit | '-' | '.'
-```
-
-Mark identifiers allow dash '-' and dot '.' characters, making them compatible with HTML, CSS, and XML naming conventions.
