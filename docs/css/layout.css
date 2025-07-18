@@ -222,6 +222,99 @@
     }
 }
 
+/* Data Model Section */
+.data-model {
+    padding: var(--space-24) 0;
+    background-color: var(--color-white);
+}
+
+.data-model__container {
+    max-width: var(--container-lg);
+    margin: 0 auto;
+    padding: 0 var(--space-6);
+}
+
+.data-model__content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-12);
+    align-items: center;
+    margin-top: var(--space-12);
+}
+
+.data-model__diagram {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.data-model__image {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+}
+
+.data-model__description {
+    color: var(--color-text-primary);
+}
+
+.data-model__subtitle {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: var(--space-4);
+    color: var(--color-text-primary);
+}
+
+.data-model__text {
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-relaxed);
+    margin-bottom: var(--space-4);
+    color: var(--color-text-secondary);
+}
+
+.data-model__list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-4) 0;
+}
+
+.data-model__list li {
+    padding: var(--space-2) 0;
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-relaxed);
+    color: var(--color-text-secondary);
+    position: relative;
+    padding-left: var(--space-6);
+}
+
+.data-model__list li::before {
+    content: "•";
+    color: var(--color-primary);
+    font-weight: bold;
+    position: absolute;
+    left: 0;
+}
+
+.data-model__list code {
+    background-color: var(--color-gray-100);
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+    font-size: 0.9em;
+    color: var(--color-primary);
+}
+
+@media (max-width: 768px) {
+    .data-model__container {
+        padding: 0 var(--space-4);
+    }
+    
+    .data-model__content {
+        grid-template-columns: 1fr;
+        gap: var(--space-8);
+    }
+}
+
 /* Syntax Comparison Section */
 .syntax-comparison {
     padding: var(--space-24) 0;
@@ -241,13 +334,104 @@
     box-shadow: var(--shadow-lg);
 }
 
+.comparison-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-8);
+    background-color: var(--color-white);
+    border-radius: var(--radius-xl);
+    padding: var(--space-8);
+    box-shadow: var(--shadow-lg);
+}
+
+.comparison-left {
+    border-right: 1px solid var(--color-border-light);
+    padding-right: var(--space-8);
+}
+
+.comparison-right {
+    padding-left: var(--space-8);
+}
+
+.comparison-description {
+    position: relative;
+    min-height: 400px;
+}
+
+.description-content {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+}
+
+.description-content--active {
+    display: block;
+}
+
+.description-title {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: var(--space-4);
+    color: var(--color-text-primary);
+}
+
+.description-text {
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-relaxed);
+    margin-bottom: var(--space-4);
+    color: var(--color-text-secondary);
+}
+
+.description-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--space-4) 0;
+}
+
+.description-list li {
+    padding: var(--space-2) 0;
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-relaxed);
+    color: var(--color-text-secondary);
+    position: relative;
+    padding-left: var(--space-6);
+}
+
+.description-list li::before {
+    content: "✓";
+    color: var(--color-primary);
+    font-weight: bold;
+    position: absolute;
+    left: 0;
+}
+
 @media (max-width: 768px) {
     .syntax-comparison__container {
         padding: 0 var(--space-4);
     }
     
-    .comparison-tabs {
+    .comparison-layout {
+        grid-template-columns: 1fr;
+        gap: var(--space-6);
         padding: var(--space-6);
+    }
+    
+    .comparison-left {
+        border-right: none;
+        border-bottom: 1px solid var(--color-border-light);
+        padding-right: 0;
+        padding-bottom: var(--space-6);
+    }
+    
+    .comparison-right {
+        padding-left: 0;
+        padding-top: var(--space-6);
+    }
+    
+    .comparison-description {
+        min-height: 300px;
     }
 }
 

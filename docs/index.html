@@ -152,9 +152,9 @@
                             <path d="M12 2L2 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.46 9-11V7l-10-5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                     </div>
-                    <h3 class="feature-card__title">Type Safety</h3>
+                    <h3 class="feature-card__title">Strongly Typed</h3>
                     <p class="feature-card__description">
-                        Every Mark element has a name, which can bind to a type, eliminating the anonymous object limitation of JSON.
+                        Every Mark element has a name, which can bind to a type. It also has more built-in types than JSON.
                     </p>
                 </div>
                 
@@ -189,6 +189,38 @@
         </div>
     </section>
 
+    <!-- Data Model -->
+    <section class="data-model" id="data-model">
+        <div class="data-model__container">
+            <div class="section-header">
+                <h2 class="section-title">Mark Data Model</h2>
+                <p class="section-subtitle">
+                    Mark extends JSON with additional data types and introduces the Mark element concept.
+                </p>
+            </div>
+            
+            <div class="data-model__content">
+                <div class="">
+                    <img src="mark-datatype-hierarchy.png" alt="Mark Data Type Hierarchy" style="min-width:600px">
+                </div>
+                
+                <div class="data-model__description">
+                    <h3 class="data-model__subtitle">Datatype Hierarchy</h3>
+                    <p class="data-model__text">
+                        Mark adds a few new data types to JSON: 
+                        <i>symbol</i>, <i>datetime</i>, <i>binary</i>, <i>list</i> and <i>element</i>, well covering all the commonly used built-in datatypes in JS.
+                    </p>                    
+                    <h3 class="data-model__subtitle">Element</h3>
+                    <p class="data-model__text">
+                        Mark <i>element</i> = <i> name</i> + <i>map</i> + <i>array</i>. <br>
+                        It maps to just <strong>one</strong> plain JavaScript object, containing both <i>named</i> and <i>indexed</i> properties. Much more compact and efficient than other 
+                        JSON-based DOM models.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Syntax Comparison -->
     <section class="syntax-comparison" id="syntax">
         <div class="syntax-comparison__container">
@@ -199,22 +231,24 @@
                 </p>
             </div>
             
-            <div class="comparison-tabs">
-                <div class="tabs">
-                    <button class="tab tab--active" data-tab="mark">Mark</button>
-                    <button class="tab" data-tab="json">JSON</button>
-                    <button class="tab" data-tab="html">HTML</button>
-                    <button class="tab" data-tab="xml">XML</button>
-                </div>
-                
-                <div class="tab-content">
-                    <div class="tab-pane tab-pane--active" id="mark">
-                        <div class="code-block">
-                            <div class="code-block__header">
-                                <span class="code-block__label">Mark Notation</span>
-                                <button class="code-block__copy">Copy</button>
-                            </div>
-                            <pre class="code-block__content"><code>&lt;form
+            <div class="comparison-layout">
+                <div class="comparison-left">
+                    <div >
+                        <div class="tabs">
+                            <button class="tab tab--active" data-tab="mark">Mark</button>
+                            <button class="tab" data-tab="json">JSON</button>
+                            <button class="tab" data-tab="html">HTML</button>
+                            <button class="tab" data-tab="xml">XML</button>
+                        </div>
+                        
+                        <div class="tab-content">
+                            <div class="tab-pane tab-pane--active" id="mark">
+                                <div class="code-block">
+                                    <div class="code-block__header">
+                                        <span class="code-block__label">Mark Notation</span>
+                                        <button class="code-block__copy">Copy</button>
+                                    </div>
+                                    <pre class="code-block__content"><code>&lt;form
   &lt;'!--'comment&gt;
   &lt;div class:'form-group'
     &lt;label for:email "Email address:"&gt;
@@ -226,16 +260,16 @@
   &gt;
   &lt;button class:[btn, 'btn-info'] "Submit"&gt;
 &gt;</code></pre>
-                        </div>
-                    </div>
-                    
-                    <div class="tab-pane" id="json">
-                        <div class="code-block">
-                            <div class="code-block__header">
-                                <span class="code-block__label">JSON</span>
-                                <button class="code-block__copy">Copy</button>
+                                </div>
                             </div>
-                            <pre class="code-block__content"><code>{
+                            
+                            <div class="tab-pane" id="json">
+                                <div class="code-block">
+                                    <div class="code-block__header">
+                                        <span class="code-block__label">JSON</span>
+                                        <button class="code-block__copy">Copy</button>
+                                    </div>
+                                    <pre class="code-block__content"><code>{
   "type": "form",
   "children": [
     {
@@ -256,16 +290,16 @@
     }
   ]
 }</code></pre>
-                        </div>
-                    </div>
-                    
-                    <div class="tab-pane" id="html">
-                        <div class="code-block">
-                            <div class="code-block__header">
-                                <span class="code-block__label">HTML</span>
-                                <button class="code-block__copy">Copy</button>
+                                </div>
                             </div>
-                            <pre class="code-block__content"><code>&lt;form&gt;
+                            
+                            <div class="tab-pane" id="html">
+                                <div class="code-block">
+                                    <div class="code-block__header">
+                                        <span class="code-block__label">HTML</span>
+                                        <button class="code-block__copy">Copy</button>
+                                    </div>
+                                    <pre class="code-block__content"><code>&lt;form&gt;
   &lt;!--comment--&gt;
   &lt;div class="form-group"&gt;
     &lt;label for="email"&gt;Email address:&lt;/label&gt;
@@ -277,16 +311,16 @@
   &lt;/div&gt;
   &lt;button class="btn btn-info"&gt;Submit&lt;/button&gt;
 &lt;/form&gt;</code></pre>
-                        </div>
-                    </div>
-                    
-                    <div class="tab-pane" id="xml">
-                        <div class="code-block">
-                            <div class="code-block__header">
-                                <span class="code-block__label">XML</span>
-                                <button class="code-block__copy">Copy</button>
+                                </div>
                             </div>
-                            <pre class="code-block__content"><code>&lt;form&gt;
+                            
+                            <div class="tab-pane" id="xml">
+                                <div class="code-block">
+                                    <div class="code-block__header">
+                                        <span class="code-block__label">XML</span>
+                                        <button class="code-block__copy">Copy</button>
+                                    </div>
+                                    <pre class="code-block__content"><code>&lt;form&gt;
   &lt;!--comment--&gt;
   &lt;div class="form-group"&gt;
     &lt;label for="email"&gt;Email address:&lt;/label&gt;
@@ -298,6 +332,68 @@
   &lt;/div&gt;
   &lt;button class="btn btn-info"&gt;Submit&lt;/button&gt;
 &lt;/form&gt;</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="comparison-right">
+                    <div class="comparison-description">
+                        <div class="description-content description-content--active" data-format="mark">
+                            <h3 class="description-title">Mark Notation</h3>
+                            <p class="description-text">
+                                The most salient syntax feature of Mark is the introduction of Mark element. 
+                            </p>
+                            <p class="description-text"> 
+                                It is a JSON object extended with a type name and a list of content items, 
+                                similar to element in HTML and XML. It also allows complex, typed data for its 
+                                attributes and content.
+                            </p>                            
+                        </div>
+                        
+                        <div class="description-content" data-format="json">
+                            <h3 class="description-title">Mark vs JSON</h3>
+                            <p class="description-text">
+                                <strong>Mark advantages over JSON:</strong>
+                            </p>
+                            <ul class="description-list">
+                                <li>Additional scalar types: symbol, decimal, datetime, binary</li>
+                                <li>Mark elements have type names, unlike anonymous JSON objects</li>
+                                <li>Built-in mixed-content support for document-oriented data</li>
+                                <li>Syntax enhancements: comments, unquoted names, cleaner structure</li>
+                                <li>More compact representation of hierarchical data</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="description-content" data-format="html">
+                            <h3 class="description-title">Mark vs HTML</h3>
+                            <p class="description-text">
+                                <strong>Mark advantages over HTML:</strong>
+                            </p>
+                            <ul class="description-list">
+                                <li>Generic data format vs. specialized web content format</li>
+                                <li>No whitespace ambiguity - text objects are explicitly quoted</li>
+                                <li>Complex attribute values supported (like JSON)</li>
+                                <li>Clean, unambiguous syntax vs. HTML5 parsing complexity</li>
+                                <li>Always properly closed vs. HTML self-closing tag issues</li>
+                                <li>Maps to plain JavaScript objects for easy processing</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="description-content" data-format="xml">
+                            <h3 class="description-title">Mark vs XML</h3>
+                            <p class="description-text">
+                                <strong>Mark advantages over XML:</strong>
+                            </p>
+                            <ul class="description-list">
+                                <li>Complex objects as attribute values vs. string-only XML attributes</li>
+                                <li>Much cleaner syntax without verbose closing tags</li>
+                                <li>No whitespace ambiguity issues</li>
+                                <li>Fully-typed data model vs. semi-typed XML</li>
+                                <li>No legacy baggage like DTD or schema complexity</li>
+                                <li>Direct mapping to JavaScript objects</li>
+                            </ul>
                         </div>
                     </div>
                 </div>

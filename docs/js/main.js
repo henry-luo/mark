@@ -7,8 +7,12 @@ document.addEventListener('DOMContentLoaded', function() {
         
         tabGroups.forEach(tabGroup => {
             const tabs = tabGroup.querySelectorAll('.tab');
-            const tabContent = tabGroup.closest('.comparison-tabs, .installation-tabs').querySelector('.tab-content');
+            const tabContent = tabGroup.closest('.comparison-tabs, .installation-tabs, .comparison-left').querySelector('.tab-content');
             const tabPanes = tabContent.querySelectorAll('.tab-pane');
+            
+            // Check if this is a comparison tab group (for description switching)
+            const comparisonContainer = tabGroup.closest('.comparison-layout');
+            const descriptions = comparisonContainer ? comparisonContainer.querySelectorAll('.description-content') : null;
             
             tabs.forEach(tab => {
                 tab.addEventListener('click', () => {
@@ -23,6 +27,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     const targetPane = tabContent.querySelector(`#${targetId}`);
                     if (targetPane) {
                         targetPane.classList.add('tab-pane--active');
+                    }
+                    
+                    // Handle description switching for comparison layout
+                    if (descriptions) {
+                        descriptions.forEach(desc => desc.classList.remove('description-content--active'));
+                        const targetDescription = comparisonContainer.querySelector(`.description-content[data-format="${targetId}"]`);
+                        if (targetDescription) {
+                            targetDescription.classList.add('description-content--active');
+                        }
                     }
                 });
             });
