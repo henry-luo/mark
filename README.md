@@ -4,35 +4,19 @@
 [![CI](https://github.com/henry-luo/mark/actions/workflows/ci.yml/badge.svg)](https://github.com/henry-luo/mark/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/henry-luo/mark/branch/master/graph/badge.svg)](https://codecov.io/gh/henry-luo/mark)
 
-**Mark Notation** is a modern, unified data format that combines the best aspects of JSON, XML, HTML, and other popular formats while eliminating their limitations. It provides a clean syntax with full type support, making it ideal for configuration files, data exchange, and document markup.
-
-## Table of Contents
-
-- [Mark Syntax](#mark-syntax)
-- [Mark Data Model](#mark-data-model)
-- [Comparisons](#mark-vs-json)
-  - [Mark vs. JSON](#mark-vs-json)
-  - [Mark vs. HTML/JSX](#mark-vs-htmljsx)
-  - [Mark vs. XML](#mark-vs-xml)
-  - [Mark vs. S-expressions](#mark-vs-s-expressions)
-- [mark.js Library](#markjs)
-- [Installation & Usage](#usage)
-- [Documentation](#documentation)
-- [Credits](#credits)
+**Mark** is a unified notation for both object and markup data, combining the best of JSON, HTML, and XML with a clean syntax and succinct data model.
 
 - It has **clean syntax** with **fully-typed** data model *(like JSON, or even better)*
 - It is **generic** and **extensible** *(like XML, or even better)*
 - It has built-in **mixed content** support *(like HTML5 or even better)*
-- It supports **high-order** composition *(like S-expressions or even better)*
 
-|                        | Mark                           | JSON     | HTML | JSX                                | XML          | S-expr                             | YAML                                  |
-| ------------ | ---- | ---- | ---- | ---------------------------------- | ------------ | ------ | ------------------------------------- |
-| Clean syntax           | yes                            | yes      | no   | no                                 | verbose      | yes                                | yes <sub>(only for basic usage)</sub> |
-| Fully-typed            | yes                            | yes      | no   | partially<br><sub>(in {...})</sub> | need schema  | yes                                | yes                                   |
-| Generic                | yes                            | yes      | no   | no                                 | yes                                    | yes                                | yes                                   |
-| Mixed content support  | yes                            | hard     | yes  | yes                                | yes                                    | hard <sub>(poor map support)</sub> | hard                                  |
-| High-order composition | yes                            | possible | no   | yes                                | verbose                                | yes                                | possible                              |
-| Wide adoption          | not <sub>(at the moment)</sub> | yes      | yes  | yes                                | yes                                    | limited                            | limited                               |
+|                       | Mark    | JSON | HTML | JSX                              | XML         | S-expr  | YAML                                  |
+| --------------------- | ------- | ---- | ---- | -------------------------------- | ----------- | ------- | ------------------------------------- |
+| Clean syntax          | yes     | yes  | no   | no                               | verbose     | yes     | yes <sub>(only for basic usage)</sub> |
+| Fully-typed           | yes     | yes  | no   | partially<br><sub>in {...}</sub> | need schema | yes     | yes                                   |
+| Generic               | yes     | yes  | no   | no                               | yes         | yes     | yes                                   |
+| Mixed content support | yes     | hard | yes  | yes                              | yes         | hard    | hard                                  |
+| Wide adoption         | not yet | yes  | yes  | yes                              | yes         | limited | limited                               |
 
 ## Mark Syntax
 
@@ -57,22 +41,21 @@ For example, a HTML registration form:
 
 Could be represented in Mark as:
 
-```text
+```mark
 <form                                 // element with name 'form'
-  <'!--'comment>                      // HTML comment as special element
   <div class:'form-group'             // nested child element
     <label for:email                  // 'for' and its value, both unquoted
       "Email address:"                // text needs to be double quoted
-    >
+    >                                 // end element with just '>'
     <input type:email, id:email>      // element without child
-  >
+  >                                   
   <div class:'form-group'             // 'form-group' is a quoted symbol
     <label for:pwd; "Password">       // pwd is an unquoted symbol
     <input type:password, id:pwd>     // attrs separated by comma, like JSON
   >
-  <button class:[btn, 'btn-info']     // attribute with complex values
-    "Submit"                          // text quoted with double quote
-  >
+  <button class:[btn,'btn-info']      // attribute with complex values
+    "Submit"                          
+  >                                   // comment like in JS!
 >
 ```
 

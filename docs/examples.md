@@ -5,8 +5,6 @@ description: Practical examples of using Mark Notation in various scenarios
 permalink: /examples/
 ---
 
-Practical examples of using Mark Notation in various scenarios.
-
 ## Basic Usage
 
 ### Simple Object Creation
