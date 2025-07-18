@@ -181,6 +181,20 @@ And here's the [Mark VSC Extension](https://marketplace.visualstudio.com/items?i
 - [FAQ](https://mark.js.org/faq)
 - Discussion about Mark beta release at [Hacker News](https://news.ycombinator.com/item?id=16308581)
 
+## 1.0 and Beyond
+
+Mark 1.0 release just mark the start of a long journey to make web a better platform to exchange and store both object and markup data.
+
+1.0 release just means whatever is released in this version will receive backward compatible support in the foreseeable future like the ever-green HTML. 
+
+Some of the planned further enhancements include:
+- Namespace support;
+- ID and IDREF support;
+
+For a new notation to be widely adopted, just defining the syntax and data model is not enough. It needs languages, tools and eco-system to work with it. Thus a new project, [Lambda Script](https://github.com/henry-luo/lambda), has been started to develop a general-purpose, pure functional language to validate, query, transform, and present data stored in Mark format.
+
+Your contribution and feedback to both projects are welcome.
+
 ## Credits
 
 Thanks to the following platforms or services that support the open source development of Mark: NPM, GitHub, [Travis CI](https://travis-ci.org/), [Codecov](https://codecov.io/), [JS.org](https://js.org/).
