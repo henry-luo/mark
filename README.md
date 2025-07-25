@@ -198,4 +198,4 @@ Your contribution and feedback to both projects are welcome.
 
 ## Credits
 
-Thanks to the following platforms or services that support the open source development of Mark: NPM, GitHub, [Travis CI](https://travis-ci.org/), [Codecov](https://codecov.io/), [JS.org](https://js.org/).
+Thanks to the following platforms or services that support the open source development of Mark: NPM, GitHub,  [Codecov](https://codecov.io/), [JS.org](https://js.org/).
