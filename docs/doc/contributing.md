@@ -4,7 +4,6 @@ Thank you for your interest in contributing to Mark Notation! This guide will he
 
 ## Table of Contents
 
-- [Code of Conduct](#code-of-conduct)
 - [Getting Started](#getting-started)
 - [Development Setup](#development-setup)
 - [Contributing Guidelines](#contributing-guidelines)
@@ -12,10 +11,6 @@ Thank you for your interest in contributing to Mark Notation! This guide will he
 - [Coding Standards](#coding-standards)
 - [Testing](#testing)
 - [Documentation](#documentation)
-
-## Code of Conduct
-
-This project adheres to a [Code of Conduct](https://github.com/henry-luo/mark/blob/master/CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior to [maintainers@mark.js.org](mailto:maintainers@mark.js.org).
 
 ## Getting Started
 

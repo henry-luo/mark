@@ -58,7 +58,7 @@ Could be represented in Mark as:
 >
 ```
 
-You can refer to the [Mark syntax doc](https://mark.js.org/mark-syntax.html) for details.
+You can refer to the [Mark syntax doc](https:/marknotation.org//mark-syntax.html) for details.
 
 ## Mark Data Model
 
@@ -69,7 +69,7 @@ Mark 1.0 introduced a few new data types: *symbol*, *datetime*, *binary*, and *l
 Roughly speaking, data models of JSON, XML, HTML are subsets of Mark data model, and Mark data model is a subset of JS data model.
 
 <div align="center">
-<img src='https://mark.js.org/data-model.png' width='280'>
+<img src='https://marknotation.org/data-model.png' width='280'>
 </div>
 
 ### Mark element
@@ -84,7 +84,7 @@ Mark utilizes a novel feature in JavaScript that a plain JS object is actually *
 
 So each Mark element is mapped to just **one** plain JavaScript object, which is more compact and efficient compared to other JSON-based DOM models (e.g. [JsonML](http://www.jsonml.org/), [virtual-dom](https://github.com/Matt-Esch/virtual-dom), [MicroXML](https://dvcs.w3.org/hg/microxml/raw-file/tip/spec/microxml.html)), and is more intuitive to use under JS.
 
-You can refer to the [Mark data model doc](https://mark.js.org/mark-model.html) for details.
+You can refer to the [Mark data model doc](https://marknotation.org/mark-model.html) for details.
 
 ## Mark vs. Other Formats
 ### Mark vs. JSON
@@ -175,10 +175,10 @@ And here's the [Mark VSC Extension](https://marketplace.visualstudio.com/items?i
 
 ## Documentation
 
-- [Syntax documentation](https://mark.js.org/syntax)
-- [Data model documentation](https://mark.js.org/data-model)
-- [API documentation](https://mark.js.org/api)
-- [FAQ](https://mark.js.org/faq)
+- [Syntax documentation](https://marknotation.org/syntax)
+- [Data model documentation](https://marknotation.org/data-model)
+- [API documentation](https://marknotation.org/api)
+- [FAQ](https://marknotation.org/faq)
 - Hacker News discussion about [Mark beta release](https://news.ycombinator.com/item?id=16308581)
 - Hacker News discussion about [Mark 1.0 release](https://news.ycombinator.com/item?id=44604474)
 

@@ -19,7 +19,7 @@ No. Mark has introduced many syntax extensions to JSON, and its syntax is no lon
 But Mark has a clean data model that is a subset of JS data model.
 
 <div align="center">
-<img src='https://mark.js.org/data-model.png' width='300'>
+<img src='https://marknotation.org/data-model.png' width='300'>
 </div>
 
 ## Is Mark secure?

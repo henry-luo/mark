@@ -118,7 +118,6 @@ If you have questions about licensing, commercial use, or need clarification abo
 
 1. Review the [official MIT License text](https://opensource.org/licenses/MIT)
 2. Check our [FAQ](faq.md) for common licensing questions
-3. Contact the maintainers at [license@mark.js.org](mailto:license@mark.js.org)
 
 ## License Compatibility
 
