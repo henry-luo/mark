@@ -180,6 +180,7 @@ And here's the [Mark VSC Extension](https://marketplace.visualstudio.com/items?i
 - [API documentation](https://mark.js.org/api)
 - [FAQ](https://mark.js.org/faq)
 - Discussion about Mark beta release at [Hacker News](https://news.ycombinator.com/item?id=16308581)
+- Discussion about Mark 1.0 release at [Hacker News](https://news.ycombinator.com/item?id=44604474)
 
 ## 1.0 and Beyond
 

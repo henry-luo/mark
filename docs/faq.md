@@ -48,10 +48,10 @@ However, for Mark to be useful, a lot need to be developed on top of the basic M
 
 ## Is mark.js production-ready?
 
-Almost. The Mark syntax and data model has stabilized, and I don't foresee any changes soon.
+The Mark syntax and data model has stabilized, and I don't foresee any changes soon.
 
-The core Mark APIs have been thoroughly tested, and shall remain stable as well.
+The core Mark APIs have been thoroughly tested, and shall remain stable as well. So you can start using mark.js in production environment already. 
 
-mark.convert.js which provides conversion between XML/HTML and Mark, and mark.selector.js which provides query function on Mark data using CSS selector, are fully functional, and carefully tested as well. However, due to the complex nature of XML/HTML/CSS, there might be corner cases not properly supported. And they'll be fixed through on-going maintenance.
+However, due to the complex nature of XML/HTML/CSS, there might be corner cases not properly supported. And they'll be fixed through on-going maintenance.
 
-So you can start using mark.js in production environment already. For any critical data or usage, always test carefully and thoroughly before you cut over. 
+For any critical data or usage, always test carefully and thoroughly before you cut over. 
